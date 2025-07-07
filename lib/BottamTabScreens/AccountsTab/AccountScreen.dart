@@ -6,7 +6,7 @@ import 'package:sk_loginscreen1/Pages/bottombar.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_state.dart';
-import '../../Utilities/LoginUserApi.dart';
+import '../../Utilities/auth/LoginUserApi.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});

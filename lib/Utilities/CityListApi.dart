@@ -7,7 +7,6 @@ class CityListApi {
       final url = Uri.parse(
         'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/city/list',
       );
-
       final headers = {
         'Content-Type': 'application/json',
         'Cookie':

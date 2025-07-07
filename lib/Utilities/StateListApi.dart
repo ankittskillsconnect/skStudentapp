@@ -26,7 +26,6 @@ class StateListApi {
 
     request.body = jsonEncode(requestBody);
     request.headers.addAll(headers);
-
     print("📡 Sending state fetch request...");
     print("📍 URL: $_url");
     print("📦 Request Body: ${jsonEncode(requestBody)}");
@@ -42,12 +41,10 @@ class StateListApi {
         print("📥 Raw Response: $jsonString");
 
         final decoded = jsonDecode(jsonString);
-
         if (decoded is Map && decoded.containsKey('data')) {
           final List<dynamic> dataList = decoded['data'];
           final List<String> states =
           dataList.map((e) => e['name'].toString()).toList();
-
           print("🏞️ States fetched: $states");
           return states;
         } else {

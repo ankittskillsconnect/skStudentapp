@@ -6,7 +6,7 @@ import 'package:sk_loginscreen1/BottamTabScreens/ContactsTab/ContactsScreen.dart
 import 'package:sk_loginscreen1/BottamTabScreens/JobTab/JobScreenBT.dart';
 import 'package:sk_loginscreen1/Pages/splashScreen.dart';
 import 'package:sk_loginscreen1/Pages/forgotPasswordPage.dart';
-import 'package:sk_loginscreen1/Utilities/LoginUserApi.dart';
+import 'package:sk_loginscreen1/Utilities/auth/LoginUserApi.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_state.dart';

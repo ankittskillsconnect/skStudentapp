@@ -43,7 +43,6 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet> {
 
   List<String> states = [];
   List<String> cities = [];
-
   String? selectedState;
   String? selectedCity;
 

@@ -6,7 +6,7 @@ import 'package:sk_loginscreen1/Pages/forgotPasswordPage.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_state.dart';
-import '../Utilities/LoginUserApi.dart';
+import '../Utilities/auth/LoginUserApi.dart';
 
 class Loginpage extends StatefulWidget {
   const Loginpage({super.key});

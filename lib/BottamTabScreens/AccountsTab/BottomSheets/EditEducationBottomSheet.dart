@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:sk_loginscreen1/Utilities/AllCourseApi.dart';
 import '../../../Utilities/CollegeListApi.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EditEducationBottomSheet extends StatefulWidget {
   final String? initialData;
@@ -41,7 +43,9 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
   late String courseType;
   late String gradingSystem;
   late String passingYear;
-  late List<String> collegeList = [];
+  List<String> collegeList = [];
+  List<String> courseList = [];
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +60,7 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
     gradingSystem = widget.gradingSystem;
     passingYear = widget.passingYear;
     _fetchCollegeList();
+    _fetchCourseList();
   }
 
   Future<void> _fetchCollegeList() async {
@@ -64,6 +69,16 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
       collegeList = colleges;
       if (!collegeList.contains(college) && collegeList.isNotEmpty) {
         college = collegeList[0];
+      }
+    });
+  }
+
+  Future<void> _fetchCourseList() async {
+    final courses = await CourseListApi.fetchCourses(courseName: courseName);
+    setState(() {
+      courseList = courses;
+      if (!courseList.contains(courseName) && courseList.isNotEmpty) {
+        courseName = courseList[0];
       }
     });
   }
@@ -147,11 +162,16 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
                         ),
                         _buildLabel("Course name"),
                         _buildDropdownField(
-                          value: courseName,
-                          items: const ["BMM", "BSc IT", "exampleCourse"],
+                          value: courseList.contains(courseName)
+                              ? courseName
+                              : (courseList.isNotEmpty ? courseList[0] : null),
+                          items: courseList.isEmpty
+                              ? ['No Courses Found']
+                              : courseList,
                           onChanged: (val) =>
                               setState(() => courseName = val ?? ''),
                         ),
+
                         _buildLabel("Specialization"),
                         _buildDropdownField(
                           value: specilization,
@@ -338,6 +358,4 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
   }
 }
 
-extension on String {
-  // String capitalize() => isEmpty ? this : this[0].toUpperCase() + substring(1);
-}
+//updated
