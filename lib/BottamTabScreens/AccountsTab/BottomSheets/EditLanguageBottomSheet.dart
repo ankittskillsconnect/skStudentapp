@@ -65,12 +65,17 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
     debugPrint("🟡 connectSid from prefs: $connectSid");
 
     if (connectSid.isEmpty) {
-      debugPrint("🧨 WARNING: connectSid is empty, setting fallback value for debug!");
-      connectSid = 's%3A90I8VK0ssLCW9DjFq4xSLrkDEI7xUgCG.JFNw9cZG8Txw07rqZ6gs7K8bGpm4pMApT7Yu9FqqjbY';
+      debugPrint(
+        "🧨 WARNING: connectSid is empty, setting fallback value for debug!",
+      );
+      connectSid =
+          's%3A90I8VK0ssLCW9DjFq4xSLrkDEI7xUgCG.JFNw9cZG8Txw07rqZ6gs7K8bGpm4pMApT7Yu9FqqjbY';
     }
 
     if (cachedLanguages != null && cachedLanguages.isNotEmpty) {
-      debugPrint("✅ Using cached languages (${cachedLanguages.length}) - $cachedLanguages");
+      debugPrint(
+        "✅ Using cached languages (${cachedLanguages.length}) - $cachedLanguages",
+      );
       setState(() {
         languages = cachedLanguages;
         if (!languages.contains(selectedLanguage) && languages.isNotEmpty) {
@@ -93,7 +98,9 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
       if (!mounted) return;
 
       setState(() {
-        languages = fetchedLanguages.isNotEmpty ? fetchedLanguages : ['No languages available'];
+        languages = fetchedLanguages.isNotEmpty
+            ? fetchedLanguages
+            : ['No languages available'];
         if (!languages.contains(selectedLanguage) && languages.isNotEmpty) {
           selectedLanguage = languages[0];
         }
@@ -105,9 +112,9 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
     } catch (e) {
       debugPrint("❌ Error fetching languages: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading languages: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error loading languages: $e')));
         setState(() {
           languages = ['No languages available'];
           if (!languages.contains(selectedLanguage)) {
@@ -150,57 +157,66 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
             opacity: _fadeAnimation,
             child: isLoadingLanguages
                 ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF005E6A)),
-                  ),
-                  SizedBox(height: 16 * sizeScale),
-                  Text(
-                    'Loading Languages...',
-                    style: TextStyle(
-                      fontSize: 16 * sizeScale,
-                      color: const Color(0xFF003840),
-                      fontWeight: FontWeight.w500,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color(0xFF005E6A),
+                          ),
+                        ),
+                        SizedBox(height: 16 * sizeScale),
+                        Text(
+                          'Loading Languages...',
+                          style: TextStyle(
+                            fontSize: 16 * sizeScale,
+                            color: const Color(0xFF003840),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            )
+                  )
                 : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                const Divider(thickness: 1.2),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: ListView(
-                    controller: scrollController,
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom + 10 * sizeScale,
-                    ),
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildLabel("Select language*", required: true),
-                      _buildDropdownField(
-                        value: selectedLanguage,
-                        items: languages,
-                        onChanged: (val) => setState(() => selectedLanguage = val ?? languages[0]),
+                      _buildHeader(),
+                      const Divider(thickness: 1.2),
+                      const SizedBox(height: 10),
+                      Expanded(
+                        child: ListView(
+                          controller: scrollController,
+                          padding: EdgeInsets.only(
+                            bottom:
+                                MediaQuery.of(context).viewInsets.bottom +
+                                10 * sizeScale,
+                          ),
+                          children: [
+                            _buildLabel("Select language*", required: true),
+                            _buildDropdownField(
+                              value: selectedLanguage,
+                              items: languages,
+                              onChanged: (val) => setState(
+                                () => selectedLanguage = val ?? languages[0],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildLabel("Select proficiency*", required: true),
+                            _buildDropdownField(
+                              value: selectedProficiency,
+                              items: _proficiencyLevels,
+                              onChanged: (val) => setState(
+                                () => selectedProficiency =
+                                    val ?? _proficiencyLevels[0],
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            _buildSubmitButton(),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                      _buildLabel("Select proficiency*", required: true),
-                      _buildDropdownField(
-                        value: selectedProficiency,
-                        items: _proficiencyLevels,
-                        onChanged: (val) => setState(() => selectedProficiency = val ?? _proficiencyLevels[0]),
-                      ),
-                      const SizedBox(height: 30),
-                      _buildSubmitButton(),
                     ],
                   ),
-                ),
-              ],
-            ),
           ),
         );
       },
@@ -241,10 +257,7 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
             ),
           ),
           if (required)
-            const Text(
-              ' *',
-              style: TextStyle(color: Colors.red, fontSize: 16),
-            ),
+            const Text(' *', style: TextStyle(color: Colors.red, fontSize: 16)),
         ],
       ),
     );
@@ -255,7 +268,9 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
     required List<String> items,
     required void Function(String?) onChanged,
   }) {
-    final displayValue = items.contains(value) ? value : (items.isNotEmpty ? items[0] : null);
+    final displayValue = items.contains(value)
+        ? value
+        : (items.isNotEmpty ? items[0] : null);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
@@ -267,7 +282,10 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
         onChanged: isLoadingLanguages ? null : onChanged,
         decoration: InputDecoration(
           hintText: 'Please select',
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           filled: true,
           fillColor: Colors.white,
@@ -291,24 +309,27 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
           ),
         ),
         onPressed: () {
-          if (selectedLanguage.isEmpty || selectedProficiency.isEmpty || selectedLanguage == 'No languages available') {
+          if (selectedLanguage.isEmpty ||
+              selectedProficiency.isEmpty ||
+              selectedLanguage == 'No languages available') {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Please fill all required fields or check language data')),
+              const SnackBar(
+                content: Text(
+                  'Please fill all required fields or check language data',
+                ),
+              ),
             );
             return;
           }
           final data = {
-            'Language': widget.initialData, // Preserve initial data if editing
+            'Language': widget.initialData,
             'language': selectedLanguage,
             'proficiency': selectedProficiency,
           };
           widget.onSave(data);
           Navigator.pop(context);
         },
-        child: const Text(
-          "Submit",
-          style: TextStyle(color: Colors.white),
-        ),
+        child: const Text("Submit", style: TextStyle(color: Colors.white)),
       ),
     );
   }

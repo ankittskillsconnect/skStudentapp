@@ -12,8 +12,12 @@ class LanguageListApi {
     final cachedLanguages = prefs.getStringList('cached_languages');
 
     if (cachedLanguages != null && cachedLanguages.isNotEmpty) {
-      print("✅ Using cached languages: ${cachedLanguages.length} - $cachedLanguages");
-      return List<String>.from(cachedLanguages.where((lang) => lang.isNotEmpty));
+      print(
+        "✅ Using cached languages: ${cachedLanguages.length} - $cachedLanguages",
+      );
+      return List<String>.from(
+        cachedLanguages.where((lang) => lang.isNotEmpty),
+      );
     }
 
     // Fallback for connectSid if empty
@@ -25,10 +29,14 @@ class LanguageListApi {
       'Cookie': 'authToken=$authToken; connect.sid=$effectiveConnectSid',
     };
 
-    final url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/language/list');
+    final url = Uri.parse(
+      'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/language/list',
+    );
 
     try {
-      print("📡 Fetching languages with headers: Cookie=${headers['Cookie']}, authToken=${authToken.substring(0, 20)}...");
+      print(
+        "📡 Fetching languages with headers: Cookie=${headers['Cookie']}, authToken=${authToken.substring(0, 20)}...",
+      );
 
       final request = http.Request('POST', url)
         ..headers.addAll(headers)
@@ -51,16 +59,24 @@ class LanguageListApi {
         if (data is Map && data['status'] == true) {
           final languageData = data['data'];
           if (languageData is List) {
-            allLanguages = languageData.map((item) => item['language_name']?.toString() ?? '').where((name) => name.isNotEmpty).toList();
+            allLanguages = languageData
+                .map((item) => item['language_name']?.toString() ?? '')
+                .where((name) => name.isNotEmpty)
+                .toList();
             print("🎯 Parsed languages from list: $allLanguages");
           } else if (languageData is Map && languageData['options'] is List) {
-            allLanguages = (languageData['options'] as List<dynamic>).map((e) => e['language_name'].toString()).where((name) => name.isNotEmpty).toList();
+            allLanguages = (languageData['options'] as List<dynamic>)
+                .map((e) => e['language_name'].toString())
+                .where((name) => name.isNotEmpty)
+                .toList();
             print("🎯 Parsed languages from options: $allLanguages");
           } else {
             print("⚠️ Unexpected 'data' format. Response data: $languageData");
           }
         } else {
-          print("⚠️ Invalid response structure, expected status: true. Response: $resBody");
+          print(
+            "⚠️ Invalid response structure, expected status: true. Response: $resBody",
+          );
         }
       } else {
         print("❌ Error: ${response.statusCode} - ${response.reasonPhrase}");

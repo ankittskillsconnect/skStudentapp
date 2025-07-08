@@ -84,10 +84,7 @@ class _MyAccountState extends State<MyAccount> {
       'annualSalary': '10 LPA',
       'jobDetail': 'Sample work experience description',
     });
-    languages.add({
-      'Language': null,
-      'language': 'English',
-    });
+    languages.add({'Language': null, 'language': 'English'});
   }
 
   Future<void> _loadSavedData() async {
@@ -112,10 +109,18 @@ class _MyAccountState extends State<MyAccount> {
         percentage = data['percentage'] as String? ?? percentage;
         passingYear = data['passingYear'] as String? ?? passingYear;
         skills = List<String>.from(data['skills'] as List<dynamic>? ?? []);
-        projects = List<Map<String, dynamic>>.from(data['projects'] as List<dynamic>? ?? []);
-        certificates = List<Map<String, dynamic>>.from(data['certificates'] as List<dynamic>? ?? []);
-        workExperiences = List<Map<String, dynamic>>.from(data['workExperiences'] as List<dynamic>? ?? []);
-        languages = List<Map<String, dynamic>>.from(data['languages'] as List<dynamic>? ?? []);
+        projects = List<Map<String, dynamic>>.from(
+          data['projects'] as List<dynamic>? ?? [],
+        );
+        certificates = List<Map<String, dynamic>>.from(
+          data['certificates'] as List<dynamic>? ?? [],
+        );
+        workExperiences = List<Map<String, dynamic>>.from(
+          data['workExperiences'] as List<dynamic>? ?? [],
+        );
+        languages = List<Map<String, dynamic>>.from(
+          data['languages'] as List<dynamic>? ?? [],
+        );
         _profileImage = data['profileImage'] as File?;
       });
     } catch (e) {
@@ -284,18 +289,9 @@ class _MyAccountState extends State<MyAccount> {
                       icon: Icons.perm_identity_outlined,
                       text: fullname,
                     ),
-                    _DetailRow(
-                      icon: Icons.cake_outlined,
-                      text: dob,
-                    ),
-                    _DetailRow(
-                      icon: Icons.phone_outlined,
-                      text: phone,
-                    ),
-                    _DetailRow(
-                      icon: Icons.message_outlined,
-                      text: whatsapp,
-                    ),
+                    _DetailRow(icon: Icons.cake_outlined, text: dob),
+                    _DetailRow(icon: Icons.phone_outlined, text: phone),
+                    _DetailRow(icon: Icons.message_outlined, text: whatsapp),
                     _DetailRow(
                       icon: Icons.location_on_outlined,
                       text: state.isEmpty ? 'Not provided' : '$state , $city',
@@ -326,10 +322,12 @@ class _MyAccountState extends State<MyAccount> {
                             educationDetail = data['educationDetail'];
                             degreeType = data['degreeType'] ?? degreeType;
                             courseName = data['courseName'] ?? courseName;
-                            specilization = data['specilization'] ?? specilization;
+                            specilization =
+                                data['specilization'] ?? specilization;
                             courseType = data['courseType'] ?? courseType;
                             college = data['college'] ?? college;
-                            gradingSystem = data['gradingSystem'] ?? gradingSystem;
+                            gradingSystem =
+                                data['gradingSystem'] ?? gradingSystem;
                             percentage = data['percentage'] ?? percentage;
                             passingYear = data['passingYear'] ?? passingYear;
                           });
@@ -359,10 +357,12 @@ class _MyAccountState extends State<MyAccount> {
                             educationDetail = data['educationDetail'];
                             degreeType = data['degreeType'] ?? degreeType;
                             courseName = data['courseName'] ?? courseName;
-                            specilization = data['specilization'] ?? specilization;
+                            specilization =
+                                data['specilization'] ?? specilization;
                             courseType = data['courseType'] ?? courseType;
                             college = data['college'] ?? college;
-                            gradingSystem = data['gradingSystem'] ?? gradingSystem;
+                            gradingSystem =
+                                data['gradingSystem'] ?? gradingSystem;
                             percentage = data['percentage'] ?? percentage;
                             passingYear = data['passingYear'] ?? passingYear;
                           });
@@ -456,7 +456,7 @@ class _MyAccountState extends State<MyAccount> {
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children:[
+                  children: [
                     const Text(
                       "Resume",
                       style: TextStyle(
@@ -568,9 +568,7 @@ class _MyAccountState extends State<MyAccount> {
                           },
                           deleteIconColor: const Color(0xFF005E6A),
                           backgroundColor: const Color(0xFFEBF6F7),
-                          labelStyle: const TextStyle(
-                            color: Color(0xFF003840),
-                          ),
+                          labelStyle: const TextStyle(color: Color(0xFF003840)),
                         );
                       }).toList(),
                     ),
@@ -641,7 +639,9 @@ class _MyAccountState extends State<MyAccount> {
                                 decoration: BoxDecoration(
                                   color: Colors.lightGreen,
                                   borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: const Color(0xFFBCD8DB)),
+                                  border: Border.all(
+                                    color: const Color(0xFFBCD8DB),
+                                  ),
                                 ),
                                 child: Text(
                                   projects[i]['projectType'],
@@ -855,7 +855,8 @@ class _MyAccountState extends State<MyAccount> {
                               isScrollControlled: true,
                               backgroundColor: Colors.white,
                               builder: (_) => EditCertificateBottomSheet(
-                                initialData: certificates[i]['certificateDetail'],
+                                initialData:
+                                    certificates[i]['certificateDetail'],
                                 onSave: (data) {
                                   setState(() {
                                     certificates[i] = data;
@@ -863,7 +864,8 @@ class _MyAccountState extends State<MyAccount> {
                                   _saveData();
                                   Navigator.pop(innerContext);
                                 },
-                                certificateName: certificates[i]['certificateName'],
+                                certificateName:
+                                    certificates[i]['certificateName'],
                                 issuedBy: certificates[i]['issuedBy'],
                                 credentialId: certificates[i]['credentialId'],
                                 issuedDate: certificates[i]['issuedDate'],
@@ -1032,8 +1034,10 @@ class _MyAccountState extends State<MyAccount> {
                                       'skills': data['skills'],
                                       'fromDate': data['fromDate'],
                                       'toDate': data['toDate'],
-                                      'experienceInYear': data['experienceInYear'],
-                                      'experienceInMonths': data['experienceInMonths'],
+                                      'experienceInYear':
+                                          data['experienceInYear'],
+                                      'experienceInMonths':
+                                          data['experienceInMonths'],
                                       'annualSalary': data['annualSalary'],
                                       'jobDetail': data['jobDetail'],
                                     };
@@ -1042,14 +1046,21 @@ class _MyAccountState extends State<MyAccount> {
                                   Navigator.pop(innerContext);
                                 },
                                 jobTitle: workExperiences[i]['jobTitle'] ?? '',
-                                companyName: workExperiences[i]['companyName'] ?? '',
+                                companyName:
+                                    workExperiences[i]['companyName'] ?? '',
                                 skills: workExperiences[i]['skills'] ?? '',
                                 fromDate: workExperiences[i]['fromDate'] ?? '',
                                 toDate: workExperiences[i]['toDate'] ?? '',
-                                experienceInYear: workExperiences[i]['experienceInYear'] ?? '0',
-                                experienceInMonths: workExperiences[i]['experienceInMonths'] ?? '0',
-                                annualSalary: workExperiences[i]['annualSalary'] ?? '',
-                                jobDetail: workExperiences[i]['jobDetail'] ?? '',
+                                experienceInYear:
+                                    workExperiences[i]['experienceInYear'] ??
+                                    '0',
+                                experienceInMonths:
+                                    workExperiences[i]['experienceInMonths'] ??
+                                    '0',
+                                annualSalary:
+                                    workExperiences[i]['annualSalary'] ?? '',
+                                jobDetail:
+                                    workExperiences[i]['jobDetail'] ?? '',
                               ),
                             );
                           },
@@ -1196,12 +1207,12 @@ class _MyAccountState extends State<MyAccount> {
   }
 
   Widget _buildSectionHeader(
-      String title, {
-        VoidCallback? onEdit,
-        VoidCallback? onAdd,
-        bool showEdit = false,
-        bool showAdd = false,
-      }) {
+    String title, {
+    VoidCallback? onEdit,
+    VoidCallback? onAdd,
+    bool showEdit = false,
+    bool showAdd = false,
+  }) {
     final size = MediaQuery.of(context).size;
     final double widthScale = size.width / 360;
     final double fontScale = widthScale.clamp(0.98, 1.02);
@@ -1303,9 +1314,9 @@ class _MyAccountState extends State<MyAccount> {
                 child: _profileImage != null
                     ? Image.file(_profileImage!, fit: BoxFit.cover)
                     : const Image(
-                  image: AssetImage('assets/placeholder.jpg'),
-                  fit: BoxFit.cover,
-                ),
+                        image: AssetImage('assets/placeholder.jpg'),
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             Positioned(
@@ -1359,10 +1370,7 @@ class _DetailRow extends StatelessWidget {
           Icon(icon, size: 20 * sizeScale, color: const Color(0xFF005E6A)),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              text,
-              style: TextStyle(fontSize: 14 * fontScale),
-            ),
+            child: Text(text, style: TextStyle(fontSize: 14 * fontScale)),
           ),
         ],
       ),
