@@ -32,8 +32,6 @@ class CourseListApi {
 
       if (response.statusCode == 200) {
         final data = json.decode(resBody);
-
-        // Validate response structure
         if (data is Map && data['status'] == true) {
           if (data['data'] is List) {
             List options = data['data'];

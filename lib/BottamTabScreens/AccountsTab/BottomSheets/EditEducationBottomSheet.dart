@@ -1,8 +1,10 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:sk_loginscreen1/Utilities/AllCourseApi.dart'; // Replace with your actual path to CourseListApi
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../Utilities/CollegeListApi.dart';
+import '../../../Utilities/SpecializationApi.dart';
+import 'package:sk_loginscreen1/Utilities/AllCourseApi.dart';
 
 class EditEducationBottomSheet extends StatefulWidget {
   final String? initialData;
@@ -31,7 +33,8 @@ class EditEducationBottomSheet extends StatefulWidget {
   });
 
   @override
-  State<EditEducationBottomSheet> createState() => _EditEducationBottomSheetState();
+  State<EditEducationBottomSheet> createState() =>
+      _EditEducationBottomSheetState();
 }
 
 class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
@@ -43,10 +46,11 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
   late String courseType;
   late String gradingSystem;
   late String passingYear;
+  bool isLoading = true;
+
   List<String> collegeList = [];
   List<String> courseList = [];
-  String courseErrorMessage = '';
-  bool isLoadingCourses = false;
+  List<String> specializationList = [];
 
   @override
   void initState() {
@@ -56,76 +60,120 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
     college = widget.college;
     courseName = widget.courseName;
     specilization = widget.specilization;
-    courseType = widget.courseType.isEmpty ? '' : widget.courseType;
+    courseType = widget.courseType;
     gradingSystem = widget.gradingSystem;
     passingYear = widget.passingYear;
-    _fetchCollegeList();
-    _fetchCourseList();
+
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    try {
+      await Future.wait([
+        _fetchCollegeList(),
+        _fetchCourseList(),
+        _fetchSpecializationList(),
+      ]);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading data: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
   }
 
   Future<void> _fetchCollegeList() async {
     final colleges = await ApiService.fetchCollegeList();
     if (!mounted) return;
     setState(() {
-      collegeList = colleges;
-      if (!collegeList.contains(college) && collegeList.isNotEmpty) {
+      collegeList = colleges.isNotEmpty ? colleges : ['No Colleges Available'];
+      if (!collegeList.contains(widget.college)) {
         college = collegeList[0];
+      } else {
+        college = widget.college;
       }
     });
   }
 
-  Future<void> _fetchCourseList({String? altCourseName}) async {
-    setState(() {
-      isLoadingCourses = true;
-      courseErrorMessage = '';
-    });
-
+  Future<void> _fetchCourseList() async {
     final prefs = await SharedPreferences.getInstance();
-    final authToken = prefs.getString('authToken') ??
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTgyMDksImVtYWlsIjoibWFoZXNoQGFwcHRyb2lkLmNvbSIsInVzZXJfdHlwZSI6Nywic291cmNlIjoibXlzcWwiLCJjb21wYW55X2lkIjoxOTUsImNvbXBhbnlfbmFtZSI6Ik5pdmEgQnVwYSIsInBhY2thZ2VfaWQiOjQsInBhY2thZ2VfdmFsaWRpdHlfaWQiOjQ5LCJzdGFydF9kYXRlIjoiMjAyMy0xMi0wM1QxODozMDowMC4wMDBaIiwiZW5kX2RhdGUiOiIyMDI1LTA3LTMwVDE4OjMwOjAwLjAwMFoiLCJwYWNrYWdlX3ZhbGlkdHkiOiJNb250aGx5IiwidHJhbnNhY3Rpb25faWQiOiI5ODAwMDAwMDAwMDAwOTAwMDkiLCJwYXltZW50X2lkIjpudWxsLCJjb3Vwb25faWQiOm51bGwsInByZW1pdW1fY29sbGVnZSI6bnVsbCwiY2xpZW50X3R5cGUiOiIiLCJpYXQiOjE3NTE5NDgzMzQsImV4cCI6MTc1MjEyMTEzNH0.xCMSmIoYjGMNGJ9vgydTxsKYjnMOLlq7YiJKT85gNto';
-    final connectSid = prefs.getString('connectSid') ??
-        's%3A90I8VK0ssLCW9DjFq4xSLrkDEI7xUgCG.JFNw9cZG8Txw07rqZ6gs7K8bGpm4pMApT7Yu9FqqjbY';
+    final authToken = prefs.getString('authToken') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
 
-    // Save fallback tokens to SharedPreferences to avoid repeated missing token errors
-    if (authToken == 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTgyMDksImVtYWlsIjoibWFoZXNoQGFwcHRyb2lkLmNvbSIsInVzZXJfdHlwZSI6Nywic291cmNlIjoibXlzcWwiLCJjb21wYW55X2lkIjoxOTUsImNvbXBhbnlfbmFtZSI6Ik5pdmEgQnVwYSIsInBhY2thZ2VfaWQiOjQsInBhY2thZ2VfdmFsaWRpdHlfaWQiOjQ5LCJzdGFydF9kYXRlIjoiMjAyMy0xMi0wM1QxODozMDowMC4wMDBaIiwiZW5kX2RhdGUiOiIyMDI1LTA3LTMwVDE4OjMwOjAwLjAwMFoiLCJwYWNrYWdlX3ZhbGlkdHkiOiJNb250aGx5IiwidHJhbnNhY3Rpb25faWQiOiI5ODAwMDAwMDAwMDAwOTAwMDkiLCJwYXltZW50X2lkIjpudWxsLCJjb3Vwb25faWQiOm51bGwsInByZW1pdW1fY29sbGVnZSI6bnVsbCwiY2xpZW50X3R5cGUiOiIiLCJpYXQiOjE3NTE5NDgzMzQsImV4cCI6MTc1MjEyMTEzNH0.xCMSmIoYjGMNGJ9vgydTxsKYjnMOLlq7YiJKT85gNto' || connectSid.isEmpty) {
-      print("❌ Auth token or session ID missing, using fallback values");
-      await prefs.setString('authToken', authToken);
-      await prefs.setString('connectSid', connectSid);
-      print("✅ Fallback tokens saved to SharedPreferences");
-      setState(() {
-        courseErrorMessage = 'Using fallback authentication, results may be limited';
-      });
-    } else {
-      print("🔐 Auth token loaded: ${authToken.substring(0, authToken.length > 20 ? 20 : authToken.length)}...");
-    }
-
-    // Try multiple case variations for courseName
-    final variations = [altCourseName ?? courseName, 'B.Sc', 'BSC', 'b.sc'];
-    List<String> courses = [];
-    String lastCourseName = '';
-    for (var variation in variations) {
-      lastCourseName = variation;
-      courses = await CourseListApi.fetchCourses(
-        courseName: variation,
-        authToken: authToken,
-        connectSid: connectSid,
-      );
-      if (courses.isNotEmpty) {
-        print("✅ Found courses for '$variation'");
-        break;
-      }
-    }
+    print("Using authToken: $authToken, connectSid: $connectSid");
+    final results = await CourseListApi.fetchCourses(
+      courseName: '', // Fetch all courses
+      authToken: authToken,
+      connectSid: connectSid,
+    );
 
     if (!mounted) return;
-
     setState(() {
-      isLoadingCourses = false;
-      courseList = courses.isEmpty ? ['No Courses Available'] : courses;
-      courseErrorMessage = courses.isEmpty ? 'No courses found for "$lastCourseName". Try another term.' : '';
-      if (!courseList.contains(courseName) && courseList.isNotEmpty && courseList[0] != 'No Courses Available') {
+      courseList = results.isNotEmpty ? results : ['No Courses Available'];
+      if (!courseList.contains(widget.courseName)) {
         courseName = courseList[0];
+      } else {
+        courseName = widget.courseName;
       }
     });
+  }
+
+  Future<void> _fetchSpecializationList() async {
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('authToken') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
+
+    final courseId = await _resolveCourseId(courseName);
+    print("Fetching specializations for course ID: $courseId");
+    final specs = await SpecializationListApi.fetchSpecializations(
+      specializationName: '', // Fetch all specializations
+      courseId: courseId,
+      authToken: authToken,
+      connectSid: connectSid,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      specializationList = specs.isNotEmpty ? specs : ['No Specializations Available'];
+      if (!specializationList.contains(widget.specilization)) {
+        specilization = specializationList[0];
+      } else {
+        specilization = widget.specilization;
+      }
+    });
+  }
+
+  Future<String> _resolveCourseId(String courseName) async {
+    if (courseName.isEmpty || courseName == 'No Courses Available') return '';
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('authToken') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/course/list'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
+        },
+        body: jsonEncode({"course_name": courseName}),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == true && data['data'] is List && data['data'].isNotEmpty) {
+          return data['data'][0]['id'].toString();
+        }
+      }
+    } catch (e) {
+      print("Error resolving course ID: $e");
+    }
+    return '';
   }
 
   @override
@@ -135,9 +183,7 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
   }
 
   String _formatEducationDetail() {
-    return '''
-    $degreeType\n$courseName ($specilization)\n$courseType - $college\n$passingYear
-    ''';
+    return '$degreeType\n$courseName ($specilization)\n$courseType - $college\n$passingYear';
   }
 
   @override
@@ -156,7 +202,9 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
-            child: Column(
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
@@ -172,7 +220,13 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.close, color: Color(0xFF005E6A)),
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        try {
+                          Navigator.of(context).pop();
+                        } catch (e) {
+                          print("Error closing bottom sheet: $e");
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -193,43 +247,20 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
                         ),
                         _buildLabel("College name"),
                         _buildDropdownField(
-                          value: collegeList.contains(college)
-                              ? college
-                              : (collegeList.isNotEmpty ? collegeList[0] : null),
-                          items: collegeList.isEmpty ? ['Loading...'] : collegeList,
+                          value: college,
+                          items: collegeList,
                           onChanged: (val) => setState(() => college = val ?? ''),
                         ),
                         _buildLabel("Course name"),
                         _buildDropdownField(
-                          value: courseList.contains(courseName)
-                              ? courseName
-                              : (courseList.isNotEmpty && courseList[0] != 'No Courses Available' ? courseList[0] : null),
+                          value: courseName,
                           items: courseList,
                           onChanged: (val) => setState(() => courseName = val ?? ''),
                         ),
-                        if (courseErrorMessage.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    courseErrorMessage,
-                                    style: const TextStyle(color: Colors.red, fontSize: 14),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () => _fetchCourseList(altCourseName: 'B.Sc'),
-                                  child: const Text('Try "B.Sc"'),
-                                ),
-                              ],
-                            ),
-                          ),
                         _buildLabel("Specialization"),
                         _buildDropdownField(
                           value: specilization,
-                          items: const ["Advertisement", "Flutter", "IT"],
+                          items: specializationList,
                           onChanged: (val) => setState(() => specilization = val ?? ''),
                         ),
                         _buildLabel("Course type"),
@@ -276,6 +307,15 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
                             minimumSize: const Size.fromHeight(50),
                           ),
                           onPressed: () {
+                            if (collegeList[0] == 'No Colleges Available' ||
+                                courseList[0] == 'No Courses Available' ||
+                                specializationList[0] == 'No Specializations Available') {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Please ensure all data is loaded')),
+                              );
+                              return;
+                            }
                             final data = {
                               'educationDetail': _formatEducationDetail(),
                               'degreeType': degreeType,
@@ -288,16 +328,6 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
                               'passingYear': passingYear,
                             };
                             widget.onSave(data);
-                            setState(() {
-                              degreeType = '';
-                              college = '';
-                              courseName = '';
-                              specilization = '';
-                              courseType = '';
-                              gradingSystem = '';
-                              passingYear = '';
-                              _percentageController.clear();
-                            });
                           },
                           child: const Text(
                             "Save",
@@ -316,93 +346,88 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
     );
   }
 
-  Widget _buildLabel(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12, bottom: 6),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-          color: Color(0xff003840),
-        ),
+  Widget _buildLabel(String text) => Padding(
+    padding: const EdgeInsets.only(top: 12, bottom: 6),
+    child: Text(
+      text,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+        color: Color(0xff003840),
       ),
-    );
-  }
+    ),
+  );
 
   Widget _buildDropdownField({
     required String? value,
     required List<String> items,
     required void Function(String?) onChanged,
   }) {
+    final displayValue = items.contains(value) ? value : (items.isNotEmpty ? items[0] : null);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: SizedBox(
-        width: double.infinity,
-        child: DropdownButtonFormField<String>(
-          isExpanded: true,
-          value: items.contains(value)
-              ? value
-              : (items.isNotEmpty && items[0] != 'No Courses Available' && items[0] != 'Loading...' ? items[0] : null),
-          items: items.map((e) {
-            return DropdownMenuItem(
-              value: e == 'No Courses Available' || e == 'Loading...' ? null : e,
-              child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1),
-            );
-          }).toList(),
-          onChanged: (newValue) {
-            if (newValue != null && newValue != 'No Courses Available' && newValue != 'Loading...') {
-              onChanged(newValue);
-              FocusScope.of(context).unfocus();
+      child: DropdownButtonFormField<String>(
+        isExpanded: true,
+        value: displayValue,
+        items: items
+            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+            .toList(),
+        onChanged: (newValue) {
+          if (newValue != null &&
+              newValue != 'No Courses Available' &&
+              newValue != 'No Specializations Available' &&
+              newValue != 'No Colleges Available') {
+            onChanged(newValue);
+            FocusScope.of(context).unfocus();
+            if (newValue == courseName) {
+              _fetchSpecializationList(); // Refresh specializations when course changes
             }
-          },
-          decoration: InputDecoration(
-            hintText: 'Please select',
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 10,
-            ),
+          }
+        },
+        decoration: InputDecoration(
+          hintText: 'Please select',
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 10,
           ),
-          dropdownColor: Colors.white,
-          menuMaxHeight: 250,
-          borderRadius: BorderRadius.circular(20),
         ),
+        dropdownColor: Colors.white,
+        menuMaxHeight: 250,
+        borderRadius: BorderRadius.circular(20),
       ),
     );
   }
 
-  Widget _buildRadio(String value) {
-    return Row(
-      children: [
-        Radio<String>(
-          value: value,
-          groupValue: courseType,
-          onChanged: (val) => setState(() => courseType = val ?? ''),
-          activeColor: const Color(0xFF005E6A),
-        ),
-        Text(value, style: const TextStyle(fontSize: 13)),
-      ],
-    );
-  }
+  Widget _buildRadio(String value) => Row(
+    children: [
+      Radio<String>(
+        value: value,
+        groupValue: courseType,
+        onChanged: (val) => setState(() => courseType = val ?? ''),
+        activeColor: const Color(0xFF005E6A),
+      ),
+      Text(value, style: const TextStyle(fontSize: 13)),
+    ],
+  );
 
   Widget _buildTextField(
       String label,
       TextEditingController controller, {
         TextInputType keyboardType = TextInputType.text,
-      }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      }) =>
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: TextField(
+          controller: controller,
+          keyboardType: keyboardType,
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         ),
-      ),
-    );
-  }
+      );
 }
