@@ -2,62 +2,81 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class StateListApi {
-  static const String _url =
-      'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/state/list';
-
   static Future<List<String>> fetchStates({
-    required int countryId,
+    required String countryId,
     required String authToken,
+    required String connectSid,
   }) async {
-    final headers = {
-      'Content-Type': 'application/json',
-      'Cookie': 'authToken=$authToken',
-    };
-
-    final requestBody = {
-      "country_id": countryId,
-      "offset": 10,
-    };
-
-    final request = http.Request(
-      'POST',
-      Uri.parse(_url),
-    );
-
-    request.body = jsonEncode(requestBody);
-    request.headers.addAll(headers);
-    print("📡 Sending state fetch request...");
-    print("📍 URL: $_url");
-    print("📦 Request Body: ${jsonEncode(requestBody)}");
-    print("🔐 Token Start: ${authToken.substring(0, 20)}...");
+    List<String> allStates = [];
+    int offset = 0;
+    const int limit = 10;
+    bool hasMore = true;
 
     try {
-      final response = await request.send();
+      while (hasMore) {
+        var url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/state/list');
+        var headers = {
+          'Content-Type': 'application/json',
+          'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
+        };
 
-      print("✅ Response Status: ${response.statusCode}");
+        var body = jsonEncode({
+          "country_id": int.parse(countryId),
+          "state_name": "",
+          "offset": offset,
+          "limit": limit,
+        });
+        var request = http.Request('POST', url)
+          ..headers.addAll(headers)
+          ..body = body;
 
-      if (response.statusCode == 200) {
-        final jsonString = await response.stream.bytesToString();
-        print("📥 Raw Response: $jsonString");
+        final response = await request.send().timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {
+            print("❌ Request timed out for states with country ID '$countryId', offset $offset");
+            return http.StreamedResponse(Stream.value([]), 408);
+          },
+        );
 
-        final decoded = jsonDecode(jsonString);
-        if (decoded is Map && decoded.containsKey('data')) {
-          final List<dynamic> dataList = decoded['data'];
-          final List<String> states =
-          dataList.map((e) => e['name'].toString()).toList();
-          print("🏞️ States fetched: $states");
-          return states;
+        final resBody = await response.stream.bytesToString();
+        // print("🔍 API Response for states with country ID '$countryId', offset $offset: $resBody");
+
+        if (response.statusCode == 200) {
+          final data = json.decode(resBody);
+          if (data is Map && data['status'] == true) {
+            if (data['data'] is List) {
+              List options = data['data'];
+              var states = options
+                  .map<String>((item) => item['name']?.toString() ?? '')
+                  .where((name) => name.isNotEmpty)
+                  .toList();
+              allStates.addAll(states);
+
+              final pagination = data['pagination'];
+              final total = pagination['total'] as int;
+              offset += limit;
+              hasMore = offset < total;
+            } else if (data['data'] == false) {
+              print("⚠️ No states found for country ID '$countryId'. Check token validity.");
+              return allStates;
+            } else {
+              print("⚠️ Unexpected 'data' format, expected List or false. Response: $resBody");
+              return allStates;
+            }
+          } else {
+            print("⚠️ Invalid response structure, expected status: true. Response: $resBody");
+            return allStates;
+          }
         } else {
-          print("⚠️ Unexpected response format.");
-          return [];
+          print("❌ API failed for states with country ID '$countryId': ${response.statusCode} - ${response.reasonPhrase}");
+          print("Response body: $resBody");
+          return allStates;
         }
-      } else {
-        print("❌ Failed to fetch states: ${response.statusCode}");
-        return [];
       }
+      return allStates;
     } catch (e) {
-      print("🚨 Error fetching states: $e");
-      return [];
+      print("❌ Error fetching states for country ID '$countryId': $e");
+      return allStates;
     }
   }
 }
