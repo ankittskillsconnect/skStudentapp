@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sk_loginscreen1/Pages/PasswordField.dart';
 import 'package:sk_loginscreen1/Pages/forgotPasswordPage.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
@@ -94,8 +95,14 @@ class _LoginpageState extends State<Loginpage> {
     });
 
     if (result['success'] == true) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('authToken', result['token'] ?? '');
+      await prefs.setString('connectSid', result['cookie'] ?? '');
+
+      print('✅ Auth token and session ID saved.');
       context.read<NavigationBloc>().add(GotoHomeScreen2());
-    } else {
+    }
+    else {
       final message = result['message'].toString().toLowerCase();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
