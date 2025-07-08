@@ -34,7 +34,7 @@ class EditPersonalDetailsSheet extends StatefulWidget {
   State<EditPersonalDetailsSheet> createState() => _EditPersonalDetailsSheetState();
 }
 
-class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet> {
+class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet> with SingleTickerProviderStateMixin {
   late TextEditingController fullNameController;
   late TextEditingController dobController;
   late TextEditingController phoneController;
@@ -42,10 +42,12 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet> {
   late TextEditingController emailController;
   late String selectedState;
   late String selectedCity;
-  bool isLoading = true;
-
+  bool isLoadingStates = true;
+  bool isLoadingCities = false;
   List<String> states = [];
-  List<String> cities = [];
+  List<String> cities = ['Select a state first'];
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
@@ -58,74 +60,114 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet> {
     selectedState = widget.state;
     selectedCity = widget.city;
 
-    _initData();
-  }
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
-  Future<void> _initData() async {
-    try {
-      await Future.wait([
-        _fetchStateList(),
-        _fetchCityList(),
-      ]);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading data: $e')),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => isLoading = false);
-      }
-    }
+    _fetchStateList();
   }
 
   Future<void> _fetchStateList() async {
     final prefs = await SharedPreferences.getInstance();
+    final cachedStates = prefs.getStringList('cached_states');
+    if (cachedStates != null && cachedStates.isNotEmpty) {
+      print("Using cached states: ${cachedStates.length} states");
+      setState(() {
+        states = cachedStates;
+        selectedState = states.contains(widget.state) ? widget.state : states[0];
+        isLoadingStates = false;
+      });
+      _animationController.forward();
+      if (widget.state.isNotEmpty && states.contains(widget.state)) {
+        await _fetchCityList();
+      }
+      return;
+    }
+
     final authToken = prefs.getString('authToken') ?? '';
     final connectSid = prefs.getString('connectSid') ?? '';
+    print("Using authToken: ${authToken.substring(0, 20)}..., connectSid: $connectSid");
+    try {
+      final fetchedStates = await StateListApi.fetchStates(
+        countryId: '101',
+        authToken: authToken,
+        connectSid: connectSid,
+      );
 
-    print("Using authToken: $authToken, connectSid: $connectSid");
-    final fetchedStates = await StateListApi.fetchStates(
-      countryId: '101', // As per Postman
-      authToken: authToken,
-      connectSid: connectSid,
-    );
+      if (!mounted) return;
+      setState(() {
+        states = fetchedStates.isNotEmpty ? fetchedStates : ['No States Available'];
+        selectedState = states.contains(widget.state) ? widget.state : states[0];
+        isLoadingStates = false;
+      });
 
-    if (!mounted) return;
-    setState(() {
-      states = fetchedStates.isNotEmpty ? fetchedStates : ['No States Available'];
-      if (!states.contains(widget.state)) {
-        selectedState = states[0];
-      } else {
-        selectedState = widget.state;
+      await prefs.setStringList('cached_states', states);
+      _animationController.forward();
+
+      if (widget.state.isNotEmpty && states.contains(widget.state)) {
+        await _fetchCityList();
       }
-    });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading states: $e')),
+        );
+        setState(() {
+          states = ['No States Available'];
+          selectedState = states[0];
+          isLoadingStates = false;
+        });
+        _animationController.forward();
+      }
+    }
   }
 
   Future<void> _fetchCityList() async {
+    if (selectedState == 'No States Available' || selectedState.isEmpty) {
+      setState(() {
+        cities = ['Select a state first'];
+        selectedCity = cities[0];
+      });
+      return;
+    }
+
+    setState(() => isLoadingCities = true);
     final prefs = await SharedPreferences.getInstance();
     final authToken = prefs.getString('authToken') ?? '';
     final connectSid = prefs.getString('connectSid') ?? '';
 
     final stateId = await _resolveStateId(selectedState);
     print("Fetching cities for state ID: $stateId");
-    final fetchedCities = await CityListApi.fetchCities(
-      cityName: '', // Fetch all cities
-      stateId: stateId,
-      authToken: authToken,
-      connectSid: connectSid,
-    );
+    try {
+      final fetchedCities = await CityListApi.fetchCities(
+        cityName: '',
+        stateId: stateId,
+        authToken: authToken,
+        connectSid: connectSid,
+      );
 
-    if (!mounted) return;
-    setState(() {
-      cities = fetchedCities.isNotEmpty ? fetchedCities : ['No Cities Available'];
-      if (!cities.contains(widget.city)) {
-        selectedCity = cities[0];
-      } else {
-        selectedCity = widget.city;
+      if (!mounted) return;
+      setState(() {
+        cities = fetchedCities.isNotEmpty ? fetchedCities : ['No Cities Available'];
+        selectedCity = cities.contains(widget.city) ? widget.city : cities[0];
+        isLoadingCities = false;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading cities: $e')),
+        );
+        setState(() {
+          cities = ['No Cities Available'];
+          selectedCity = cities[0];
+          isLoadingCities = false;
+        });
       }
-    });
+    }
   }
 
   Future<String> _resolveStateId(String stateName) async {
@@ -188,6 +230,7 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet> {
     phoneController.dispose();
     whatsappController.dispose();
     emailController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -217,137 +260,177 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet> {
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Edit Personal Details',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF003840),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Color(0xFF005E6A)),
-                      onPressed: () {
-                        try {
-                          Navigator.of(context).pop();
-                        } catch (e) {
-                          print("Error closing bottom sheet: $e");
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: AnimatedPadding(
-                    duration: const Duration(milliseconds: 10),
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
-                    ),
-                    child: ListView(
-                      controller: scrollController,
-                      children: [
-                        _buildLabel("Full Name"),
-                        _buildTextField(
-                          "Enter full name",
-                          fullNameController,
-                          keyboardType: TextInputType.name,
-                        ),
-                        _buildLabel("Date of Birth"),
-                        _buildTextField(
-                          "Select DOB",
-                          dobController,
-                          suffixIcon: Icons.calendar_today,
-                          readOnly: true,
-                          onTap: _selectDate,
-                        ),
-                        _buildLabel("Contact No"),
-                        _buildTextField(
-                          "Enter contact no",
-                          phoneController,
-                          keyboardType: TextInputType.phone,
-                        ),
-                        _buildLabel("WhatsApp No"),
-                        _buildTextField(
-                          "Enter WhatsApp no",
-                          whatsappController,
-                          keyboardType: TextInputType.phone,
-                        ),
-                        _buildLabel("Email"),
-                        _buildTextField(
-                          "Enter email",
-                          emailController,
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-                        _buildLabel("State"),
-                        _buildDropdownField(
-                          value: selectedState,
-                          items: states,
-                          onChanged: (val) async {
-                            setState(() {
-                              selectedState = val ?? '';
-                              selectedCity = ''; // Reset city when state changes
-                              cities = ['No Cities Available'];
-                            });
-                            await _fetchCityList(); // Refresh cities
-                          },
-                        ),
-                        _buildLabel("City"),
-                        _buildDropdownField(
-                          value: selectedCity,
-                          items: cities,
-                          onChanged: (val) => setState(() => selectedCity = val ?? ''),
-                        ),
-                        const SizedBox(height: 30),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF005E6A),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            minimumSize: const Size.fromHeight(50),
-                          ),
-                          onPressed: () {
-                            if (states[0] == 'No States Available' ||
-                                cities[0] == 'No Cities Available') {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Please ensure all data is loaded')),
-                              );
-                              return;
-                            }
-                            final dataToSave = {
-                              'personalDetails': _formatPersonalDetails(),
-                              'fullname': fullNameController.text,
-                              'dob': dobController.text,
-                              'phone': phoneController.text,
-                              'whatsapp': whatsappController.text,
-                              'email': emailController.text,
-                              'state': selectedState,
-                              'city': selectedCity,
-                              'country': widget.country,
-                            };
-                            print("Saving data: $dataToSave");
-                            widget.onSave(dataToSave);
-                          },
-                          child: const Text(
-                            "Save",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
+            child: isLoadingStates
+                ? Container(
+              height: size.height * 0.9,
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF005E6A)),
+                    strokeWidth: 4,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Loading States...',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF003840),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
+            )
+                : FadeTransition(
+              opacity: _fadeAnimation,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Edit Personal Details',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF003840),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Color(0xFF005E6A)),
+                        onPressed: () {
+                          try {
+                            Navigator.of(context).pop();
+                          } catch (e) {
+                            print("Error closing bottom sheet: $e");
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: AnimatedPadding(
+                      duration: const Duration(milliseconds: 10),
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom,
+                      ),
+                      child: ListView(
+                        controller: scrollController,
+                        children: [
+                          _buildLabel("Full Name"),
+                          _buildTextField(
+                            "Enter full name",
+                            fullNameController,
+                            keyboardType: TextInputType.name,
+                          ),
+                          _buildLabel("Date of Birth"),
+                          _buildTextField(
+                            "Select DOB",
+                            dobController,
+                            suffixIcon: Icons.calendar_today,
+                            readOnly: true,
+                            onTap: _selectDate,
+                          ),
+                          _buildLabel("Contact No"),
+                          _buildTextField(
+                            "Enter contact no",
+                            phoneController,
+                            keyboardType: TextInputType.phone,
+                          ),
+                          _buildLabel("WhatsApp No"),
+                          _buildTextField(
+                            "Enter WhatsApp no",
+                            whatsappController,
+                            keyboardType: TextInputType.phone,
+                          ),
+                          _buildLabel("Email"),
+                          _buildTextField(
+                            "Enter email",
+                            emailController,
+                            keyboardType: TextInputType.emailAddress,
+                          ),
+                          _buildLabel("State"),
+                          _buildDropdownField(
+                            value: selectedState,
+                            items: states,
+                            onChanged: (val) async {
+                              setState(() {
+                                selectedState = val ?? '';
+                                selectedCity = '';
+                                cities = ['Select a state first'];
+                                isLoadingCities = true;
+                              });
+                              await _fetchCityList();
+                            },
+                          ),
+                          _buildLabel("City"),
+                          Stack(
+                            children: [
+                              _buildDropdownField(
+                                value: selectedCity,
+                                items: cities,
+                                onChanged: (val) => setState(() => selectedCity = val ?? ''),
+                              ),
+                              if (isLoadingCities)
+                                const Positioned(
+                                  bottom: 10,
+                                  right: 5,
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 30),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF005E6A),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              minimumSize: const Size.fromHeight(50),
+                            ),
+                            onPressed: () {
+                              if (states[0] == 'No States Available' ||
+                                  cities[0] == 'No Cities Available' ||
+                                  cities[0] == 'Select a state first') {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('Please ensure all data is loaded')),
+                                );
+                                return;
+                              }
+                              final dataToSave = {
+                                'personalDetails': _formatPersonalDetails(),
+                                'fullname': fullNameController.text,
+                                'dob': dobController.text,
+                                'phone': phoneController.text,
+                                'whatsapp': whatsappController.text,
+                                'email': emailController.text,
+                                'state': selectedState,
+                                'city': selectedCity,
+                                'country': widget.country,
+                              };
+                              print("Saving data: $dataToSave");
+                              widget.onSave(dataToSave);
+                            },
+                            child: const Text(
+                              "Save",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -382,8 +465,8 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet> {
         items: items
             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
             .toList(),
-        onChanged: (newValue) {
-          if (newValue != null && newValue != 'No States Available' && newValue != 'No Cities Available') {
+        onChanged: isLoadingCities ? null : (newValue) {
+          if (newValue != null && newValue != 'No States Available' && newValue != 'No Cities Available' && newValue != 'Select a state first') {
             onChanged(newValue);
             FocusScope.of(context).unfocus();
           }

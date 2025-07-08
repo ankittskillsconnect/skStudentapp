@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'dart:math';
 
 class StateListApi {
   static Future<List<String>> fetchStates({
@@ -9,8 +10,10 @@ class StateListApi {
   }) async {
     List<String> allStates = [];
     int offset = 0;
-    const int limit = 10;
+    const int limit = 50;
     bool hasMore = true;
+    int retryCount = 0;
+    const int maxRetries = 3;
 
     try {
       while (hasMore) {
@@ -39,7 +42,7 @@ class StateListApi {
         );
 
         final resBody = await response.stream.bytesToString();
-        // print("🔍 API Response for states with country ID '$countryId', offset $offset: $resBody");
+        print("🔍 API Response for states with country ID '$countryId', offset $offset: $resBody");
 
         if (response.statusCode == 200) {
           final data = json.decode(resBody);
@@ -67,11 +70,19 @@ class StateListApi {
             print("⚠️ Invalid response structure, expected status: true. Response: $resBody");
             return allStates;
           }
+        } else if (response.statusCode == 429 && retryCount < maxRetries) {
+          retryCount++;
+          final delay = Duration(milliseconds: 500 * pow(2, retryCount).toInt());
+          print("⚠️ Rate limit hit (429). Retrying ($retryCount/$maxRetries) after $delay...");
+          await Future.delayed(delay);
+          continue;
         } else {
           print("❌ API failed for states with country ID '$countryId': ${response.statusCode} - ${response.reasonPhrase}");
           print("Response body: $resBody");
           return allStates;
         }
+
+        await Future.delayed(const Duration(milliseconds: 500));
       }
       return allStates;
     } catch (e) {

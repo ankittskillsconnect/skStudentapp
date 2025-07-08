@@ -289,7 +289,7 @@ class _MyAccountState extends State<MyAccount> {
                       text: whatsapp,
                     ),
                     _DetailRow(
-                      icon: Icons.location_city_outlined,
+                      icon: Icons.location_on_outlined,
                       text: state.isEmpty ? 'Not provided' : '$state , $city',
                     ),
                     // _DetailRow(
@@ -1178,7 +1178,7 @@ class _MyAccountState extends State<MyAccount> {
                 child: _profileImage != null
                     ? Image.file(_profileImage!, fit: BoxFit.cover)
                     : const Image(
-                  image: AssetImage('assets/placeholder.png'),
+                  image: AssetImage('assets/placeholder.jpg'),
                   fit: BoxFit.cover,
                 ),
               ),
