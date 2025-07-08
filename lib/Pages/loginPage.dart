@@ -52,14 +52,9 @@ class _LoginpageState extends State<Loginpage> {
 
   bool _emailIsValid() {
     final email = emailController.text.trim();
-
-    final emailRegex = RegExp(
-        r"@"
-    );
-
+    final emailRegex = RegExp(r"@");
     return email.isNotEmpty && emailRegex.hasMatch(email);
   }
-
 
   Future<void> _login() async {
     if (!_areFieldsValid()) {
@@ -72,9 +67,10 @@ class _LoginpageState extends State<Loginpage> {
       return;
     }
 
-    if(!_emailIsValid()){
+    if (!_emailIsValid()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Enter a valid email"),
+        const SnackBar(
+          content: Text("Enter a valid email"),
           backgroundColor: Colors.red,
         ),
       );
@@ -96,24 +92,45 @@ class _LoginpageState extends State<Loginpage> {
 
     if (result['success'] == true) {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('authToken', result['token'] ?? '');
-      await prefs.setString('connectSid', result['cookie'] ?? '');
 
-      print('✅ Auth token and session ID saved.');
+      final authToken = result['token'] ?? '';
+      String connectSid = result['cookie'] ?? '';
+
+      print('🟡 Raw connectSid from API: $connectSid');
+
+      // Extract "connect.sid=..." from the cookie string
+      final match = RegExp(r'connect\.sid=([^;]+)').firstMatch(connectSid);
+      if (match != null) {
+        connectSid = match.group(1) ?? '';
+        print('🟢 Extracted connectSid: $connectSid');
+      } else {
+        print('🧨 WARNING: connect.sid not found in cookie string.');
+      }
+
+      // Save tokens
+      await prefs.setString('authToken', authToken);
+      await prefs.setString('connectSid', connectSid);
+
+      print('✅ Auth token and connect.sid saved to SharedPreferences.');
+      print('🟢 authToken = $authToken');
+      print('🟢 connectSid = $connectSid');
+
       context.read<NavigationBloc>().add(GotoHomeScreen2());
-    }
-    else {
+    } else {
       final message = result['message'].toString().toLowerCase();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(message.contains('error') || message.contains('exception')
-              ? result['message']
-              : "Enter correct credentials"),
+          content: Text(
+            message.contains('error') || message.contains('exception')
+                ? result['message']
+                : "Enter correct credentials",
+          ),
           backgroundColor: Colors.red,
         ),
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +151,7 @@ class _LoginpageState extends State<Loginpage> {
         backgroundColor: const Color(0xFF003840),
         resizeToAvoidBottomInset: true,
         body: Column(
-          children:[
+          children: [
             Expanded(
               flex: 2,
               child: SafeArea(
@@ -236,8 +253,7 @@ class _LoginpageState extends State<Loginpage> {
                             ),
                           )
                               : const Icon(Icons.arrow_forward, color: Colors.white),
-                          label: const Text("Log In", style: TextStyle(color: Colors.white),
-                          ),
+                          label: const Text("Log In", style: TextStyle(color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.teal,
                             shape: RoundedRectangleBorder(

@@ -48,7 +48,7 @@ class SharedPrefHelper {
     required List<Map<String, dynamic>> projects,
     required List<Map<String, dynamic>> certificates,
     required List<Map<String, dynamic>> workExperiences,
-    File? profileImage,
+    File? profileImage, required List<Map<String, dynamic>> languages,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     print(

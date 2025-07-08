@@ -368,6 +368,7 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet> wit
                           ),
                           _buildLabel("City"),
                           Stack(
+                            alignment: Alignment.center,
                             children: [
                               _buildDropdownField(
                                 value: selectedCity,
@@ -375,17 +376,20 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet> wit
                                 onChanged: (val) => setState(() => selectedCity = val ?? ''),
                               ),
                               if (isLoadingCities)
-                                const Positioned(
-                                  bottom: 10,
-                                  right: 5,
-                                  child: SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                const Positioned.fill(
+                                  child: IgnorePointer(
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      ),
+                                    ),
                                   ),
                                 ),
                             ],
                           ),
+
                           const SizedBox(height: 30),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(

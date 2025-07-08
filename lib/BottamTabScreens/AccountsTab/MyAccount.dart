@@ -6,6 +6,7 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditWo
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyAccountAppbar.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/sharedpref.dart';
 import 'BottomSheets/EditEducationBottomSheet.dart';
+import 'BottomSheets/EditLanguageBottomSheet.dart';
 import 'BottomSheets/EditPersonalDetailSheet.dart';
 import 'BottomSheets/EditSkillsBottomSheet.dart';
 import 'package:image_picker/image_picker.dart';
@@ -42,6 +43,7 @@ class _MyAccountState extends State<MyAccount> {
   List<Map<String, dynamic>> projects = [];
   List<Map<String, dynamic>> certificates = [];
   List<Map<String, dynamic>> workExperiences = [];
+  List<Map<String, dynamic>> languages = [];
   String? internshipDetail;
   String? workExperienceDetail;
   File? _profileImage;
@@ -82,6 +84,10 @@ class _MyAccountState extends State<MyAccount> {
       'annualSalary': '10 LPA',
       'jobDetail': 'Sample work experience description',
     });
+    languages.add({
+      'Language': null,
+      'language': 'English',
+    });
   }
 
   Future<void> _loadSavedData() async {
@@ -109,6 +115,7 @@ class _MyAccountState extends State<MyAccount> {
         projects = List<Map<String, dynamic>>.from(data['projects'] as List<dynamic>? ?? []);
         certificates = List<Map<String, dynamic>>.from(data['certificates'] as List<dynamic>? ?? []);
         workExperiences = List<Map<String, dynamic>>.from(data['workExperiences'] as List<dynamic>? ?? []);
+        languages = List<Map<String, dynamic>>.from(data['languages'] as List<dynamic>? ?? []);
         _profileImage = data['profileImage'] as File?;
       });
     } catch (e) {
@@ -140,6 +147,7 @@ class _MyAccountState extends State<MyAccount> {
       projects: projects,
       certificates: certificates,
       workExperiences: workExperiences,
+      languages: languages,
       profileImage: _profileImage,
     );
     print('Data save completed in MyAccount');
@@ -448,7 +456,7 @@ class _MyAccountState extends State<MyAccount> {
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+                  children:[
                     const Text(
                       "Resume",
                       style: TextStyle(
@@ -1061,6 +1069,123 @@ class _MyAccountState extends State<MyAccount> {
                       ],
                     ),
                   ),
+                const SizedBox(height: 20),
+                _buildSectionHeader(
+                  "Languages",
+                  showAdd: true,
+                  onAdd: () {
+                    showModalBottomSheet(
+                      context: innerContext,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.white,
+                      builder: (_) => LanguageBottomSheet(
+                        initialData: null,
+                        language: '',
+                        onSave: (data) {
+                          setState(() {
+                            languages.add({
+                              'Language': data['Language'],
+                              'language': data['language'],
+                              'proficiency': data['proficiency'],
+                            });
+                          });
+                          _saveData();
+                        },
+                      ),
+                    );
+                  },
+                ),
+                for (var i = 0; i < languages.length; i++)
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(14 * sizeScale),
+                    margin: const EdgeInsets.only(top: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xFFBCD8DB)),
+                      borderRadius: BorderRadius.circular(12 * sizeScale),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(6 * sizeScale),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEBF6F7),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.language,
+                            size: 24,
+                            color: Color(0xFF005E6A),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                languages[i]['language'] ?? 'Language',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14 * fontScale,
+                                  color: const Color(0xFF005E6A),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                languages[i]['proficiency'] ?? 'Proficiency',
+                                style: TextStyle(
+                                  fontSize: 12 * fontScale,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Color(0xFF005E6A),
+                          ),
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: innerContext,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.white,
+                              builder: (_) => LanguageBottomSheet(
+                                initialData: languages[i]['Language'],
+                                language: languages[i]['language'] ?? '',
+                                onSave: (data) {
+                                  setState(() {
+                                    languages[i] = {
+                                      'Language': data['Language'],
+                                      'language': data['language'],
+                                      'proficiency': data['proficiency'],
+                                    };
+                                  });
+                                  _saveData();
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              languages.removeAt(i);
+                            });
+                            _saveData();
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
                 const SizedBox(height: 20),
               ],
             ),
