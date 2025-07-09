@@ -14,6 +14,11 @@ import 'package:sk_loginscreen1/BottamTabScreens/Interveiwtab/InterviewScreen.da
 import 'package:sk_loginscreen1/BottamTabScreens/homeScreen.dart';
 import 'package:sk_loginscreen1/Pages/loginPage.dart';
 
+import 'ProfileLogic/ProfileEvent.dart';
+import 'ProfileLogic/ProfileLogic.dart';
+
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,8 +30,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => NavigationBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => NavigationBloc()),
+        BlocProvider(create: (_) => ProfileBloc()..add(LoadProfileData())),
+      ],
       child: MaterialApp(debugShowCheckedModeBanner: false, home: MainApp()),
     );
   }

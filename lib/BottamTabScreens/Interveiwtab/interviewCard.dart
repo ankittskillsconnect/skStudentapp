@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:sk_loginscreen1/Pages/BlinkAnimatedStatus.dart';
 
 class DiscussionCard extends StatelessWidget {
   final String title;
@@ -89,25 +90,27 @@ class DiscussionCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Color(0xFFEA4D4D),
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: Color(0xFFBCD8DB)),
-                      ),
-                      child: Text(
-                        status,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+                    // Container(
+                    //   padding: const EdgeInsets.symmetric(
+                    //     horizontal: 8,
+                    //     vertical: 4,
+                    //   ),
+                    //   decoration: BoxDecoration(
+                    //     color: Color(0xFFEA4D4D),
+                    //     borderRadius: BorderRadius.circular(18),
+                    //     border: Border.all(color: Color(0xFFBCD8DB)),
+                    //   ),
+                    //   child: Text(
+                    //     status,
+                    //     style: const TextStyle(
+                    //       color: Colors.white,
+                    //       fontSize: 14,
+                    //       fontWeight: FontWeight.w600,
+                    //     ),
+                    //   ),
+                    // ),
+                    //
+                    LiveSlidingText(status: status),
                   ],
                 ),
                 const SizedBox(height: 8),

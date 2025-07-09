@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/Home/CustomAppbarBT.dart';
-import 'package:sk_loginscreen1/BottamTabScreens/JobTab/AppBarJobScreen.dart';
 import '../Pages/bottombar.dart';
 import 'Home/KnowHowBanner.dart';
 import 'Home/PopularJobCard.dart';

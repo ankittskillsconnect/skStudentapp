@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/ContactsTab/ContactScreenCard.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/ContactsTab/ContactsAppbar.dart';
-import 'package:sk_loginscreen1/BottamTabScreens/JobTab/AppBarJobScreen.dart';
 import '../../Pages/bottombar.dart';
 
 class Contactsscreen extends StatefulWidget {

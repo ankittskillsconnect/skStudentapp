@@ -140,7 +140,7 @@ class SharedPrefHelper {
     return loadedData;
   }
 
-  // Helper method to decode and cast List<Map<String, dynamic>>
+
   static List<Map<String, dynamic>> _decodeListMap(List<String> jsonList) {
     return jsonList
         .map((json) {
@@ -156,7 +156,7 @@ class SharedPrefHelper {
           print('Error decoding JSON: $e, json: $json');
         }
       }
-      return <String, dynamic>{}; // Return empty map on error
+      return <String, dynamic>{};
     })
         .toList()
         .cast<Map<String, dynamic>>();
