@@ -52,19 +52,19 @@ class _AccountScreenState extends State<AccountScreen> {
     context.read<ProfileBloc>().add(LoadProfileData());
   }
 
-  String _calculateAge(String dob) {
-    try {
-      final date = DateFormat('dd, MMM yyyy').parse(dob);
-      final today = DateTime.now();
-      int age = today.year - date.year;
-      if (today.month < date.month || (today.month == date.month && today.day < date.day)) {
-        age--;
-      }
-      return '$age years old';
-    } catch (e) {
-      return 'N/A';
-    }
-  }
+  // String _calculateAge(String dob) {
+  //   try {
+  //     final date = DateFormat('dd, MMM yyyy').parse(dob);
+  //     final today = DateTime.now();
+  //     int age = today.year - date.year;
+  //     if (today.month < date.month || (today.month == date.month && today.day < date.day)) {
+  //       age--;
+  //     }
+  //     return '$age years old';
+  //   } catch (e) {
+  //     return 'N/A';
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
