@@ -52,19 +52,36 @@ class _AccountScreenState extends State<AccountScreen> {
     context.read<ProfileBloc>().add(LoadProfileData());
   }
 
-  // String _calculateAge(String dob) {
-  //   try {
-  //     final date = DateFormat('dd, MMM yyyy').parse(dob);
-  //     final today = DateTime.now();
-  //     int age = today.year - date.year;
-  //     if (today.month < date.month || (today.month == date.month && today.day < date.day)) {
-  //       age--;
-  //     }
-  //     return '$age years old';
-  //   } catch (e) {
-  //     return 'N/A';
-  //   }
-  // }
+  // Refresh callback for pull-to-refresh
+  Future<void> _onRefresh() async {
+    context.read<ProfileBloc>().add(LoadProfileData());
+    await Future.delayed(const Duration(seconds: 1));
+  }
+
+  // Calculate age from dob with improved error handling
+  String _calculateAge(String? dob) {
+    if (dob == null || dob.isEmpty) {
+      debugPrint('DOB is null or empty');
+      return 'N/A';
+    }
+    try {
+      final date = DateFormat('dd, MMM yyyy').parse(dob);
+      final today = DateTime.now();
+      int age = today.year - date.year;
+      if (today.month < date.month || (today.month == date.month && today.day < date.day)) {
+        age--;
+      }
+      if (age < 0 || age > 120) {
+        debugPrint('Invalid age calculated: $age for DOB: $dob');
+        return 'N/A';
+      }
+      debugPrint('DOB: $dob, Calculated Age: $age');
+      return '$age years old';
+    } catch (e) {
+      debugPrint('Error parsing DOB: $dob, Error: $e');
+      return 'N/A';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -145,61 +162,72 @@ class _AccountScreenState extends State<AccountScreen> {
                             ),
                           ),
                           SizedBox(height: spacing * 0.3),
-                          // Text(
-                          //   _calculateAge(state.dob),
-                          //   style: TextStyle(
-                          //     fontSize: media.width * 0.04,
-                          //     color: const Color(0xFF6A8E92),
-                          //   ),
-                          // ),
+                          Text(
+                            _calculateAge(state.dob), // Display calculated age
+                            style: TextStyle(
+                              fontSize: media.width * 0.04,
+                              color: const Color(0xFF6A8E92),
+                            ),
+                          ),
                         ],
                       );
                     } else {
-                      return const SizedBox();
+                      return const Text(
+                        'Unable to load profile data',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.red,
+                        ),
+                      );
                     }
                   },
                 ),
                 SizedBox(height: spacing * 1.3),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: options.length,
-                    itemBuilder: (context, index) {
-                      final option = options[index];
-                      final isMyAccount = option["label"] == 'My Account';
-                      final interviewVideos =
-                          option["label"] == "My interview videos";
-                      return _AccountOption(
-                        icon: option['icon'] as IconData,
-                        label: option['label'] as String,
-                        isSelected: selectedOptionIndex == index,
-                        onTap: () {
-                          setState(() {
-                            selectedOptionIndex = index;
-                          });
-                          if (index == 6) {
-                            _logout();
-                          } else if (isMyAccount) {
-                            context.read<NavigationBloc>().add(
-                              GoToMyAccountScreen(),
-                            );
-                          } else if (interviewVideos) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => MyInterviewVideos(),
-                              ),
-                            );
-                          }
-                          Future.delayed(const Duration(milliseconds: 50), () {
-                            if (mounted) {
-                              setState(() {
-                                selectedOptionIndex = -1;
-                              });
+                  child: RefreshIndicator(
+                    onRefresh: _onRefresh,
+                    color: const Color(0xFF005E6A),
+                    backgroundColor: Colors.white,
+                    child: ListView.builder(
+                      itemCount: options.length,
+                      itemBuilder: (context, index) {
+                        final option = options[index];
+                        final isMyAccount = option["label"] == 'My Account';
+                        final interviewVideos =
+                            option["label"] == "My interview videos";
+                        return _AccountOption(
+                          icon: option['icon'] as IconData,
+                          label: option['label'] as String,
+                          isSelected: selectedOptionIndex == index,
+                          onTap: () {
+                            setState(() {
+                              selectedOptionIndex = index;
+                            });
+                            if (index == 6) {
+                              _logout();
+                            } else if (isMyAccount) {
+                              context.read<NavigationBloc>().add(
+                                GoToMyAccountScreen(),
+                              );
+                            } else if (interviewVideos) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MyInterviewVideos(),
+                                ),
+                              );
                             }
-                          });
-                        },
-                      );
-                    },
+                            Future.delayed(const Duration(milliseconds: 50), () {
+                              if (mounted) {
+                                setState(() {
+                                  selectedOptionIndex = -1;
+                                });
+                              }
+                            });
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],
