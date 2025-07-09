@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyAccount.dart';
+import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyInterviewVid/MyInterviewVideos.dart';
+import 'package:sk_loginscreen1/Pages/bottombar.dart';
+import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
+import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
+import 'package:sk_loginscreen1/blocpage/bloc_state.dart';
 import '../../ProfileLogic/ProfileEvent.dart';
 import '../../ProfileLogic/ProfileLogic.dart';
 import '../../ProfileLogic/ProfileState.dart';
 import '../../Utilities/auth/LoginUserApi.dart';
-import 'MyAccount.dart';
-import 'MyInterviewVid/MyInterviewVideos.dart';
-import '../../Pages/bottombar.dart';
-import '../../blocpage/bloc_event.dart';
-import '../../blocpage/bloc_logic.dart';
-import '../../blocpage/bloc_state.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -21,7 +21,12 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
   int _selectedIndex = 0;
-  int selectedOptionIndex = -1;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   final List<Map<String, dynamic>> options = [
     {"icon": Icons.person_outline, "label": "My Account"},
@@ -33,15 +38,7 @@ class _AccountScreenState extends State<AccountScreen> {
     {"icon": Icons.logout, "label": "Logout"},
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    context.read<ProfileBloc>().add(LoadProfileData());
-  }
-
-  void _onItemTapped(int index) {
-    setState(() => _selectedIndex = index);
-  }
+  int selectedOptionIndex = -1;
 
   Future<void> _logout() async {
     final loginService = loginUser();
@@ -49,16 +46,22 @@ class _AccountScreenState extends State<AccountScreen> {
     context.read<NavigationBloc>().add(GobackToLoginPage());
   }
 
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProfileBloc>().add(LoadProfileData());
+  }
+
   String _calculateAge(String dob) {
     try {
-      final birthDate = DateFormat('dd, MMM yyyy').parse(dob);
+      final date = DateFormat('dd, MMM yyyy').parse(dob);
       final today = DateTime.now();
-      int age = today.year - birthDate.year;
-      if (today.month < birthDate.month || (today.month == birthDate.month && today.day < birthDate.day)) {
+      int age = today.year - date.year;
+      if (today.month < date.month || (today.month == date.month && today.day < date.day)) {
         age--;
       }
       return '$age years old';
-    } catch (_) {
+    } catch (e) {
       return 'N/A';
     }
   }
@@ -66,10 +69,9 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
-    final iconSize = media.width * 0.065;
-    final profileSize = media.width * 0.37;
-    final spacing = media.height * 0.015;
-
+    final double iconSize = media.width * 0.065;
+    final double profileSize = media.width * 0.37;
+    final double spacing = media.height * 0.015;
     return BlocListener<NavigationBloc, NavigationState>(
       listener: (context, state) {
         if (state is NavigateToMyAccount) {
@@ -93,11 +95,14 @@ class _AccountScreenState extends State<AccountScreen> {
                       "Account",
                       style: TextStyle(
                         fontSize: media.width * 0.07,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                         color: const Color(0xFF003840),
                       ),
                     ),
-                    _iconCircle(icon: Icons.notifications_none, iconSize: iconSize),
+                    _iconCircle(
+                      icon: Icons.notifications_none,
+                      iconSize: iconSize,
+                    ),
                   ],
                 ),
                 SizedBox(height: media.height * 0.05),
@@ -113,11 +118,17 @@ class _AccountScreenState extends State<AccountScreen> {
                             height: profileSize,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: const Color(0xFF005E6A), width: 1),
+                              border: Border.all(
+                                color: const Color(0xFF005E6A),
+                                width: 1,
+                              ),
                             ),
                             child: ClipOval(
                               child: state.profileImage != null
-                                  ? Image.file(state.profileImage!, fit: BoxFit.cover)
+                                  ? Image.file(
+                                state.profileImage!,
+                                fit: BoxFit.cover,
+                              )
                                   : const Image(
                                 image: AssetImage('assets/portrait.png'),
                                 fit: BoxFit.cover,
@@ -134,13 +145,13 @@ class _AccountScreenState extends State<AccountScreen> {
                             ),
                           ),
                           SizedBox(height: spacing * 0.3),
-                          Text(
-                            _calculateAge(state.dob),
-                            style: TextStyle(
-                              fontSize: media.width * 0.04,
-                              color: const Color(0xFF6A8E92),
-                            ),
-                          ),
+                          // Text(
+                          //   _calculateAge(state.dob),
+                          //   style: TextStyle(
+                          //     fontSize: media.width * 0.04,
+                          //     color: const Color(0xFF6A8E92),
+                          //   ),
+                          // ),
                         ],
                       );
                     } else {
@@ -154,34 +165,37 @@ class _AccountScreenState extends State<AccountScreen> {
                     itemCount: options.length,
                     itemBuilder: (context, index) {
                       final option = options[index];
-                      final label = option["label"];
-
+                      final isMyAccount = option["label"] == 'My Account';
+                      final interviewVideos =
+                          option["label"] == "My interview videos";
                       return _AccountOption(
                         icon: option['icon'] as IconData,
-                        label: label,
+                        label: option['label'] as String,
                         isSelected: selectedOptionIndex == index,
                         onTap: () {
-                          setState(() => selectedOptionIndex = index);
-
-                          switch (label) {
-                            case "Logout":
-                              _logout();
-                              break;
-                            case "My Account":
-                              context.read<NavigationBloc>().add(GoToMyAccountScreen());
-                              break;
-                            case "My interview videos":
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => MyInterviewVideos()),
-                              );
-                              break;
-                            default:
-                              break;
+                          setState(() {
+                            selectedOptionIndex = index;
+                          });
+                          if (index == 6) {
+                            _logout();
+                          } else if (isMyAccount) {
+                            context.read<NavigationBloc>().add(
+                              GoToMyAccountScreen(),
+                            );
+                          } else if (interviewVideos) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MyInterviewVideos(),
+                              ),
+                            );
                           }
-
                           Future.delayed(const Duration(milliseconds: 50), () {
-                            if (mounted) setState(() => selectedOptionIndex = -1);
+                            if (mounted) {
+                              setState(() {
+                                selectedOptionIndex = -1;
+                              });
+                            }
                           });
                         },
                       );
@@ -206,7 +220,7 @@ class _AccountScreenState extends State<AccountScreen> {
       height: iconSize * 1.4,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.grey),
+        border: Border.all(color: Colors.grey, width: 1),
       ),
       child: Icon(icon, size: iconSize, color: const Color(0xFF003840)),
     );
@@ -229,8 +243,7 @@ class _AccountOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final color = isSelected ? const Color(0xFF007B84) : const Color(0xFF003840);
-
+    final selectedColor = const Color(0xFF007B84);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
@@ -238,13 +251,17 @@ class _AccountOption extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: size.height * 0.02),
         child: Row(
           children: [
-            Icon(icon, color: color, size: size.width * 0.06),
+            Icon(
+              icon,
+              color: isSelected ? selectedColor : const Color(0xFF003840),
+              size: size.width * 0.06,
+            ),
             SizedBox(width: size.width * 0.04),
             Text(
               label,
               style: TextStyle(
                 fontSize: size.width * 0.045,
-                color: color,
+                color: isSelected ? selectedColor : const Color(0xFF003840),
                 fontWeight: FontWeight.w500,
               ),
             ),

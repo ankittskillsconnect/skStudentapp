@@ -270,3 +270,10 @@ class DiscussionCard extends StatelessWidget {
 //     ),
 //   );
 // }
+// Text(
+//   _calculateAge(state.dob),
+//   style: TextStyle(
+//     fontSize: media.width * 0.04,
+//     color: const Color(0xFF6A8E92),
+//   ),
+// ),
