@@ -52,13 +52,11 @@ class _AccountScreenState extends State<AccountScreen> {
     context.read<ProfileBloc>().add(LoadProfileData());
   }
 
-  // Refresh callback for pull-to-refresh
   Future<void> _onRefresh() async {
     context.read<ProfileBloc>().add(LoadProfileData());
     await Future.delayed(const Duration(seconds: 1));
   }
 
-  // Calculate age from dob with improved error handling
   String _calculateAge(String? dob) {
     if (dob == null || dob.isEmpty) {
       debugPrint('DOB is null or empty');
@@ -75,7 +73,6 @@ class _AccountScreenState extends State<AccountScreen> {
         debugPrint('Invalid age calculated: $age for DOB: $dob');
         return 'N/A';
       }
-      debugPrint('DOB: $dob, Calculated Age: $age');
       return '$age years old';
     } catch (e) {
       debugPrint('Error parsing DOB: $dob, Error: $e');
@@ -89,13 +86,10 @@ class _AccountScreenState extends State<AccountScreen> {
     final double iconSize = media.width * 0.065;
     final double profileSize = media.width * 0.37;
     final double spacing = media.height * 0.015;
+
     return BlocListener<NavigationBloc, NavigationState>(
       listener: (context, state) {
-        if (state is NavigateToMyAccount) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const MyAccount()),
-          );
-        }
+        // NavigationBloc used only for logout here
       },
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -163,7 +157,7 @@ class _AccountScreenState extends State<AccountScreen> {
                           ),
                           SizedBox(height: spacing * 0.3),
                           Text(
-                            _calculateAge(state.dob), // Display calculated age
+                            _calculateAge(state.dob),
                             style: TextStyle(
                               fontSize: media.width * 0.04,
                               color: const Color(0xFF6A8E92),
@@ -193,8 +187,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       itemBuilder: (context, index) {
                         final option = options[index];
                         final isMyAccount = option["label"] == 'My Account';
-                        final interviewVideos =
-                            option["label"] == "My interview videos";
+                        final interviewVideos = option["label"] == "My interview videos";
                         return _AccountOption(
                           icon: option['icon'] as IconData,
                           label: option['label'] as String,
@@ -203,20 +196,27 @@ class _AccountScreenState extends State<AccountScreen> {
                             setState(() {
                               selectedOptionIndex = index;
                             });
+
                             if (index == 6) {
                               _logout();
                             } else if (isMyAccount) {
-                              context.read<NavigationBloc>().add(
-                                GoToMyAccountScreen(),
-                              );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const MyAccount()),
+                              ).then((_) {
+                                Future.delayed(const Duration(milliseconds: 200), () {
+                                  if (mounted) {
+                                    context.read<ProfileBloc>().add(LoadProfileData());
+                                  }
+                                });
+                              });
                             } else if (interviewVideos) {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (_) => MyInterviewVideos(),
-                                ),
+                                MaterialPageRoute(builder: (_) => MyInterviewVideos()),
                               );
                             }
+
                             Future.delayed(const Duration(milliseconds: 50), () {
                               if (mounted) {
                                 setState(() {
