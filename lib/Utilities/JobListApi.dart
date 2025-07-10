@@ -29,7 +29,8 @@ class JobApi {
           final now = DateTime.now();
           final hoursAgo = now.difference(createdOn).inHours;
           final postTime = hoursAgo < 24 ? '$hoursAgo hr ago' : '${hoursAgo ~/ 24} days ago' ;
-          print("Job object: $job");// can del debug
+          // print("Job object: $job");// can del debug
+
           return {
             'title': job['title'] as String,
             'company': job['company_name'] as String,
@@ -39,8 +40,6 @@ class JobApi {
             'expiry': '7 days left',
             'tags': tags,
             'logoUrl': job['company_logo'] as String?,
-
-
           };
 
         }).toList();

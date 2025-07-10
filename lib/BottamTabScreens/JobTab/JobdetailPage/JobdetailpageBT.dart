@@ -14,10 +14,9 @@ class JobDetailPage2 extends StatefulWidget {
 class _JobDetailPage2State extends State<JobDetailPage2> {
   @override
   Widget build(BuildContext context) {
-
     final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360; // Base width: 360
-    final double heightScale = size.height / 640; // Base height: 640
+    final double widthScale = size.width / 360;
+    final double heightScale = size.height / 640;
 
     final double fontScale = (widthScale * 0.8).clamp(0.8, 1.2);
 
@@ -52,7 +51,10 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                     height: 46 * sizeScale,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.grey.shade300, width: 1 * sizeScale),
+                      border: Border.all(
+                        color: Colors.grey.shade300,
+                        width: 1 * sizeScale,
+                      ),
                     ),
                     child: IconButton(
                       padding: EdgeInsets.all(12),
@@ -75,7 +77,10 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                       height: 46 * sizeScale,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.grey.shade300, width: 1 * sizeScale),
+                        border: Border.all(
+                          color: Colors.grey.shade300,
+                          width: 1 * sizeScale,
+                        ),
                       ),
                       child: IconButton(
                         padding: EdgeInsets.zero,
@@ -84,8 +89,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                           size: 22 * sizeScale,
                           color: const Color(0xFF003840),
                         ),
-                        onPressed: () {
-                        },
+                        onPressed: () {},
                       ),
                     ),
                   ),
@@ -98,7 +102,10 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
           children: [
             const JobHeaderSection(),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 16 * sizeScale, vertical: 12 * sizeScale),
+              margin: EdgeInsets.symmetric(
+                horizontal: 16 * sizeScale,
+                vertical: 12 * sizeScale,
+              ),
               padding: EdgeInsets.all(4 * sizeScale),
               decoration: BoxDecoration(
                 color: const Color(0xFFEBF6F7),
@@ -148,7 +155,10 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
           ],
         ),
         bottomNavigationBar: Container(
-          padding: EdgeInsets.symmetric(vertical: 12 * sizeScale, horizontal: 140 * sizeScale),
+          padding: EdgeInsets.symmetric(
+            vertical: 12 * sizeScale,
+            horizontal: 140 * sizeScale,
+          ),
           color: const Color(0xFFEFF8F9),
           child: Row(
             children: [
@@ -176,7 +186,6 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
             ],
           ),
         ),
-
       ),
     );
   }
