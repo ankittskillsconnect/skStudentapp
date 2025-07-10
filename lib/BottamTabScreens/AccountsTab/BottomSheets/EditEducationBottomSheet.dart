@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Utilities/CollegeListApi.dart';
 import '../../../Utilities/SpecializationApi.dart';
 import 'package:sk_loginscreen1/Utilities/AllCourseApi.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 class EditEducationBottomSheet extends StatefulWidget {
   final String? initialData;
@@ -56,14 +57,15 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
   void initState() {
     super.initState();
     _percentageController = TextEditingController(text: widget.percentage);
-    degreeType = widget.degreeType == 'Undergrad' ? 'UnderGrad' : widget.degreeType;
+    degreeType = widget.degreeType == 'Undergrad'
+        ? 'UnderGrad'
+        : widget.degreeType;
     college = widget.college;
     courseName = widget.courseName;
     specilization = widget.specilization;
     courseType = widget.courseType;
     gradingSystem = widget.gradingSystem;
     passingYear = widget.passingYear;
-
     _initData();
   }
 
@@ -76,9 +78,9 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
       ]);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading data: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error loading data: $e')));
       }
     } finally {
       if (mounted) {
@@ -107,7 +109,7 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
 
     print("Using authToken: $authToken, connectSid: $connectSid");
     final results = await CourseListApi.fetchCourses(
-      courseName: '', // Fetch all courses
+      courseName: '',
       authToken: authToken,
       connectSid: connectSid,
     );
@@ -131,7 +133,7 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
     final courseId = await _resolveCourseId(courseName);
     print("Fetching specializations for course ID: $courseId");
     final specs = await SpecializationListApi.fetchSpecializations(
-      specializationName: '', // Fetch all specializations
+      specializationName: '',
       courseId: courseId,
       authToken: authToken,
       connectSid: connectSid,
@@ -139,7 +141,9 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
 
     if (!mounted) return;
     setState(() {
-      specializationList = specs.isNotEmpty ? specs : ['No Specializations Available'];
+      specializationList = specs.isNotEmpty
+          ? specs
+          : ['No Specializations Available'];
       if (!specializationList.contains(widget.specilization)) {
         specilization = specializationList[0];
       } else {
@@ -153,20 +157,25 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
     final prefs = await SharedPreferences.getInstance();
     final authToken = prefs.getString('authToken') ?? '';
     final connectSid = prefs.getString('connectSid') ?? '';
-
     try {
-      final response = await http.post(
-        Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/course/list'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
-        },
-        body: jsonEncode({"course_name": courseName}),
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(
+            Uri.parse(
+              'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/course/list',
+            ),
+            headers: {
+              'Content-Type': 'application/json',
+              'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
+            },
+            body: jsonEncode({"course_name": courseName}),
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data['status'] == true && data['data'] is List && data['data'].isNotEmpty) {
+        if (data['status'] == true &&
+            data['data'] is List &&
+            data['data'].isNotEmpty) {
           return data['data'][0]['id'].toString();
         }
       }
@@ -205,147 +214,162 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Add Education Details',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF003840),
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Add Education Details',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF003840),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.close,
+                              color: Color(0xFF005E6A),
+                            ),
+                            onPressed: () {
+                              try {
+                                Navigator.of(context).pop();
+                              } catch (e) {
+                                print("Error closing bottom sheet: $e");
+                              }
+                            },
+                          ),
+                        ],
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Color(0xFF005E6A)),
-                      onPressed: () {
-                        try {
-                          Navigator.of(context).pop();
-                        } catch (e) {
-                          print("Error closing bottom sheet: $e");
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: AnimatedPadding(
-                    duration: const Duration(milliseconds: 10),
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
-                    ),
-                    child: ListView(
-                      controller: scrollController,
-                      children: [
-                        _buildLabel("Degree type"),
-                        _buildDropdownField(
-                          value: degreeType,
-                          items: const ["UnderGrad", "Graduate", "Open"],
-                          onChanged: (val) => setState(() => degreeType = val ?? ''),
-                        ),
-                        _buildLabel("College name"),
-                        _buildDropdownField(
-                          value: college,
-                          items: collegeList,
-                          onChanged: (val) => setState(() => college = val ?? ''),
-                        ),
-                        _buildLabel("Course name"),
-                        _buildDropdownField(
-                          value: courseName,
-                          items: courseList,
-                          onChanged: (val) => setState(() => courseName = val ?? ''),
-                        ),
-                        _buildLabel("Specialization"),
-                        _buildDropdownField(
-                          value: specilization,
-                          items: specializationList,
-                          onChanged: (val) => setState(() => specilization = val ?? ''),
-                        ),
-                        _buildLabel("Course type"),
-                        Column(
-                          children: [
-                            Row(
-                              children: [
-                                _buildRadio("Full Time"),
-                                _buildRadio("Part Time"),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                _buildRadio("Correspondences / Distance learning"),
-                              ],
-                            ),
-                          ],
-                        ),
-                        _buildLabel("Grading system"),
-                        _buildDropdownField(
-                          value: gradingSystem,
-                          items: const ["CGPA", "Percentage"],
-                          onChanged: (val) => setState(() => gradingSystem = val ?? ''),
-                        ),
-                        _buildLabel("Your percentage / grade"),
-                        _buildTextField(
-                          "Please select",
-                          _percentageController,
-                          keyboardType: TextInputType.number,
-                        ),
-                        _buildLabel("Year of passing"),
-                        _buildDropdownField(
-                          value: passingYear,
-                          items: const ["2023", "2024", "2025"],
-                          onChanged: (val) => setState(() => passingYear = val ?? ''),
-                        ),
-                        const SizedBox(height: 30),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF005E6A),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            minimumSize: const Size.fromHeight(50),
+                      Expanded(
+                        child: AnimatedPadding(
+                          duration: const Duration(milliseconds: 10),
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom,
                           ),
-                          onPressed: () {
-                            if (collegeList[0] == 'No Colleges Available' ||
-                                courseList[0] == 'No Courses Available' ||
-                                specializationList[0] == 'No Specializations Available') {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Please ensure all data is loaded')),
-                              );
-                              return;
-                            }
-                            final data = {
-                              'educationDetail': _formatEducationDetail(),
-                              'degreeType': degreeType,
-                              'courseName': courseName,
-                              'specilization': specilization,
-                              'courseType': courseType,
-                              'college': college,
-                              'gradingSystem': gradingSystem,
-                              'percentage': _percentageController.text,
-                              'passingYear': passingYear,
-                            };
-                            widget.onSave(data);
-                          },
-                          child: const Text(
-                            "Save",
-                            style: TextStyle(color: Colors.white),
+                          child: ListView(
+                            controller: scrollController,
+                            children: [
+                              _buildLabel("Degree type"),
+                              _buildDropdownField(
+                                value: degreeType,
+                                items: const ["UnderGrad", "Graduate", "Open"],
+                                onChanged: (val) =>
+                                    setState(() => degreeType = val ?? ''),
+                              ),
+                              _buildLabel("College name"),
+                              _buildDropdownField(
+                                value: college,
+                                items: collegeList,
+                                onChanged: (val) =>
+                                    setState(() => college = val ?? ''),
+                              ),
+                              _buildLabel("Course name"),
+                              _buildDropdownField(
+                                value: courseName,
+                                items: courseList,
+                                onChanged: (val) =>
+                                    setState(() => courseName = val ?? ''),
+                              ),
+                              _buildLabel("Specialization"),
+                              _buildDropdownField(
+                                value: specilization,
+                                items: specializationList,
+                                onChanged: (val) =>
+                                    setState(() => specilization = val ?? ''),
+                              ),
+                              _buildLabel("Course type"),
+                              Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      _buildRadio("Full Time"),
+                                      _buildRadio("Part Time"),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      _buildRadio(
+                                        "Correspondences / Distance learning",
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              _buildLabel("Grading system"),
+                              _buildDropdownField(
+                                value: gradingSystem,
+                                items: const ["CGPA", "Percentage"],
+                                onChanged: (val) =>
+                                    setState(() => gradingSystem = val ?? ''),
+                              ),
+                              _buildLabel("Your percentage / grade"),
+                              _buildTextField(
+                                "Please select",
+                                _percentageController,
+                                keyboardType: TextInputType.number,
+                              ),
+                              _buildLabel("Year of passing"),
+                              _buildDropdownField(
+                                value: passingYear,
+                                items: const ["2023", "2024", "2025"],
+                                onChanged: (val) =>
+                                    setState(() => passingYear = val ?? ''),
+                              ),
+                              const SizedBox(height: 30),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF005E6A),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  minimumSize: const Size.fromHeight(50),
+                                ),
+                                onPressed: () {
+                                  if (collegeList[0] ==
+                                          'No Colleges Available' ||
+                                      courseList[0] == 'No Courses Available' ||
+                                      specializationList[0] ==
+                                          'No Specializations Available') {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Please ensure all data is loaded',
+                                        ),
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  final data = {
+                                    'educationDetail': _formatEducationDetail(),
+                                    'degreeType': degreeType,
+                                    'courseName': courseName,
+                                    'specilization': specilization,
+                                    'courseType': courseType,
+                                    'college': college,
+                                    'gradingSystem': gradingSystem,
+                                    'percentage': _percentageController.text,
+                                    'passingYear': passingYear,
+                                  };
+                                  widget.onSave(data);
+                                },
+                                child: const Text(
+                                  "Save",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
         );
       },
     );
   }
-
   Widget _buildLabel(String text) => Padding(
     padding: const EdgeInsets.only(top: 12, bottom: 6),
     child: Text(
@@ -363,8 +387,9 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
     required List<String> items,
     required void Function(String?) onChanged,
   }) {
-    final displayValue = items.contains(value) ? value : (items.isNotEmpty ? items[0] : null);
-
+    final displayValue = items.contains(value)
+        ? value
+        : (items.isNotEmpty ? items[0] : null);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: DropdownButtonFormField<String>(
@@ -381,7 +406,7 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
             onChanged(newValue);
             FocusScope.of(context).unfocus();
             if (newValue == courseName) {
-              _fetchSpecializationList(); // Refresh specializations when course changes
+              _fetchSpecializationList();
             }
           }
         },
@@ -415,19 +440,18 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
   );
 
   Widget _buildTextField(
-      String label,
-      TextEditingController controller, {
-        TextInputType keyboardType = TextInputType.text,
-      }) =>
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: TextField(
-          controller: controller,
-          keyboardType: keyboardType,
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        ),
-      );
+    String label,
+    TextEditingController controller, {
+    TextInputType keyboardType = TextInputType.text,
+  }) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    ),
+  );
 }

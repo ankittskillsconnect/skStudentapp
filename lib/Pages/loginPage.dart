@@ -92,28 +92,25 @@ class _LoginpageState extends State<Loginpage> {
 
     if (result['success'] == true) {
       final prefs = await SharedPreferences.getInstance();
-
       final authToken = result['token'] ?? '';
       String connectSid = result['cookie'] ?? '';
 
-      print('🟡 Raw connectSid from API: $connectSid');
+      print(' Raw connectSid from API: $connectSid');
 
-      // Extract "connect.sid=..." from the cookie string
       final match = RegExp(r'connect\.sid=([^;]+)').firstMatch(connectSid);
       if (match != null) {
         connectSid = match.group(1) ?? '';
-        print('🟢 Extracted connectSid: $connectSid');
+        print(' Extracted connectSid: $connectSid');
       } else {
-        print('🧨 WARNING: connect.sid not found in cookie string.');
+        print(' WARNING: connect.sid not found in cookie string.');
       }
 
-      // Save tokens
       await prefs.setString('authToken', authToken);
       await prefs.setString('connectSid', connectSid);
 
-      print('✅ Auth token and connect.sid saved to SharedPreferences.');
-      print('🟢 authToken = $authToken');
-      print('🟢 connectSid = $connectSid');
+      print(' Auth token and connect.sid saved to SharedPreferences.');
+      print(' authToken = $authToken');
+      print(' connectSid = $connectSid');
 
       context.read<NavigationBloc>().add(GotoHomeScreen2());
     } else {

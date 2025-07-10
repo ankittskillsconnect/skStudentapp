@@ -13,9 +13,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   }
 
   Future<void> _onLoadProfileData(
-      LoadProfileData event,
-      Emitter<ProfileState> emit,
-      ) async {
+    LoadProfileData event,
+    Emitter<ProfileState> emit,
+  ) async {
     emit(ProfileLoading());
 
     final data = await SharedPrefHelper.loadData();
@@ -24,18 +24,20 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     final age = _calculateAge(dobString);
     final image = data['profileImage'] as File?;
 
-    emit(ProfileDataLoaded(
-      fullname: name,
-      age: age,
-      dob: dobString,
-      profileImage: image,
-    ));
+    emit(
+      ProfileDataLoaded(
+        fullname: name,
+        age: age,
+        dob: dobString,
+        profileImage: image,
+      ),
+    );
   }
 
   Future<void> _onUpdateProfileData(
-      UpdateProfileData event,
-      Emitter<ProfileState> emit,
-      ) async {
+    UpdateProfileData event,
+    Emitter<ProfileState> emit,
+  ) async {
     emit(ProfileLoading());
 
     final existingData = await SharedPrefHelper.loadData();
@@ -60,20 +62,28 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       passingYear: existingData['passingYear'],
       skills: List<String>.from(existingData['skills'] ?? []),
       projects: List<Map<String, dynamic>>.from(existingData['projects'] ?? []),
-      certificates: List<Map<String, dynamic>>.from(existingData['certificates'] ?? []),
-      workExperiences: List<Map<String, dynamic>>.from(existingData['workExperiences'] ?? []),
+      certificates: List<Map<String, dynamic>>.from(
+        existingData['certificates'] ?? [],
+      ),
+      workExperiences: List<Map<String, dynamic>>.from(
+        existingData['workExperiences'] ?? [],
+      ),
       profileImage: event.profileImage,
-      languages: List<Map<String, dynamic>>.from(existingData['languages'] ?? []),
+      languages: List<Map<String, dynamic>>.from(
+        existingData['languages'] ?? [],
+      ),
     );
 
     final age = _calculateAge(event.dob);
 
-    emit(ProfileDataLoaded(
-      fullname: event.fullname,
-      age: age,
-      dob: event.dob,
-      profileImage: event.profileImage,
-    ));
+    emit(
+      ProfileDataLoaded(
+        fullname: event.fullname,
+        age: age,
+        dob: event.dob,
+        profileImage: event.profileImage,
+      ),
+    );
   }
 
   int _calculateAge(String dob) {
@@ -81,7 +91,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       final date = DateFormat('dd, MMM yyyy').parse(dob);
       final now = DateTime.now();
       int age = now.year - date.year;
-      if (now.month < date.month || (now.month == date.month && now.day < date.day)) {
+      if (now.month < date.month ||
+          (now.month == date.month && now.day < date.day)) {
         age--;
       }
       return age;

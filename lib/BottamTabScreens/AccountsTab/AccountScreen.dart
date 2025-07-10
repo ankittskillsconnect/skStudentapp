@@ -166,13 +166,16 @@ class _AccountScreenState extends State<AccountScreen> {
                         ],
                       );
                     } else {
-                      return const Text(
-                        'Unable to load profile data',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.red,
-                        ),
+                      return CircularProgressIndicator(
+                        color: Colors.teal,
                       );
+                      //   Text(
+                      //   'Unable to load profile data',
+                      //   style: TextStyle(
+                      //     fontSize: 16,
+                      //     color: Colors.red,
+                      //   ),
+                      // );
                     }
                   },
                 ),

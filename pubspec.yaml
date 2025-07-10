@@ -64,6 +64,7 @@ dev_dependencies:
   chewie: ^1.11.3
   youtube_player_iframe: ^5.2.1
   flutter_secure_storage: ^9.2.4
+  dropdown_search: ^6.0.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

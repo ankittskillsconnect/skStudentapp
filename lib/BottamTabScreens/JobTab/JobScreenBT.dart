@@ -138,7 +138,6 @@ class _JobScreenbtState extends State<Jobscreenbt> {
                     },
                   ),
                 ),
-
                 //uncomment for only the top most card to be tappable
                 // Expanded(
                 //   child: ListView.builder(
