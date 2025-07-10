@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/JobTab/AppBarJobScreen.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/JobTab/JobdetailPage/JobdetailpageBT.dart';
 import 'package:sk_loginscreen1/Pages/bottombar.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_state.dart';
+import '../../Utilities/JobListApi.dart';
 import 'JobCardBT.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Jobscreenbt extends StatefulWidget {
   const Jobscreenbt({super.key});
@@ -15,73 +16,38 @@ class Jobscreenbt extends StatefulWidget {
 }
 
 class _JobScreenbtState extends State<Jobscreenbt> {
-  final List<Map<String, dynamic>> jobs = [
-    {
-      'title': 'UI/UX Designer',
-      'company': 'Google',
-      'location': 'Bangalore, Karnataka, India',
-      'salary': '₹12–15 LPA',
-      'postTime': '30 min ago',
-      'expiry': '7 days left',
-      'tags': ['Hybrid (3 days WFH)', 'Full time (On-site)'],
-    },
-    {
-      'title': 'Artificial Intelligence Engineer',
-      'company': 'Google',
-      'location': 'Bangalore, Karnataka, India',
-      'salary': '₹12–15 LPA',
-      'postTime': '30 min ago',
-      'expiry': '7 days left',
-      'tags': ['Hybrid (3 days WFH)', 'Full time (On-site)'],
-    },
-    {
-      'title': 'Graphic Designer',
-      'company': 'Google',
-      'location': 'Bangalore, Karnataka, India',
-      'salary': '₹12–15 LPA',
-      'postTime': '30 min ago',
-      'expiry': '7 days left',
-      'tags': ['Hybrid (3 days WFH)', 'Full time (On-site)'],
-    },
-    {
-      'title': 'Fashion Designer',
-      'company': 'Google',
-      'location': 'Bangalore, Karnataka, India',
-      'salary': '₹12–15 LPA',
-      'postTime': '30 min ago',
-      'expiry': '7 days left',
-      'tags': ['Hybrid (3 days WFH)', 'Full time (On-site)'],
-    },
-    {
-      'title': 'Fashion Designer',
-      'company': 'Google',
-      'location': 'Bangalore, Karnataka, India',
-      'salary': '₹12–15 LPA',
-      'postTime': '30 min ago',
-      'expiry': '7 days left',
-      'tags': ['Hybrid (3 days WFH)', 'Full time (On-site)'],
-    },
-    {
-      'title': 'Fashion Designer',
-      'company': 'Google',
-      'location': 'Bangalore, Karnataka, India',
-      'salary': '₹12–15 LPA',
-      'postTime': '30 min ago',
-      'expiry': '7 days left',
-      'tags': ['Hybrid (3 days WFH)', 'Full time (On-site)'],
-    },
-    {
-      'title': 'Fashion Designer',
-      'company': 'Google',
-      'location': 'Bangalore, Karnataka, India',
-      'salary': '₹12–15 LPA',
-      'postTime': '30 min ago',
-      'expiry': '7 days left',
-      'tags': ['Hybrid (3 days WFH)', 'Full time (On-site)'],
-    },
-  ];
-
+  List<Map<String, dynamic>> jobs = [];
+  bool isLoading = true;
+  String? errorMessage;
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchJobs();
+  }
+
+  Future<void> _fetchJobs() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+    try {
+      final fetchedJobs = await JobApi.fetchJobs();
+      setState(() {
+        jobs = fetchedJobs;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = 'Failed to load jobs: $e';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load jobs: $e')),
+        );
+      });
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -96,7 +62,7 @@ class _JobScreenbtState extends State<Jobscreenbt> {
         if (state is NavigateTOJobDetailBT) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => JobDetailPage2()),
+            MaterialPageRoute(builder: (_) => const JobDetailPage2()),
           );
         }
       },
@@ -110,7 +76,13 @@ class _JobScreenbtState extends State<Jobscreenbt> {
               children: [
                 const SizedBox(height: 10),
                 Expanded(
-                  child: ListView.builder(
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : errorMessage != null
+                      ? Center(child: Text(errorMessage!, style: const TextStyle(color: Colors.red)))
+                      : jobs.isEmpty
+                      ? const Center(child: Text('No jobs found'))
+                      : ListView.builder(
                     shrinkWrap: false,
                     physics: const AlwaysScrollableScrollPhysics(),
                     itemCount: jobs.length,
@@ -121,7 +93,7 @@ class _JobScreenbtState extends State<Jobscreenbt> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => JobDetailPage2(),
+                              builder: (_) => const JobDetailPage2(),
                             ),
                           );
                         },
@@ -133,44 +105,12 @@ class _JobScreenbtState extends State<Jobscreenbt> {
                           postTime: job['postTime'],
                           expiry: job['expiry'],
                           tags: List<String>.from(job['tags']),
+                          logoUrl: job['logoUrl'],
                         ),
                       );
                     },
                   ),
                 ),
-                //uncomment for only the top most card to be tappable
-                // Expanded(
-                //   child: ListView.builder(
-                //     shrinkWrap: false,
-                //     physics: const AlwaysScrollableScrollPhysics(),
-                //     itemCount: jobs.length,
-                //     itemBuilder: (context, index){
-                //       final job = jobs[index];
-                //       final isTappable = job["title"] == 'UI/UX Designer';
-                //       final JobCard = JobCardBT(
-                //         jobTitle: job['title'],
-                //         company: job['company'],
-                //         location: job['location'],
-                //         salary: job['salary'],
-                //         postTime: job['postTime'],
-                //         expiry: job['expiry'],
-                //         tags: List<String>.from(job['tags']),
-                //       );
-                //       return isTappable
-                //           ? InkWell(onTap: () {
-                //         Navigator.push(
-                //           context,
-                //           MaterialPageRoute(
-                //             builder: (_) => JobDetailPage2(),
-                //           ),
-                //         );
-                //       }, child: JobCard
-                //       )
-                //           : JobCard;
-                //     },
-                //   ),
-                // ),
-
               ],
             ),
           ),

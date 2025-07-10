@@ -8,6 +8,7 @@ class JobCardBT extends StatelessWidget {
   final String postTime;
   final String expiry;
   final List<String> tags;
+  final String? logoUrl;
 
   const JobCardBT({
     super.key,
@@ -18,13 +19,13 @@ class JobCardBT extends StatelessWidget {
     required this.postTime,
     required this.expiry,
     required this.tags,
+    this.logoUrl,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: const Color(0xFFEBF6F7),
@@ -49,18 +50,25 @@ class JobCardBT extends StatelessWidget {
                   children: [
                     Container(
                       padding: const EdgeInsets.all(3),
-                      margin: EdgeInsets.only(bottom: 0),
+                      margin: const EdgeInsets.only(bottom: 0),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: const Color(0xFF005E6A)),
                       ),
-                      child: Image.asset(
-                        "assets/google.png",
+                      child: logoUrl != null && logoUrl!.isNotEmpty
+                          ? Image.network(
+                        logoUrl!,
                         width: 40,
                         height: 40,
                         fit: BoxFit.contain,
-                      ),
+                        errorBuilder: (context, error, stackTrace) {
+                          print("Image load error: $error");
+                          return Image.asset("assets/google.png", width: 40, height: 40);
+                        },
+                      )
+                          : Image.asset("assets/google.png", width: 40, height: 40),
+
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -106,9 +114,12 @@ class JobCardBT extends StatelessWidget {
                   runSpacing: 8,
                   children: tags.map((tag) {
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: Colors.white   ,
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: const Color(0xFF827B7B)),
                       ),
@@ -151,11 +162,14 @@ class JobCardBT extends StatelessWidget {
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: Color(0xFFFEDDDC),
+                    color: const Color(0xFFFEDDDC),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Color(0xFFBCD8DB)),
+                    border: Border.all(color: const Color(0xFFBCD8DB)),
                   ),
                   child: Text(
                     expiry,

@@ -22,24 +22,27 @@ class JobApi {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       if (data['status'] == true && data['jobs'] is List) {
-        // Transform API jobs to match JobCardBT structure
         return data['jobs'].map<Map<String, dynamic>>((job) {
           final skills = (job['skills'] as String?)?.split(',') ?? [];
           final tags = [job['job_type'] as String, ...skills].where((tag) => tag.isNotEmpty).toList();
           final createdOn = DateTime.parse(job['created_on'] as String);
           final now = DateTime.now();
-          final minutesAgo = now.difference(createdOn).inMinutes;
-          final postTime = minutesAgo < 60 ? '$minutesAgo min ago' : '${minutesAgo ~/ 60} hr ago';
-
+          final hoursAgo = now.difference(createdOn).inHours;
+          final postTime = hoursAgo < 24 ? '$hoursAgo hr ago' : '${hoursAgo ~/ 24} days ago' ;
+          print("Job object: $job");// can del debug
           return {
             'title': job['title'] as String,
             'company': job['company_name'] as String,
             'location': job['three_cities_name'] as String,
             'salary': '₹${job['cost_to_company']} LPA',
             'postTime': postTime,
-            'expiry': '7 days left', // Placeholder
+            'expiry': '7 days left',
             'tags': tags,
+            'logoUrl': job['company_logo'] as String?,
+
+
           };
+
         }).toList();
       } else {
         throw Exception('Invalid response format: ${data['msg']}');
