@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/JobTab/AppBarJobScreen.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/JobTab/JobdetailPage/JobdetailpageBT.dart';
 import 'package:sk_loginscreen1/Pages/bottombar.dart';
@@ -77,14 +78,20 @@ class _JobScreenbtState extends State<Jobscreenbt> {
                 const SizedBox(height: 10),
                 Expanded(
                   child: isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? ListView.builder(
+                    itemCount: 5,
+                    itemBuilder: (context, index) => _buildShimmerCard(),
+                  )
                       : errorMessage != null
-                      ? Center(child: Text(errorMessage!, style: const TextStyle(color: Colors.red)))
+                      ? Center(
+                    child: Text(
+                      errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  )
                       : jobs.isEmpty
                       ? const Center(child: Text('No jobs found'))
                       : ListView.builder(
-                    shrinkWrap: false,
-                    physics: const AlwaysScrollableScrollPhysics(),
                     itemCount: jobs.length,
                     itemBuilder: (context, index) {
                       final job = jobs[index];
@@ -110,7 +117,8 @@ class _JobScreenbtState extends State<Jobscreenbt> {
                       );
                     },
                   ),
-                ),
+                )
+
               ],
             ),
           ),
@@ -122,4 +130,109 @@ class _JobScreenbtState extends State<Jobscreenbt> {
       ),
     );
   }
+}
+
+Widget _buildShimmerCard() {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+    padding: const EdgeInsets.all(8),
+    decoration: BoxDecoration(
+
+      borderRadius: BorderRadius.circular(25),
+    ),
+    child: Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 18,
+                            width: 120,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            height: 14,
+                            width: 180,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      height: 16,
+                      width: 50,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Tags row (fake chips)
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: List.generate(3, (index) {
+                    return Container(
+                      height: 20,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  height: 14,
+                  width: 80,
+                  color: Colors.white,
+                ),
+                Container(
+                  height: 14,
+                  width: 60,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }

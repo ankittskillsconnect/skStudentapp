@@ -79,7 +79,7 @@ class JobCardBT extends StatelessWidget {
                             jobTitle,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                              fontSize: 19,
                               color: Color(0xFF003840),
                             ),
                             maxLines: 1,
@@ -88,7 +88,7 @@ class JobCardBT extends StatelessWidget {
                           Text(
                             "$company\n$location",
                             style: const TextStyle(
-                              fontSize: 14,
+                              fontSize: 15,
                               color: Color(0xFF827B7B),
                             ),
                             maxLines: 2,
@@ -127,7 +127,7 @@ class JobCardBT extends StatelessWidget {
                         tag,
                         style: const TextStyle(
                           color: Color(0xFF003840),
-                          fontSize: 11,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
