@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Utilities/CollegeListApi.dart';
 import '../../../Utilities/SpecializationApi.dart';
 import 'package:sk_loginscreen1/Utilities/AllCourseApi.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 
 class EditEducationBottomSheet extends StatefulWidget {
   final String? initialData;
@@ -48,7 +47,6 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
   late String gradingSystem;
   late String passingYear;
   bool isLoading = true;
-
   List<String> collegeList = [];
   List<String> courseList = [];
   List<String> specializationList = [];
@@ -106,14 +104,12 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
     final prefs = await SharedPreferences.getInstance();
     final authToken = prefs.getString('authToken') ?? '';
     final connectSid = prefs.getString('connectSid') ?? '';
-
     print("Using authToken: $authToken, connectSid: $connectSid");
     final results = await CourseListApi.fetchCourses(
       courseName: '',
       authToken: authToken,
       connectSid: connectSid,
     );
-
     if (!mounted) return;
     setState(() {
       courseList = results.isNotEmpty ? results : ['No Courses Available'];
@@ -129,7 +125,6 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
     final prefs = await SharedPreferences.getInstance();
     final authToken = prefs.getString('authToken') ?? '';
     final connectSid = prefs.getString('connectSid') ?? '';
-
     final courseId = await _resolveCourseId(courseName);
     print("Fetching specializations for course ID: $courseId");
     final specs = await SpecializationListApi.fetchSpecializations(
@@ -138,7 +133,6 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
       authToken: authToken,
       connectSid: connectSid,
     );
-
     if (!mounted) return;
     setState(() {
       specializationList = specs.isNotEmpty

@@ -8,9 +8,8 @@ class JobHeaderSection extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final widthScale = size.width / 360;
     final fontScale = (widthScale * 0.9).clamp(0.9, 1.2);
-
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 14 * widthScale, vertical: 10 * widthScale),
+      padding: EdgeInsets.symmetric(horizontal: 5 * widthScale, vertical: 10 * widthScale),
       child: Column(
         children: [
           Row(
@@ -80,14 +79,11 @@ class JobHeaderSection extends StatelessWidget {
 
 class _Tag extends StatelessWidget {
   final String label;
-
   const _Tag({required this.label});
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final widthScale = size.width / 360;
-
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 12 * widthScale,
