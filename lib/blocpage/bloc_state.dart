@@ -110,10 +110,13 @@ class NavigateToAccountScreen extends NavigationState {
 }
 
 class NavigateTOJobDetailBT extends NavigationState {
-  const NavigateTOJobDetailBT();
+  final String jobToken;
+  const NavigateTOJobDetailBT({required this.jobToken});
+
   @override
-  List<Object> get props => ['NavigateToJobDetailScreenBT'];
+  List<Object> get props => ['NavigateToJobDetailScreenBT', jobToken];
 }
+
 
 class NavigateToMyAccount extends NavigationState {
   const NavigateToMyAccount();

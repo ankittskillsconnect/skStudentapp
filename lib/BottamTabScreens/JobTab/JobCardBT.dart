@@ -35,7 +35,7 @@ class JobCardBT extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children:[
+        children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(

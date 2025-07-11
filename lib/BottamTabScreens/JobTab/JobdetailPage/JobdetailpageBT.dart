@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'JobDetailHeader.dart';
 
 class JobDetailPage2 extends StatefulWidget {
   const JobDetailPage2({super.key});
@@ -88,11 +89,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                     ),
                     child: IconButton(
                       padding: EdgeInsets.all(12),
-                      icon: Icon(
-                        Icons.arrow_back_ios,
-                        size: 22 * sizeScale,
-                        color: const Color(0xFF003840),
-                      ),
+                      icon: Icon(Icons.arrow_back_ios, size: 22 * sizeScale, color: const Color(0xFF003840)),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -111,11 +108,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                       ),
                       child: IconButton(
                         padding: EdgeInsets.zero,
-                        icon: Icon(
-                          Icons.share,
-                          size: 22 * sizeScale,
-                          color: const Color(0xFF003840),
-                        ),
+                        icon: Icon(Icons.share, size: 22 * sizeScale, color: const Color(0xFF003840)),
                         onPressed: () {},
                       ),
                     ),
@@ -127,14 +120,11 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 16 * sizeScale,
-              vertical: 5 * sizeScale,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 16 * sizeScale, vertical: 5 * sizeScale),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _jobHeader(size, widthScale, fontScale),
+                const JobHeaderSection(),
                 _sectionTitle('Responsibilities of the Candidate:'),
                 _bulletSection(responsibilities, sizeScale),
                 _sectionTitle('Terms and Condition :-'),
@@ -186,88 +176,12 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
     );
   }
 
-  Widget _jobHeader(Size size, double widthScale, double fontScale) {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 5 * widthScale,
-        vertical: 10 * widthScale,
-      ),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/google.png',
-                height: 48 * widthScale,
-                width: 48 * widthScale,
-              ),
-              SizedBox(width: 10 * widthScale),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            "Software engineer",
-                            style: TextStyle(
-                              fontSize: 18 * fontScale,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF005E6A),
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Icon(
-                            Icons.bookmark_add_outlined,
-                            size: 26 * widthScale,
-                            color: const Color(0xFF005E6A),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Google • Surat, India",
-                      style: TextStyle(
-                        fontSize: 14 * fontScale,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 14 * widthScale),
-          Padding(
-            padding: EdgeInsets.only(left: 10 * widthScale),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Wrap(
-                spacing: 10 * widthScale,
-                children: const [
-                  _Tag(label: "Full-time"),
-                  _Tag(label: "In-office"),
-                  _Tag(label: "14 Openings"),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _sectionTitle(String title) => Padding(
     padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
     child: Text(
       title,
       style: const TextStyle(
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: FontWeight.bold,
         color: Color(0xFF003840),
       ),
@@ -289,44 +203,12 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("\u2022 ", style: TextStyle(fontSize: 16 * scale)),
-              Expanded(
-                child: Text(e, style: TextStyle(fontSize: 14 * scale)),
-              ),
+              Text("\u2022 ", style: TextStyle(fontSize: 14 * scale)),
+              Expanded(child: Text(e, style: TextStyle(fontSize: 14 * scale))),
             ],
           ),
         );
       }).toList(),
     ),
   );
-}
-
-class _Tag extends StatelessWidget {
-  final String label;
-
-  const _Tag({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final widthScale = size.width / 360;
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 12 * widthScale,
-        vertical: 6 * widthScale,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEFF8F9),
-        borderRadius: BorderRadius.circular(20 * widthScale),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: const Color(0xFF005E6A),
-          fontSize: 14 * widthScale,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
 }

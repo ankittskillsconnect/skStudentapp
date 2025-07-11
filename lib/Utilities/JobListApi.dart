@@ -32,15 +32,17 @@ class JobApi {
           // print("Job object: $job");// can del debug
 
           return {
-            'title': job['title'] as String,
-            'company': job['company_name'] as String,
-            'location': job['three_cities_name'] as String,
-            'salary': '₹${job['cost_to_company']} LPA',
+            'title': job['title'] ?? '',
+            'company': job['company_name'] ?? '',
+            'location': job['three_cities_name'] ?? '',
+            'salary': '₹${job['cost_to_company'] ?? '0'} LPA',
             'postTime': postTime,
             'expiry': '7 days left',
             'tags': tags,
-            'logoUrl': job['company_logo'] as String?,
+            'logoUrl': job['company_logo'],
+            'jobToken': job['token'] ?? '',
           };
+
 
         }).toList();
       } else {

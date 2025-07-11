@@ -96,8 +96,9 @@ class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
     });
     on<GoToJobDetailScreenBT>((event, emit) {
       print('Handling NavigateToJobDetailScreenBT');
-      emit(const NavigateTOJobDetailBT());
+      emit(NavigateTOJobDetailBT(jobToken: event.jobToken));
     });
+
     on<GoToMyAccountScreen>((event, emit) {
       print('Handling NavigateToMyAccount');
       emit(const NavigateToMyAccount());

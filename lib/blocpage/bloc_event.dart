@@ -19,8 +19,17 @@ class GotoJobScreen2 extends NavigationEvent {}
 class GoToInterviewScreen2 extends NavigationEvent {}
 class GoToContactsScreen2 extends NavigationEvent {}
 class GoToAccountScreen2  extends NavigationEvent {}
-class GoToJobDetailScreenBT extends NavigationEvent {}
-class GoToMyAccountScreen extends NavigationEvent {}
+class GoToJobDetailScreenBT extends NavigationEvent {
+  final String jobToken;
+  const GoToJobDetailScreenBT({required this.jobToken});
+
+  @override
+  List<Object> get props => [jobToken];
+}
+
+class GoToMyAccountScreen extends NavigationEvent {
+
+}
 class GoToMyInterviewVideosScreen extends NavigationEvent {}
 
 
