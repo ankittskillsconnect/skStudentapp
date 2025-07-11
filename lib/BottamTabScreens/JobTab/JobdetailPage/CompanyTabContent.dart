@@ -37,7 +37,7 @@ class SectionTitle extends StatelessWidget {
       style: const TextStyle(
         fontWeight: FontWeight.w700,
         color: Color(0xFF003840),
-        fontSize: 16
+        fontSize: 16,
       ),
     );
   }
@@ -54,11 +54,7 @@ class Subpoints extends StatelessWidget {
       padding: const EdgeInsets.only(top: 3),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-              child: Text(text, style: TextStyle(fontSize: 14),),
-          ),
-        ],
+        children: [Expanded(child: Text(text, style: TextStyle(fontSize: 14)))],
       ),
     );
   }

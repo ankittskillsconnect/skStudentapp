@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'DescriptionTabContent.dart';
+import 'package:flutter/services.dart';
 import 'JobDetailHeader.dart';
-import 'CompanyTabContent.dart';
-import 'SummaryTabContent.dart';
 
 class JobDetailPage2 extends StatefulWidget {
   const JobDetailPage2({super.key});
@@ -12,18 +10,53 @@ class JobDetailPage2 extends StatefulWidget {
 }
 
 class _JobDetailPage2State extends State<JobDetailPage2> {
+  final List<String> responsibilities = [
+    'Initially students will be placed in various departments – Warping, Weaving, TFO, Monofilament, Packing & Dispatch, Stitching, Processing, Non – Woven etc. of our factory, to understand the flow of production process.',
+    'Post that their area of expertise will be finalised.',
+  ];
+
+  final List<String> termsAndConditions = [
+    'Students shall be hired as GET (Graduate Engineer Trainee) , for minimum one year.',
+    'Food to be arranged by students on their own. (Canteen Facility available at factory premises , which will be on actual cost).',
+    'An Amount of Rs.1500/- per month shall be deducted towards Bachelor Accommodation (only applicable to students who are joining at Wada factory).',
+    'There will be Retention Bonus for three years of Rs.1500 per month , the aforesaid amount shall be deducted every month and will be reimbursed on completion of three years with us.',
+    'Non-Disclosure Affidavit cum Declaration will be there at the time of joining.',
+    'Detail GET joining Letter (Appointment Letter) will be provided at the time of joining.',
+  ];
+
+  final List<String> requirements = [
+    'Bachelors degree in Textile Engineering or related field',
+    'Strong understanding of textile manufacturing processes and materials',
+    'Ability to work well in a team environment',
+    'Strong communication and organizational skills',
+    'Willingness to learn and adapt to new technologies and processes',
+    'Basic computer skills including proficiency in Microsoft Office',
+  ];
+
+  final List<String> niceToHave = [
+    'Internship or project experience in the textile industry',
+    'Understanding of sustainable textile production practices',
+  ];
+
+  final List<String> aboutCompany = [
+    'Alphabet Pvt. Ltd. is a leading manufacturer of technical textiles and industrial filter fabrics, serving industries like pharma, mining, food processing, and wastewater treatment.',
+    'With over 40 years of experience and state-of-the-art facilities in Maharashtra, Daman, and Surat, they offer fully integrated production—from fiber to finished products.',
+    'The company exports to 120+ countries and is known for quality, innovation, and sustainability.',
+  ];
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final double widthScale = size.width / 360;
     final double heightScale = size.height / 640;
-
     final double fontScale = (widthScale * 0.8).clamp(0.8, 1.2);
-
     final double sizeScale = (widthScale * 0.9).clamp(0.9, 1.3);
 
-    return DefaultTabController(
-      length: 3,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark.copyWith(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+      ),
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: PreferredSize(
@@ -32,6 +65,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
             padding: EdgeInsets.all(1 * sizeScale),
             child: AppBar(
               backgroundColor: Colors.white,
+              surfaceTintColor: Colors.white,
               elevation: 0,
               centerTitle: true,
               titleSpacing: 0,
@@ -51,18 +85,11 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                     height: 46 * sizeScale,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.grey.shade300,
-                        width: 1 * sizeScale,
-                      ),
+                      border: Border.all(color: Colors.grey.shade300),
                     ),
                     child: IconButton(
                       padding: EdgeInsets.all(12),
-                      icon: Icon(
-                        Icons.arrow_back_ios,
-                        size: 22 * sizeScale,
-                        color: const Color(0xFF003840),
-                      ),
+                      icon: Icon(Icons.arrow_back_ios, size: 22 * sizeScale, color: const Color(0xFF003840)),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -77,18 +104,11 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                       height: 46 * sizeScale,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.grey.shade300,
-                          width: 1 * sizeScale,
-                        ),
+                        border: Border.all(color: Colors.grey.shade300),
                       ),
                       child: IconButton(
                         padding: EdgeInsets.zero,
-                        icon: Icon(
-                          Icons.share,
-                          size: 22 * sizeScale,
-                          color: const Color(0xFF003840),
-                        ),
+                        icon: Icon(Icons.share, size: 22 * sizeScale, color: const Color(0xFF003840)),
                         onPressed: () {},
                       ),
                     ),
@@ -98,61 +118,27 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
             ),
           ),
         ),
-        body: Column(
-          children: [
-            const JobHeaderSection(),
-            Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: 16 * sizeScale,
-                vertical: 12 * sizeScale,
-              ),
-              padding: EdgeInsets.all(4 * sizeScale),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEBF6F7),
-                borderRadius: BorderRadius.circular(30 * sizeScale),
-              ),
-              child: TabBar(
-                indicatorSize: TabBarIndicatorSize.tab,
-                indicator: BoxDecoration(
-                  color: const Color(0xFF005E6A),
-                  borderRadius: BorderRadius.circular(30 * sizeScale),
-                ),
-                labelColor: Colors.white,
-                indicatorColor: Colors.white,
-                unselectedLabelColor: const Color(0xFF003840),
-                dividerColor: Colors.transparent,
-                tabs: [
-                  Tab(
-                    child: Text(
-                      'Description',
-                      style: TextStyle(fontSize: 16 * fontScale),
-                    ),
-                  ),
-                  Tab(
-                    child: Text(
-                      'Company',
-                      style: TextStyle(fontSize: 16 * fontScale),
-                    ),
-                  ),
-                  Tab(
-                    child: Text(
-                      'Summary',
-                      style: TextStyle(fontSize: 16 * fontScale),
-                    ),
-                  ),
-                ],
-              ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16 * sizeScale, vertical: 5 * sizeScale),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const JobHeaderSection(),
+                _sectionTitle('Responsibilities of the Candidate:'),
+                _bulletSection(responsibilities, sizeScale),
+                _sectionTitle('Terms and Condition :-'),
+                _bulletSection(termsAndConditions, sizeScale),
+                _sectionTitle('Requirements:'),
+                _bulletSection(requirements, sizeScale),
+                _sectionTitle('Nice to Have:'),
+                _bulletSection(niceToHave, sizeScale),
+                _sectionTitle('About Company'),
+                _bulletSection(aboutCompany, sizeScale),
+                const SizedBox(height: 16),
+              ],
             ),
-            const Expanded(
-              child: TabBarView(
-                children: [
-                  DescriptionTabContent(),
-                  Companytabcontent(),
-                  Summarytabcontent(),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
         bottomNavigationBar: Container(
           padding: EdgeInsets.symmetric(
@@ -189,4 +175,40 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
       ),
     );
   }
+
+  Widget _sectionTitle(String title) => Padding(
+    padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+    child: Text(
+      title,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF003840),
+      ),
+    ),
+  );
+
+  Widget _bulletSection(List<String> items, double scale) => Container(
+    decoration: BoxDecoration(
+      color: const Color(0xFFEBF6F7),
+      borderRadius: BorderRadius.circular(12 * scale),
+    ),
+    padding: EdgeInsets.symmetric(vertical: 10 * scale, horizontal: 12 * scale),
+    margin: EdgeInsets.only(bottom: 8 * scale),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: items.map((e) {
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 4 * scale),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("\u2022 ", style: TextStyle(fontSize: 14 * scale)),
+              Expanded(child: Text(e, style: TextStyle(fontSize: 14 * scale))),
+            ],
+          ),
+        );
+      }).toList(),
+    ),
+  );
 }

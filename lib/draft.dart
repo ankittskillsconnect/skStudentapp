@@ -1,522 +1,190 @@
 // import 'package:flutter/material.dart';
-// import 'package:sk_loginscreen1/Utilities/AllCourseApi.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-// import '../../../Utilities/CollegeListApi.dart';
-// import '../../../Utilities/SpecializationApi.dart';
+// import 'DescriptionTabContent.dart';
+// import 'JobDetailHeader.dart';
+// import 'CompanyTabContent.dart';
+// import 'SummaryTabContent.dart';
 //
-// class EditEducationBottomSheet extends StatefulWidget {
-//   final String? initialData;
-//   final String degreeType;
-//   final String courseName;
-//   final String college;
-//   final String specilization;
-//   final String courseType;
-//   final String gradingSystem;
-//   final String percentage;
-//   final String passingYear;
-//   final Function(Map<String, dynamic> data) onSave;
-//
-//   const EditEducationBottomSheet({
-//     super.key,
-//     this.initialData,
-//     required this.onSave,
-//     required this.degreeType,
-//     required this.courseName,
-//     required this.college,
-//     required this.specilization,
-//     required this.courseType,
-//     required this.percentage,
-//     required this.passingYear,
-//     required this.gradingSystem,
-//   });
+// class JobDetailPage2 extends StatefulWidget {
+//   const JobDetailPage2({super.key});
 //
 //   @override
-//   State<EditEducationBottomSheet> createState() =>
-//       _EditEducationBottomSheetState();
+//   State<JobDetailPage2> createState() => _JobDetailPage2State();
 // }
 //
-// class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
-//   late TextEditingController _percentageController;
-//   late String degreeType;
-//   late String college;
-//   late String courseName;
-//   late String specilization;
-//   late String courseType;
-//   late String gradingSystem;
-//   late String passingYear;
-//   List<String> collegeList = [];
-//   List<String> courseList = [];
-//   String courseErrorMessage = '';
-//   bool isLoadingCourses = false;
-//   List<String> specializationList = [];
-//   bool isLoadingSpecializations = false;
-//   String specializationErrorMessage = '';
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     _percentageController = TextEditingController(text: widget.percentage);
-//     degreeType = widget.degreeType == 'Undergrad'
-//         ? 'UnderGrad'
-//         : widget.degreeType;
-//     college = widget.college;
-//     courseName = widget.courseName;
-//     specilization = widget.specilization;
-//     courseType = widget.courseType.isEmpty ? '' : widget.courseType;
-//     gradingSystem = widget.gradingSystem;
-//     passingYear = widget.passingYear;
-//     _fetchCollegeList();
-//     _fetchCourseList();
-//     _fetchSpecializationList();
-//   }
-//
-//   Future<void> _fetchCollegeList() async {
-//     final colleges = await ApiService.fetchCollegeList();
-//     if (!mounted) return;
-//     setState(() {
-//       collegeList = colleges;
-//       if (!collegeList.contains(college) && collegeList.isNotEmpty) {
-//         college = collegeList[0];
-//       }
-//     });
-//   }
-//
-//   Future<void> _fetchSpecializationList({String? altSpecName}) async {
-//     setState(() {
-//       isLoadingSpecializations = true;
-//       specializationErrorMessage = '';
-//     });
-//
-//     final prefs = await SharedPreferences.getInstance();
-//     final authToken =
-//         prefs.getString('authToken') ??
-//             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTgyMDksImVtYWlsIjoibWFoZXNoQGFwcHRyb2lkLmNvbSIsInVzZXJfdHlwZSI6Nywic291cmNlIjoibXlzcWwiLCJjb21wYW55X2lkIjoxOTUsImNvbXBhbnlfbmFtZSI6Ik5pdmEgQnVwYSIsInBhY2thZ2VfaWQiOjQsInBhY2thZ2VfdmFsaWRpdHlfaWQiOjQ5LCJzdGFydF9kYXRlIjoiMjAyMy0xMi0wM1QxODozMDowMC4wMDBaIiwiZW5kX2RhdGUiOiIyMDI1LTA3LTMwVDE4OjMwOjAwLjAwMFoiLCJwYWNrYWdlX3ZhbGlkdHkiOiJNb250aGx5IiwidHJhbnNhY3Rpb25faWQiOiI5ODAwMDAwMDAwMDAwOTAwMDkiLCJwYXltZW50X2lkIjpudWxsLCJjb3Vwb25faWQiOm51bGwsInByZW1pdW1fY29sbGVnZSI6bnVsbCwiY2xpZW50X3R5cGUiOiIiLCJpYXQiOjE3NTE5NTUzNDksImV4cCI6MTc1MjEyODE0OX0.xmPMlkMDuNrt3rePOayBrfBtMrdKMH3RZL76Y07KbRI';
-//     final connectSid =
-//         prefs.getString('connectSid') ??
-//             's%3A90I8VK0ssLCW9DjFq4xSLrkDEI7xUgCG.JFNw9cZG8Txw07rqZ6gs7K8bGpm4pMApT7Yu9FqqjbY';
-//
-//     if (authToken.isEmpty || connectSid.isEmpty) {
-//       print("❌ Missing auth or session. Using fallback.");
-//       await prefs.setString('authToken', authToken);
-//       await prefs.setString('connectSid', connectSid);
-//     }
-//     final variations = [
-//       altSpecName ?? specilization,
-//       'IT',
-//       'Flutter',
-//       'Data',
-//     ]; // Customize as needed
-//     List<String> specs = [];
-//     String lastTried = '';
-//     for (var variation in variations) {
-//       lastTried = variation;
-//       specs = await SpecializationListApi.fetchSpecializations(
-//         specializationName: variation,
-//         courseId: await _resolveCourseId(courseName),
-//         authToken: authToken,
-//         connectSid: connectSid,
-//       );
-//       if (specs.isNotEmpty) {
-//         print("✅ Found specializations for '$variation'");
-//         break;
-//       }
-//     }
-//
-//     if (!mounted) return;
-//
-//     setState(() {
-//       isLoadingSpecializations = false;
-//       specializationList = specs.isEmpty ? ['No Specializations Found'] : specs;
-//       specializationErrorMessage = specs.isEmpty
-//           ? 'No specialization found for "$lastTried".'
-//           : '';
-//       if (!specializationList.contains(specilization) &&
-//           specializationList.isNotEmpty &&
-//           specializationList[0] != 'No Specializations Found') {
-//         specilization = specializationList[0];
-//       }
-//     });
-//   }
-//
-//   Future<String> _resolveCourseId(String courseName) async {
-//     Map<String, String> courseIdMap = {
-//       'B.Sc(Bachelor of Science) / BSc': '7',
-//       'B.Sc B.Ed': '285',
-//     };
-//     return courseIdMap[courseName] ?? '';
-//   }
-//
-//   Future<void> _fetchCourseList({String? altCourseName}) async {
-//     setState(() {
-//       isLoadingCourses = true;
-//       courseErrorMessage = '';
-//     });
-//
-//     final prefs = await SharedPreferences.getInstance();
-//
-//     // Load or fallback auth token and session
-//     final authToken = prefs.getString('authToken') ??
-//         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTgyMDksImVtYWlsIjoibWFoZXNoQGFwcHRyb2lkLmNvbSIsInVzZXJfdHlwZSI6Nywic291cmNlIjoibXlzcWwiLCJjb21wYW55X2lkIjoxOTUsImNvbXBhbnlfbmFtZSI6Ik5pdmEgQnVwYSIsInBhY2thZ2VfaWQiOjQsInBhY2thZ2VfdmFsaWRpdHlfaWQiOjQ5LCJzdGFydF9kYXRlIjoiMjAyMy0xMi0wM1QxODozMDowMC4wMDBaIiwiZW5kX2RhdGUiOiIyMDI1LTA3LTMwVDE4OjMwOjAwLjAwMFoiLCJwYWNrYWdlX3ZhbGlkdHkiOiJNb250aGx5IiwidHJhbnNhY3Rpb25faWQiOiI5ODAwMDAwMDAwMDAwOTAwMDkiLCJwYXltZW50X2lkIjpudWxsLCJjb3Vwb25faWQiOm51bGwsInByZW1pdW1fY29sbGVnZSI6bnVsbCwiY2xpZW50X3R5cGUiOiIiLCJpYXQiOjE3NTE5NDgzMzQsImV4cCI6MTc1MjEyMTEzNH0.xCMSmIoYjGMNGJ9vgydTxsKYjnMOLlq7YiJKT85gNto';
-//
-//     final connectSid = prefs.getString('connectSid') ??
-//         's%3A90I8VK0ssLCW9DjFq4xSLrkDEI7xUgCG.JFNw9cZG8Txw07rqZ6gs7K8bGpm4pMApT7Yu9FqqjbY';
-//
-//     if (authToken.contains('eyJhbGciOiJIUzI1NiIs') || connectSid.isEmpty) {
-//       print("❌ Auth token or session ID missing, using fallback values");
-//       await prefs.setString('authToken', authToken);
-//       await prefs.setString('connectSid', connectSid);
-//       print("✅ Fallback tokens saved to SharedPreferences");
-//       setState(() {
-//         courseErrorMessage = 'Using fallback authentication, results may be limited';
-//       });
-//     } else {
-//       print("🔐 Auth token loaded: ${authToken.substring(0, 20)}...");
-//     }
-//
-//     // Course name variations to search
-//     final variations = {altCourseName ?? courseName, 'B.Sc', 'BSC', 'b.sc'};
-//
-//     // Use a Set to avoid duplicates
-//     final Set<String> courseSet = {};
-//     String lastCourseName = '';
-//
-//     for (var variation in variations) {
-//       lastCourseName = variation;
-//       final List<String> results = await CourseListApi.fetchCourses(
-//         courseName: variation,
-//         authToken: authToken,
-//         connectSid: connectSid,
-//       );
-//       if (results.isNotEmpty) {
-//         print("✅ Found ${results.length} course(s) for '$variation'");
-//         courseSet.addAll(results);
-//       }
-//     }
-//
-//     if (!mounted) return;
-//
-//     setState(() {
-//       isLoadingCourses = false;
-//       courseList = courseSet.isEmpty ? ['No Courses Available'] : courseSet.toList();
-//       courseErrorMessage = courseSet.isEmpty
-//           ? 'No courses found for "$lastCourseName". Try another term.'
-//           : '';
-//       if (!courseList.contains(courseName) &&
-//           courseList.isNotEmpty &&
-//           courseList[0] != 'No Courses Available') {
-//         courseName = courseList[0];
-//       }
-//     });
-//   }
-//
-//
-//   @override
-//   void dispose() {
-//     _percentageController.dispose();
-//     super.dispose();
-//   }
-//
-//   String _formatEducationDetail() {
-//     return '''
-//     $degreeType\n$courseName ($specilization)\n$courseType - $college\n$passingYear
-//     ''';
-//   }
-//
+// class _JobDetailPage2State extends State<JobDetailPage2> {
 //   @override
 //   Widget build(BuildContext context) {
-//     return DraggableScrollableSheet(
-//       expand: false,
-//       initialChildSize: 0.9,
-//       maxChildSize: 0.9,
-//       minChildSize: 0.9,
-//       builder: (context, scrollController) {
-//         return GestureDetector(
-//           onTap: () => FocusScope.of(context).unfocus(),
-//           child: Container(
-//             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
-//             decoration: const BoxDecoration(
-//               color: Colors.white,
-//               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-//             ),
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.stretch,
-//               children: [
-//                 Row(
-//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                   children: [
-//                     const Text(
-//                       'Add Education Details',
-//                       style: TextStyle(
-//                         fontSize: 18,
-//                         fontWeight: FontWeight.bold,
-//                         color: Color(0xFF003840),
+//     final size = MediaQuery.of(context).size;
+//     final double widthScale = size.width / 360;
+//     final double heightScale = size.height / 640;
+//
+//     final double fontScale = (widthScale * 0.8).clamp(0.8, 1.2);
+//
+//     final double sizeScale = (widthScale * 0.9).clamp(0.9, 1.3);
+//
+//     return DefaultTabController(
+//       length: 3,
+//       child: Scaffold(
+//         backgroundColor: Colors.white,
+//         appBar: PreferredSize(
+//           preferredSize: Size.fromHeight(50 * heightScale),
+//           child: Padding(
+//             padding: EdgeInsets.all(1 * sizeScale),
+//             child: AppBar(
+//               backgroundColor: Colors.white,
+//               elevation: 0,
+//               centerTitle: true,
+//               titleSpacing: 0,
+//               title: Text(
+//                 "Job Detail",
+//                 style: TextStyle(
+//                   fontSize: 25 * fontScale,
+//                   color: const Color(0xFF003840),
+//                   fontWeight: FontWeight.w600,
+//                 ),
+//               ),
+//               leading: Padding(
+//                 padding: EdgeInsets.only(left: 12 * sizeScale),
+//                 child: Center(
+//                   child: Container(
+//                     width: 46 * sizeScale,
+//                     height: 46 * sizeScale,
+//                     decoration: BoxDecoration(
+//                       shape: BoxShape.circle,
+//                       border: Border.all(
+//                         color: Colors.grey.shade300,
+//                         width: 1 * sizeScale,
 //                       ),
 //                     ),
-//                     IconButton(
-//                       icon: const Icon(Icons.close, color: Color(0xFF005E6A)),
-//                       onPressed: () => Navigator.of(context).pop(),
+//                     child: IconButton(
+//                       padding: EdgeInsets.all(12),
+//                       icon: Icon(
+//                         Icons.arrow_back_ios,
+//                         size: 22 * sizeScale,
+//                         color: const Color(0xFF003840),
+//                       ),
+//                       onPressed: () => Navigator.pop(context),
 //                     ),
-//                   ],
+//                   ),
 //                 ),
-//                 Expanded(
-//                   child: AnimatedPadding(
-//                     duration: const Duration(milliseconds: 10),
-//                     padding: EdgeInsets.only(
-//                       bottom: MediaQuery.of(context).viewInsets.bottom,
-//                     ),
-//                     child: ListView(
-//                       controller: scrollController,
-//                       children: [
-//                         _buildLabel("Degree type"),
-//                         _buildDropdownField(
-//                           value: degreeType,
-//                           items: const ["UnderGrad", "Graduate", "Open"],
-//                           onChanged: (val) =>
-//                               setState(() => degreeType = val ?? ''),
+//               ),
+//               actions: [
+//                 Padding(
+//                   padding: EdgeInsets.only(right: 12 * sizeScale),
+//                   child: Center(
+//                     child: Container(
+//                       width: 46 * sizeScale,
+//                       height: 46 * sizeScale,
+//                       decoration: BoxDecoration(
+//                         shape: BoxShape.circle,
+//                         border: Border.all(
+//                           color: Colors.grey.shade300,
+//                           width: 1 * sizeScale,
 //                         ),
-//                         _buildLabel("College name"),
-//                         _buildDropdownField(
-//                           value: collegeList.contains(college)
-//                               ? college
-//                               : (collegeList.isNotEmpty
-//                               ? collegeList[0]
-//                               : null),
-//                           items: collegeList.isEmpty
-//                               ? ['Loading...']
-//                               : collegeList,
-//                           onChanged: (val) =>
-//                               setState(() => college = val ?? ''),
+//                       ),
+//                       child: IconButton(
+//                         padding: EdgeInsets.zero,
+//                         icon: Icon(
+//                           Icons.share,
+//                           size: 22 * sizeScale,
+//                           color: const Color(0xFF003840),
 //                         ),
-//                         _buildLabel("Course name"),
-//                         _buildDropdownField(
-//                           value: courseList.contains(courseName)
-//                               ? courseName
-//                               : (courseList.isNotEmpty &&
-//                               courseList[0] != 'No Courses Available'
-//                               ? courseList[0]
-//                               : null),
-//                           items: courseList,
-//                           onChanged: (val) =>
-//                               setState(() => courseName = val ?? ''),
-//                         ),
-//                         // if (courseErrorMessage.isNotEmpty)
-//                         //   Padding(
-//                         //     padding: const EdgeInsets.symmetric(vertical: 8.0),
-//                         //     child: Row(
-//                         //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                         //       children: [
-//                         //         Expanded(
-//                         //           child: Text(
-//                         //             courseErrorMessage,
-//                         //             style: const TextStyle(
-//                         //               color: Colors.red,
-//                         //               fontSize: 14,
-//                         //             ),
-//                         //           ),
-//                         //         ),
-//                         //         TextButton(
-//                         //           onPressed: () =>
-//                         //               _fetchCourseList(altCourseName: 'B.Sc'),
-//                         //           child: const Text('Try "B.Sc"'),
-//                         //         ),
-//                         //       ],
-//                         //     ),
-//                         //   ),
-//                         _buildLabel("Specialization"),
-//                         _buildDropdownField(
-//                           value: specializationList.contains(specilization)
-//                               ? specilization
-//                               : (specializationList.isNotEmpty
-//                               ? specializationList[0]
-//                               : null),
-//                           items: specializationList.isEmpty
-//                               ? ['Loading...']
-//                               : specializationList,
-//                           onChanged: (val) =>
-//                               setState(() => specilization = val ?? ''),
-//                         ),
-//
-//                         _buildLabel("Course type"),
-//                         Column(
-//                           children: [
-//                             Row(
-//                               children: [
-//                                 _buildRadio("Full Time"),
-//                                 _buildRadio("Part Time"),
-//                               ],
-//                             ),
-//                             Row(
-//                               children: [
-//                                 _buildRadio(
-//                                   "Correspondences / Distance learning",
-//                                 ),
-//                               ],
-//                             ),
-//                           ],
-//                         ),
-//                         _buildLabel("Grading system"),
-//                         _buildDropdownField(
-//                           value: gradingSystem,
-//                           items: const ["CGPA", "Percentage"],
-//                           onChanged: (val) =>
-//                               setState(() => gradingSystem = val ?? ''),
-//                         ),
-//                         _buildLabel("Your percentage / grade"),
-//                         _buildTextField(
-//                           "Please select",
-//                           _percentageController,
-//                           keyboardType: TextInputType.number,
-//                         ),
-//                         _buildLabel("Year of passing"),
-//                         _buildDropdownField(
-//                           value: passingYear,
-//                           items: const ["2023", "2024", "2025"],
-//                           onChanged: (val) =>
-//                               setState(() => passingYear = val ?? ''),
-//                         ),
-//                         const SizedBox(height: 30),
-//                         ElevatedButton(
-//                           style: ElevatedButton.styleFrom(
-//                             backgroundColor: const Color(0xFF005E6A),
-//                             shape: RoundedRectangleBorder(
-//                               borderRadius: BorderRadius.circular(30),
-//                             ),
-//                             minimumSize: const Size.fromHeight(50),
-//                           ),
-//                           onPressed: () {
-//                             final data = {
-//                               'educationDetail': _formatEducationDetail(),
-//                               'degreeType': degreeType,
-//                               'courseName': courseName,
-//                               'specilization': specilization,
-//                               'courseType': courseType,
-//                               'college': college,
-//                               'gradingSystem': gradingSystem,
-//                               'percentage': _percentageController.text,
-//                               'passingYear': passingYear,
-//                             };
-//                             widget.onSave(data);
-//                             setState(() {
-//                               degreeType = '';
-//                               college = '';
-//                               courseName = '';
-//                               specilization = '';
-//                               courseType = '';
-//                               gradingSystem = '';
-//                               passingYear = '';
-//                               _percentageController.clear();
-//                             });
-//                           },
-//                           child: const Text(
-//                             "Save",
-//                             style: TextStyle(color: Colors.white),
-//                           ),
-//                         ),
-//                       ],
+//                         onPressed: () {},
+//                       ),
 //                     ),
 //                   ),
 //                 ),
 //               ],
 //             ),
 //           ),
-//         );
-//       },
-//     );
-//   }
-//
-//   Widget _buildLabel(String text) {
-//     return Padding(
-//       padding: const EdgeInsets.only(top: 12, bottom: 6),
-//       child: Text(
-//         text,
-//         style: const TextStyle(
-//           fontSize: 16,
-//           fontWeight: FontWeight.w700,
-//           color: Color(0xff003840),
 //         ),
-//       ),
-//     );
-//   }
-//
-//   Widget _buildDropdownField({
-//     required String? value,
-//     required List<String> items,
-//     required void Function(String?) onChanged,
-//   }) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 6.0),
-//       child: SizedBox(
-//         width: double.infinity,
-//         child: DropdownButtonFormField<String>(
-//           isExpanded: true,
-//           value: items.contains(value)
-//               ? value
-//               : (items.isNotEmpty &&
-//               items[0] != 'No Courses Available' &&
-//               items[0] != 'Loading...'
-//               ? items[0]
-//               : null),
-//           items: items.map((e) {
-//             return DropdownMenuItem(
-//               value: e == 'No Courses Available' || e == 'Loading...'
-//                   ? null
-//                   : e,
-//               child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1),
-//             );
-//           }).toList(),
-//           onChanged: (newValue) {
-//             if (newValue != null &&
-//                 newValue != 'No Courses Available' &&
-//                 newValue != 'Loading...') {
-//               onChanged(newValue);
-//               FocusScope.of(context).unfocus();
-//             }
-//           },
-//           decoration: InputDecoration(
-//             hintText: 'Please select',
-//             filled: true,
-//             fillColor: Colors.white,
-//             border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
-//             contentPadding: const EdgeInsets.symmetric(
-//               horizontal: 10,
-//               vertical: 10,
+//         body: Column(
+//           children: [
+//             const JobHeaderSection(),
+//             Container(
+//               margin: EdgeInsets.symmetric(
+//                 horizontal: 16 * sizeScale,
+//                 vertical: 12 * sizeScale,
+//               ),
+//               padding: EdgeInsets.all(4 * sizeScale),
+//               decoration: BoxDecoration(
+//                 color: const Color(0xFFEBF6F7),
+//                 borderRadius: BorderRadius.circular(30 * sizeScale),
+//               ),
+//               child: TabBar(
+//                 indicatorSize: TabBarIndicatorSize.tab,
+//                 indicator: BoxDecoration(
+//                   color: const Color(0xFF005E6A),
+//                   borderRadius: BorderRadius.circular(30 * sizeScale),
+//                 ),
+//                 labelColor: Colors.white,
+//                 indicatorColor: Colors.white,
+//                 unselectedLabelColor: const Color(0xFF003840),
+//                 dividerColor: Colors.transparent,
+//                 tabs: [
+//                   Tab(
+//                     child: Text(
+//                       'Description',
+//                       style: TextStyle(fontSize: 16 * fontScale),
+//                     ),
+//                   ),
+//                   Tab(
+//                     child: Text(
+//                       'Company',
+//                       style: TextStyle(fontSize: 16 * fontScale),
+//                     ),
+//                   ),
+//                   Tab(
+//                     child: Text(
+//                       'Summary',
+//                       style: TextStyle(fontSize: 16 * fontScale),
+//                     ),
+//                   ),
+//                 ],
+//               ),
 //             ),
+//             const Expanded(
+//               child: TabBarView(
+//                 children: [
+//                   DescriptionTabContent(),
+//                   Companytabcontent(),
+//                   Summarytabcontent(),
+//                 ],
+//               ),
+//             ),
+//           ],
+//         ),
+//         bottomNavigationBar: Container(
+//           padding: EdgeInsets.symmetric(
+//             vertical: 12 * sizeScale,
+//             horizontal: 140 * sizeScale,
 //           ),
-//           dropdownColor: Colors.white,
-//           menuMaxHeight: 250,
-//           borderRadius: BorderRadius.circular(20),
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Widget _buildRadio(String value) {
-//     return Row(
-//       children: [
-//         Radio<String>(
-//           value: value,
-//           groupValue: courseType,
-//           onChanged: (val) => setState(() => courseType = val ?? ''),
-//           activeColor: const Color(0xFF005E6A),
-//         ),
-//         Text(value, style: const TextStyle(fontSize: 13)),
-//       ],
-//     );
-//   }
-//
-//   Widget _buildTextField(
-//       String label,
-//       TextEditingController controller, {
-//         TextInputType keyboardType = TextInputType.text,
-//       }) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 6),
-//       child: TextField(
-//         controller: controller,
-//         keyboardType: keyboardType,
-//         decoration: InputDecoration(
-//           labelText: label,
-//           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+//           color: const Color(0xFFEFF8F9),
+//           child: Row(
+//             children: [
+//               Expanded(
+//                 child: ElevatedButton(
+//                   onPressed: () {},
+//                   style: ElevatedButton.styleFrom(
+//                     backgroundColor: const Color(0xFF005E6A),
+//                     foregroundColor: Colors.white,
+//                     padding: EdgeInsets.symmetric(vertical: 16 * sizeScale),
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(30 * sizeScale),
+//                     ),
+//                     elevation: 0,
+//                   ),
+//                   child: Text(
+//                     "Apply Now",
+//                     style: TextStyle(
+//                       fontSize: 16 * fontScale,
+//                       fontWeight: FontWeight.w600,
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
 //         ),
 //       ),
 //     );
