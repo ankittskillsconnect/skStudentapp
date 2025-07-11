@@ -76,6 +76,7 @@ class PopularJobCard extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                             fontSize: 18,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           subtitile,
@@ -91,28 +92,36 @@ class PopularJobCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              Text(
-                description,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 14, color: Colors.grey[800]),
-              ),
+             Flexible(
+               child: Text(
+                    description,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 14, color: Colors.grey[800]),
+                  ),
+             ),
               const SizedBox(height: 20),
               const Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    salary,
-                    style: const TextStyle(
-                      color: Color(0xFF003840),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17,
+                  Expanded(
+                    child: Text(
+                      salary,
+                      style: const TextStyle(
+                        color: Color(0xFF003840),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 17,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  Text(
-                    time,
-                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  Flexible(
+                    child: Text(
+                      time,
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

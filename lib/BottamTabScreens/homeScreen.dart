@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/Home/CustomAppbarBT.dart';
+import 'package:sk_loginscreen1/BottamTabScreens/JobTab/JobdetailPage/JobdetailpageBT.dart';
 import '../Pages/bottombar.dart';
 import 'Home/KnowHowBanner.dart';
 import 'Home/PopularJobCard.dart';
@@ -59,43 +60,48 @@ class _HomeScreen2State extends State<HomeScreen2> {
               _sectionHeader("Popular Jobs", actionText: "See all"),
               SizedBox(
                 height: popularJobListHeight.clamp(220.0, 240.0),
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  children: const [
-                    PopularJobCard(
-                      title: 'Product Manager',
-                      subtitile: "Google",
-                      description: 'Collaborate with cross-functional teams to define projects, requirements, and timelines.',
-                      salary: '1.25L/month',
-                      time: 'Posted 7 mins ago',
-                      immageAsset: 'assets/google.png',
-                    ),
-                    PopularJobCard(
-                      title: 'UI/UX',
-                      subtitile: "Zuno Studios",
-                      description: 'Work on UI/UX projects with a focus on user experience and design.',
-                      salary: '25K/month',
-                      time: 'Posted 7 mins ago',
-                      immageAsset: 'assets/UIUXpurple.png',
-                    ),
-                    PopularJobCard(
-                      title: 'UI Designer',
-                      subtitile: "Zuno Studios",
-                      description: 'Design intuitive user interfaces for web and mobile applications.',
-                      salary: '22K/month',
-                      time: 'Posted 10 mins ago',
-                      immageAsset: 'assets/UIUXpurple.png',
-                    ),
-                    PopularJobCard(
-                      title: 'Interaction Designer',
-                      subtitile: "Zuno Studios",
-                      description: 'Create interactive prototypes and design user flows.',
-                      salary: '23K/month',
-                      time: 'Posted 20 mins ago',
-                      immageAsset: 'assets/UIUXpurple.png',
-                    ),
-                  ],
+                child: InkWell(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => JobDetailPage2()));
+                  },
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: const [
+                      PopularJobCard(
+                        title: 'Product Manager',
+                        subtitile: "Google",
+                        description: 'Collaborate with cross-functional teams to define projects, requirements, and timelinesCollaborate with cross-functional teams to define projects, requirements, and timelines.',
+                        salary: '1.25L/month',
+                        time: 'Posted 7 mins ago',
+                        immageAsset: 'assets/google.png',
+                      ),
+                      PopularJobCard(
+                        title: 'UI/UX',
+                        subtitile: "Zuno Studios",
+                        description: 'Work on UI/UX projects with a focus on user experience and designCollaborate with cross-functional teams to define projects, requirements, and timelines.',
+                        salary: '25K/month',
+                        time: 'Posted 7 mins ago',
+                        immageAsset: 'assets/UIUXpurple.png',
+                      ),
+                      PopularJobCard(
+                        title: 'UI Designer',
+                        subtitile: "Zuno Studios",
+                        description: 'Design intuitive user interfaces for web and mobile applications.',
+                        salary: '22K/month',
+                        time: 'Posted 10 mins ago',
+                        immageAsset: 'assets/UIUXpurple.png',
+                      ),
+                      PopularJobCard(
+                        title: 'Interaction Designer',
+                        subtitile: "Zuno Studios",
+                        description: 'Create interactive prototypes and design user flows.',
+                        salary: '23K/month',
+                        time: 'Posted 20 mins ago',
+                        immageAsset: 'assets/UIUXpurple.png',
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 17),
