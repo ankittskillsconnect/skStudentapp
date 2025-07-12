@@ -24,6 +24,7 @@ class JobCardBT extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("Rendering JobCardBT - Title: $jobTitle, Company: $company, Location: $location, Tags: $tags, LogoUrl: $logoUrl"); // Debug log
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
       padding: const EdgeInsets.all(8),
@@ -63,12 +64,11 @@ class JobCardBT extends StatelessWidget {
                         height: 40,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
-                          print("Image load error: $error");
+                          print("Image load error for $logoUrl: $error"); // Debug error
                           return Image.asset("assets/google.png", width: 40, height: 40);
                         },
                       )
                           : Image.asset("assets/google.png", width: 40, height: 40),
-
                     ),
                     const SizedBox(width: 12),
                     Expanded(

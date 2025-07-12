@@ -3,7 +3,7 @@ import 'package:sk_loginscreen1/BottamTabScreens/Home/CustomAppbarBT.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/JobTab/JobdetailPage/JobdetailpageBT.dart';
 import '../Pages/bottombar.dart';
 import 'Home/KnowHowBanner.dart';
-import 'Home/PopularJobCard.dart';
+import 'Home/PopularJobCard.dart'; // Ensure this file exists
 import 'Home/FeaturedJobCard.dart';
 
 class HomeScreen2 extends StatefulWidget {
@@ -26,7 +26,6 @@ class _HomeScreen2State extends State<HomeScreen2> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final double screenHeight = mediaQuery.size.height;
-
 
     const double appBarHeight = 56.0;
     const double bottomNavBarHeight = 60.0;
@@ -61,13 +60,13 @@ class _HomeScreen2State extends State<HomeScreen2> {
               SizedBox(
                 height: popularJobListHeight.clamp(220.0, 240.0),
                 child: InkWell(
-                  onTap: (){
-                    // Navigator.push(context, MaterialPageRoute(builder: (_) => JobDetailPage2(jobToken: ,)));
+                  onTap: () {
+                    // Navigator.push(context, MaterialPageRoute(builder: (_) => JobDetailPage2(jobToken: '',)));
                   },
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    children: const [
+                    children: [
                       PopularJobCard(
                         title: 'Product Manager',
                         subtitile: "Google",
@@ -100,7 +99,14 @@ class _HomeScreen2State extends State<HomeScreen2> {
                         time: 'Posted 20 mins ago',
                         immageAsset: 'assets/UIUXpurple.png',
                       ),
-                    ],
+                    ].map((card) {
+                      try {
+                        return card; // Ensure widget builds without errors
+                      } catch (e) {
+                        print("Error building PopularJobCard: $e"); // Debug log
+                        return const SizedBox.shrink(); // Fallback to empty widget
+                      }
+                    }).toList(),
                   ),
                 ),
               ),

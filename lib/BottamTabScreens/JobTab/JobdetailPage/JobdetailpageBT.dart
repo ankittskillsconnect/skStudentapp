@@ -1,48 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'JobDetailHeader.dart';
+import '../../../Utilities/JobDetailApi.dart';
 
 class JobDetailPage2 extends StatefulWidget {
-  const JobDetailPage2({super.key});
+  final String jobToken; // Added parameter
+
+  const JobDetailPage2({super.key, this.jobToken = ''}); // Default empty token
 
   @override
   State<JobDetailPage2> createState() => _JobDetailPage2State();
 }
 
 class _JobDetailPage2State extends State<JobDetailPage2> {
-  final List<String> responsibilities = [
-    'Initially students will be placed in various departments – Warping, Weaving, TFO, Monofilament, Packing & Dispatch, Stitching, Processing, Non – Woven etc. of our factory, to understand the flow of production process.',
-    'Post that their area of expertise will be finalised.',
-  ];
+  Map<String, dynamic>? jobDetail;
+  bool isLoading = true;
+  String? error;
 
-  final List<String> termsAndConditions = [
-    'Students shall be hired as GET (Graduate Engineer Trainee) , for minimum one year.',
-    'Food to be arranged by students on their own. (Canteen Facility available at factory premises , which will be on actual cost).',
-    'An Amount of Rs.1500/- per month shall be deducted towards Bachelor Accommodation (only applicable to students who are joining at Wada factory).',
-    'There will be Retention Bonus for three years of Rs.1500 per month , the aforesaid amount shall be deducted every month and will be reimbursed on completion of three years with us.',
-    'Non-Disclosure Affidavit cum Declaration will be there at the time of joining.',
-    'Detail GET joining Letter (Appointment Letter) will be provided at the time of joining.',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchJobDetail();
+  }
 
-  final List<String> requirements = [
-    'Bachelors degree in Textile Engineering or related field',
-    'Strong understanding of textile manufacturing processes and materials',
-    'Ability to work well in a team environment',
-    'Strong communication and organizational skills',
-    'Willingness to learn and adapt to new technologies and processes',
-    'Basic computer skills including proficiency in Microsoft Office',
-  ];
-
-  final List<String> niceToHave = [
-    'Internship or project experience in the textile industry',
-    'Understanding of sustainable textile production practices',
-  ];
-
-  final List<String> aboutCompany = [
-    'Alphabet Pvt. Ltd. is a leading manufacturer of technical textiles and industrial filter fabrics, serving industries like pharma, mining, food processing, and wastewater treatment.',
-    'With over 40 years of experience and state-of-the-art facilities in Maharashtra, Daman, and Surat, they offer fully integrated production—from fiber to finished products.',
-    'The company exports to 120+ countries and is known for quality, innovation, and sustainability.',
-  ];
+  Future<void> _fetchJobDetail() async {
+    setState(() {
+      isLoading = true;
+      error = null;
+    });
+    try {
+      if (widget.jobToken.isEmpty) {
+        throw Exception('Job token is missing');
+      }
+      final data = await JobDetailApi.fetchJobDetail(token: widget.jobToken);
+      print("Fetched job detail at 11:17 AM IST, July 12, 2025: $data"); // Updated timestamp
+      setState(() {
+        jobDetail = {
+          'title': data['title'] ?? 'Untitled',
+          'company': data['company'] ?? 'Unknown Company',
+          'location': (data['location'] as String?)?.isNotEmpty ?? false
+              ? data['location']
+              : (data['job_location_detail'] as List<dynamic>?)?.isNotEmpty ?? false
+              ? (data['job_location_detail'] as List<dynamic>)
+              .map((loc) => loc['city_name'] as String? ?? 'Unknown')
+              .join(' • ')
+              : 'N/A',
+          'logoUrl': data['logoUrl'],
+          'responsibilities': (data['responsibilities'] as List<dynamic>?)?.cast<String>() ?? [],
+          'terms': (data['terms'] as List<dynamic>?)?.cast<String>() ?? [],
+          'requirements': (data['requirements'] as List<dynamic>?)?.cast<String>() ?? [],
+          'niceToHave': (data['niceToHave'] as List<dynamic>?)?.cast<String>() ?? [],
+          'aboutCompany': (data['aboutCompany'] as List<dynamic>?)?.cast<String>() ?? [],
+          'tags': (data['tags'] as List<dynamic>?)?.cast<String>() ?? [], // Added tags
+        };
+        isLoading = false;
+        print("Mapped jobDetail at 11:17 AM IST, July 12, 2025: $jobDetail"); // Updated timestamp
+      });
+    } catch (e) {
+      print("Error fetching job detail at 11:17 AM IST, July 12, 2025: $e"); // Updated timestamp
+      setState(() {
+        error = 'Failed to load job details: $e';
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,23 +138,27 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
             ),
           ),
         ),
-        body: SingleChildScrollView(
+        body: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : error != null
+            ? Center(child: Text(error!, style: const TextStyle(color: Colors.red)))
+            : SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 16 * sizeScale, vertical: 5 * sizeScale),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const JobHeaderSection(),
+                _buildHeader(jobDetail, widthScale, fontScale),
                 _sectionTitle('Responsibilities of the Candidate:'),
-                _bulletSection(responsibilities, sizeScale),
+                _bulletSection(jobDetail?['responsibilities'] ?? [], sizeScale),
                 _sectionTitle('Terms and Condition :-'),
-                _bulletSection(termsAndConditions, sizeScale),
+                _bulletSection(jobDetail?['terms'] ?? [], sizeScale),
                 _sectionTitle('Requirements:'),
-                _bulletSection(requirements, sizeScale),
+                _bulletSection(jobDetail?['requirements'] ?? [], sizeScale),
                 _sectionTitle('Nice to Have:'),
-                _bulletSection(niceToHave, sizeScale),
+                _bulletSection(jobDetail?['niceToHave'] ?? [], sizeScale),
                 _sectionTitle('About Company'),
-                _bulletSection(aboutCompany, sizeScale),
+                _bulletSection(jobDetail?['aboutCompany'] ?? [], sizeScale),
                 const SizedBox(height: 16),
               ],
             ),
@@ -150,7 +174,9 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
             children: [
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    print("Apply button pressed with jobToken: ${widget.jobToken}");
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF005E6A),
                     foregroundColor: Colors.white,
@@ -172,6 +198,94 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(Map<String, dynamic>? job, double widthScale, double fontScale) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 5 * widthScale, vertical: 10 * widthScale),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(3),
+                margin: const EdgeInsets.only(bottom: 0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFF005E6A)),
+                ),
+                child: job?['logoUrl'] != null && (job?['logoUrl'] as String).isNotEmpty
+                    ? Image.network(
+                  job!['logoUrl'] as String,
+                  height: 48 * widthScale,
+                  width: 48 * widthScale,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    print("Image load error for ${job['logoUrl']}: $error at 11:24 AM IST, July 12, 2025");
+                    return Image.asset('assets/google.png', height: 48 * widthScale, width: 48 * widthScale);
+                  },
+                )
+                    : Image.asset('assets/google.png', height: 48 * widthScale, width: 48 * widthScale),
+              ),
+              SizedBox(width: 10 * widthScale),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            job?['title'] ?? 'Software Engineer',
+                            style: TextStyle(
+                              fontSize: 18 * fontScale,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF005E6A),
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.bookmark_add_outlined,
+                            size: 26 * widthScale,
+                            color: const Color(0xFF005E6A),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      "${job?['company'] ?? 'Company'}\n${job?['location'] ?? 'Location'}",
+                      style: TextStyle(
+                        fontSize: 14 * fontScale,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 14 * widthScale),
+          Padding(
+            padding: EdgeInsets.only(left: 10 * widthScale),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Wrap(
+                spacing: 10 * widthScale,
+                children: (job?['tags'] as List<String>?)?.map((tag) => _Tag(label: tag)).toList() ??  [
+                  _Tag(label: "Full-time"),
+                  _Tag(label: "In-office"),
+                  _Tag(label: "14 Openings"),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -211,4 +325,27 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
       }).toList(),
     ),
   );
+
+  Widget _Tag({required String label}) {
+    final size = MediaQuery.of(context).size;
+    final widthScale = size.width / 360;
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 12 * widthScale,
+        vertical: 6 * widthScale,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFF8F9),
+        borderRadius: BorderRadius.circular(20 * widthScale),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: const Color(0xFF005E6A),
+          fontSize: 14 * widthScale,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
 }

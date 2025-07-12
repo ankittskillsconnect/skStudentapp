@@ -35,11 +35,35 @@ class _JobScreenbtState extends State<Jobscreenbt> {
     });
     try {
       final fetchedJobs = await JobApi.fetchJobs();
+      print("Fetched jobs: $fetchedJobs"); // Debug log for fetched data
       setState(() {
-        jobs = fetchedJobs;
+        jobs = fetchedJobs.map((job) {
+          // Robust location mapping from job_location_detail if available
+          final location = (job['location'] as String?)?.isNotEmpty ?? false
+              ? job['location']
+              : (job['job_location_detail'] as List<dynamic>?)?.isNotEmpty ?? false
+              ? (job['job_location_detail'] as List<dynamic>)
+              .map((loc) => loc['city_name'] as String? ?? 'Unknown')
+              .join(' • ')
+              : 'N/A';
+          print("Job ${job['title']} - Location mapped to: $location"); // Debug location
+          print("Job ${job['title']} - LogoUrl: ${job['logoUrl']}"); // Debug logo
+          return {
+            'title': job['title'] ?? 'Untitled',
+            'company': job['company'] ?? 'Unknown Company',
+            'location': location,
+            'salary': job['salary'] ?? 'N/A',
+            'postTime': job['postTime'] ?? 'N/A',
+            'expiry': job['expiry'] ?? 'N/A',
+            'tags': List<String>.from(job['tags'] ?? []),
+            'logoUrl': job['logoUrl'],
+            'jobToken': job['jobToken'],
+          };
+        }).toList();
         isLoading = false;
       });
     } catch (e) {
+      print("Error fetching jobs: $e"); // Debug log for errors
       setState(() {
         isLoading = false;
         errorMessage = 'Failed to load jobs: $e';
@@ -97,10 +121,11 @@ class _JobScreenbtState extends State<Jobscreenbt> {
                       final job = jobs[index];
                       return InkWell(
                         onTap: () {
+                          print("Navigating with jobToken: ${job['jobToken']}"); // Debug log
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const JobDetailPage2(),
+                              builder: (_) => JobDetailPage2(jobToken: job['jobToken']),
                             ),
                           );
                         },
@@ -111,14 +136,13 @@ class _JobScreenbtState extends State<Jobscreenbt> {
                           salary: job['salary'],
                           postTime: job['postTime'],
                           expiry: job['expiry'],
-                          tags: List<String>.from(job['tags']),
+                          tags: job['tags'],
                           logoUrl: job['logoUrl'],
                         ),
                       );
                     },
                   ),
                 )
-
               ],
             ),
           ),
@@ -137,7 +161,6 @@ Widget _buildShimmerCard() {
     margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
     padding: const EdgeInsets.all(8),
     decoration: BoxDecoration(
-
       borderRadius: BorderRadius.circular(25),
     ),
     child: Shimmer.fromColors(
@@ -162,7 +185,6 @@ Widget _buildShimmerCard() {
                       height: 40,
                       decoration: BoxDecoration(
                         color: Colors.white,
-
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
@@ -194,7 +216,6 @@ Widget _buildShimmerCard() {
                   ],
                 ),
                 const SizedBox(height: 12),
-                // Tags row (fake chips)
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,

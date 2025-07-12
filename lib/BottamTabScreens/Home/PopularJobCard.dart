@@ -100,7 +100,7 @@ class PopularJobCard extends StatelessWidget {
                     style: TextStyle(fontSize: 14, color: Colors.grey[800]),
                   ),
              ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 2),
               const Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
