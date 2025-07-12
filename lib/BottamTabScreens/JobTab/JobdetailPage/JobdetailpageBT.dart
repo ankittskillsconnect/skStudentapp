@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../Utilities/JobDetailApi.dart';
 
 class JobDetailPage2 extends StatefulWidget {
-  final String jobToken; // Added parameter
+  final String jobToken;
 
-  const JobDetailPage2({super.key, this.jobToken = ''}); // Default empty token
+  const JobDetailPage2({super.key, this.jobToken = ''});
 
   @override
   State<JobDetailPage2> createState() => _JobDetailPage2State();
@@ -32,7 +33,6 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
         throw Exception('Job token is missing');
       }
       final data = await JobDetailApi.fetchJobDetail(token: widget.jobToken);
-      print("Fetched job detail at 11:17 AM IST, July 12, 2025: $data"); // Updated timestamp
       setState(() {
         jobDetail = {
           'title': data['title'] ?? 'Untitled',
@@ -50,13 +50,11 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
           'requirements': (data['requirements'] as List<dynamic>?)?.cast<String>() ?? [],
           'niceToHave': (data['niceToHave'] as List<dynamic>?)?.cast<String>() ?? [],
           'aboutCompany': (data['aboutCompany'] as List<dynamic>?)?.cast<String>() ?? [],
-          'tags': (data['tags'] as List<dynamic>?)?.cast<String>() ?? [], // Added tags
+          'tags': (data['tags'] as List<dynamic>?)?.cast<String>() ?? [],
         };
         isLoading = false;
-        print("Mapped jobDetail at 11:17 AM IST, July 12, 2025: $jobDetail"); // Updated timestamp
       });
     } catch (e) {
-      print("Error fetching job detail at 11:17 AM IST, July 12, 2025: $e"); // Updated timestamp
       setState(() {
         error = 'Failed to load job details: $e';
         isLoading = false;
@@ -109,7 +107,11 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                     ),
                     child: IconButton(
                       padding: EdgeInsets.all(12),
-                      icon: Icon(Icons.arrow_back_ios, size: 22 * sizeScale, color: const Color(0xFF003840)),
+                      icon: Icon(
+                        Icons.arrow_back_ios,
+                        size: 22 * sizeScale,
+                        color: const Color(0xFF003840),
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -128,7 +130,11 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                       ),
                       child: IconButton(
                         padding: EdgeInsets.zero,
-                        icon: Icon(Icons.share, size: 22 * sizeScale, color: const Color(0xFF003840)),
+                        icon: Icon(
+                          Icons.share,
+                          size: 22 * sizeScale,
+                          color: const Color(0xFF003840),
+                        ),
                         onPressed: () {},
                       ),
                     ),
@@ -139,7 +145,10 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
           ),
         ),
         body: isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16 * sizeScale, vertical: 16 * sizeScale),
+          child: _buildShimmer(sizeScale, widthScale),
+        )
             : error != null
             ? Center(child: Text(error!, style: const TextStyle(color: Colors.red)))
             : SingleChildScrollView(
@@ -165,10 +174,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
           ),
         ),
         bottomNavigationBar: Container(
-          padding: EdgeInsets.symmetric(
-            vertical: 12 * sizeScale,
-            horizontal: 140 * sizeScale,
-          ),
+          padding: EdgeInsets.symmetric(vertical: 12 * sizeScale, horizontal: 140 * sizeScale),
           color: const Color(0xFFEFF8F9),
           child: Row(
             children: [
@@ -202,6 +208,70 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
     );
   }
 
+  Widget _buildShimmer(double scale, double widthScale) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300, // static background grey
+      highlightColor: Colors.grey.shade100.withOpacity(0.6), // shiny slide effect
+      direction: ShimmerDirection.ltr, // left to right slide
+      period: const Duration(seconds: 2), // smooth speed
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 48 * widthScale,
+                height: 48 * widthScale,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              SizedBox(width: 10 * widthScale),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 14 * scale,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    SizedBox(height: 8 * scale),
+                    Container(
+                      height: 12 * scale,
+                      width: 100 * scale,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 20 * scale),
+          for (int i = 0; i < 4; i++)
+            Container(
+              height: 130 * scale,
+              margin: EdgeInsets.symmetric(vertical: 6 * scale),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(25),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+
+
   Widget _buildHeader(Map<String, dynamic>? job, double widthScale, double fontScale) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 5 * widthScale, vertical: 10 * widthScale),
@@ -212,7 +282,6 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
             children: [
               Container(
                 padding: const EdgeInsets.all(3),
-                margin: const EdgeInsets.only(bottom: 0),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
@@ -224,10 +293,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                   height: 48 * widthScale,
                   width: 48 * widthScale,
                   fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    print("Image load error for ${job['logoUrl']}: $error at 11:24 AM IST, July 12, 2025");
-                    return Image.asset('assets/google.png', height: 48 * widthScale, width: 48 * widthScale);
-                  },
+                  errorBuilder: (context, error, stackTrace) => Image.asset('assets/google.png', height: 48 * widthScale, width: 48 * widthScale),
                 )
                     : Image.asset('assets/google.png', height: 48 * widthScale, width: 48 * widthScale),
               ),
@@ -260,10 +326,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                     ),
                     Text(
                       "${job?['company'] ?? 'Company'}\n${job?['location'] ?? 'Location'}",
-                      style: TextStyle(
-                        fontSize: 14 * fontScale,
-                        color: Colors.grey[700],
-                      ),
+                      style: TextStyle(fontSize: 14 * fontScale, color: Colors.grey[700]),
                     ),
                   ],
                 ),
@@ -277,7 +340,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
               alignment: Alignment.centerLeft,
               child: Wrap(
                 spacing: 10 * widthScale,
-                children: (job?['tags'] as List<String>?)?.map((tag) => _Tag(label: tag)).toList() ??  [
+                children: (job?['tags'] as List<String>?)?.map((tag) => _Tag(label: tag)).toList() ?? [
                   _Tag(label: "Full-time"),
                   _Tag(label: "In-office"),
                   _Tag(label: "14 Openings"),
@@ -294,19 +357,12 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
     padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
     child: Text(
       title,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: Color(0xFF003840),
-      ),
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF003840)),
     ),
   );
 
   Widget _bulletSection(List<String> items, double scale) => Container(
-    decoration: BoxDecoration(
-      color: const Color(0xFFEBF6F7),
-      borderRadius: BorderRadius.circular(12 * scale),
-    ),
+    decoration: BoxDecoration(color: const Color(0xFFEBF6F7), borderRadius: BorderRadius.circular(12 * scale)),
     padding: EdgeInsets.symmetric(vertical: 10 * scale, horizontal: 12 * scale),
     margin: EdgeInsets.only(bottom: 8 * scale),
     child: Column(
@@ -330,10 +386,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
     final size = MediaQuery.of(context).size;
     final widthScale = size.width / 360;
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 12 * widthScale,
-        vertical: 6 * widthScale,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 12 * widthScale, vertical: 6 * widthScale),
       decoration: BoxDecoration(
         color: const Color(0xFFEFF8F9),
         borderRadius: BorderRadius.circular(20 * widthScale),
