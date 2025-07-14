@@ -16,6 +16,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
   Map<String, dynamic>? jobDetail;
   bool isLoading = true;
   String? error;
+  bool isLocationExpanded = false;
 
   @override
   void initState() {
@@ -48,7 +49,6 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
         };
         isLoading = false;
       });
-
     } catch (e) {
       setState(() {
         error = 'Failed to load job details: $e';
@@ -155,8 +155,6 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                 _buildHeader(jobDetail, widthScale, fontScale),
                 _sectionTitle('Responsibilities of the Candidate:'),
                 _bulletSection(jobDetail?['responsibilities'] ?? [], sizeScale),
-                // _sectionTitle('Terms and Condition :-'),
-                // _bulletSection(jobDetail?['terms'] ?? [], sizeScale),
                 _sectionTitle('Requirements:'),
                 _bulletSection(jobDetail?['requirements'] ?? [], sizeScale),
                 _sectionTitle('Nice to Have:'),
@@ -266,66 +264,98 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
   }
 
   Widget _buildHeader(Map<String, dynamic>? job, double widthScale, double fontScale) {
+    final location = job?['location'] ?? 'Location';
+    final company = job?['company'] ?? 'Company';
+    final isLocationLong = location.length > 40 || location.contains('\n');
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 5 * widthScale, vertical: 10 * widthScale),
       child: Column(
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFF005E6A)),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFF005E6A)),
+                  ),
+                  child: job?['logoUrl'] != null && (job?['logoUrl'] as String).isNotEmpty
+                      ? Image.network(
+                    job!['logoUrl'] as String,
+                    height: 44 * widthScale,
+                    width: 44 * widthScale,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Image.asset('assets/google.png', height: 44 * widthScale, width: 44 * widthScale),
+                  )
+                      : Image.asset('assets/google.png', height: 44 * widthScale, width: 44 * widthScale),
                 ),
-                child: job?['logoUrl'] != null && (job?['logoUrl'] as String).isNotEmpty
-                    ? Image.network(
-                  job!['logoUrl'] as String,
-                  height: 44 * widthScale,
-                  width: 44 * widthScale,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => Image.asset('assets/google.png', height: 44 * widthScale, width: 44 * widthScale),
-                )
-                    : Image.asset('assets/google.png', height: 44 * widthScale, width: 44 * widthScale),
-              ),
-              SizedBox(width: 12 * widthScale),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            job?['title'] ?? 'Software Engineer',
-                            style: TextStyle(
-                              fontSize: 21 * fontScale,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF005E6A),
+                SizedBox(width: 12 * widthScale),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              job?['title'] ?? 'Software Engineer',
+                              style: TextStyle(
+                                fontSize: 21 * fontScale,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF005E6A),
+                              ),
                             ),
                           ),
-                        ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Icon(
+                          Icon(
                             Icons.bookmark_add_outlined,
                             size: 26 * widthScale,
                             color: const Color(0xFF005E6A),
                           ),
+                        ],
+                      ),
+                      Text(
+                        company,
+                        style: TextStyle(fontSize: 15 * fontScale, color: Colors.grey[800], height: 0.8),
+
+                      ),
+                      const SizedBox(height: 2),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isLocationExpanded = !isLocationExpanded;
+                          });
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isLocationExpanded ? location : _shortenText(location),
+                              style: TextStyle(fontSize: 15 * fontScale, color: Colors.grey[800]),
+                            ),
+                            if (isLocationLong)
+                              Text(
+                                isLocationExpanded ? 'Show less' : 'Show more +',
+                                style: TextStyle(
+                                  fontSize: 15 * fontScale,
+                                  color: const Color(0xFF005E6A),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                          ],
                         ),
-                      ],
-                    ),
-                    Text(
-                      "${job?['company'] ?? 'Company'}\n${job?['location'] ?? 'Location'}",
-                      style: TextStyle(fontSize: 15 * fontScale, color: Colors.grey[800]),
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+
           SizedBox(height: 14 * widthScale),
           Padding(
             padding: EdgeInsets.only(left: 10 * widthScale),
@@ -344,6 +374,13 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
         ],
       ),
     );
+  }
+
+
+
+  String _shortenText(String text, {int maxChars = 40}) {
+    if (text.length <= maxChars) return text;
+    return '${text.substring(0, maxChars - 3)}...';
   }
 
   Widget _sectionTitle(String title) => Padding(

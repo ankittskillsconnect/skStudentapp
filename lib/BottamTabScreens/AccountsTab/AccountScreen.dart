@@ -89,7 +89,6 @@ class _AccountScreenState extends State<AccountScreen> {
 
     return BlocListener<NavigationBloc, NavigationState>(
       listener: (context, state) {
-        // NavigationBloc used only for logout here
       },
       child: Scaffold(
         backgroundColor: Colors.white,
