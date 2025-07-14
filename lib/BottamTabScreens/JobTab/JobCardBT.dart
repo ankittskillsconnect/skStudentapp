@@ -59,16 +59,26 @@ class JobCardBT extends StatelessWidget {
                       ),
                       child: logoUrl != null && logoUrl!.isNotEmpty
                           ? Image.network(
-                        logoUrl!,
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          print("Image load error for $logoUrl: $error"); // Debug error
-                          return Image.asset("assets/google.png", width: 40, height: 40);
-                        },
-                      )
-                          : Image.asset("assets/google.png", width: 40, height: 40),
+                              logoUrl!,
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                print(
+                                  "Image load error for $logoUrl: $error",
+                                ); // Debug error
+                                return Image.asset(
+                                  "assets/google.png",
+                                  width: 40,
+                                  height: 40,
+                                );
+                              },
+                            )
+                          : Image.asset(
+                              "assets/google.png",
+                              width: 40,
+                              height: 40,
+                            ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -86,7 +96,7 @@ class JobCardBT extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            "$company\n$location",
+                            "$company\n${location.isNotEmpty ? location : 'NA'}",
                             style: const TextStyle(
                               fontSize: 15,
                               color: Color(0xFF827B7B),

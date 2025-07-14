@@ -37,13 +37,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
         jobDetail = {
           'title': data['title'] ?? 'Untitled',
           'company': data['company'] ?? 'Unknown Company',
-          'location': (data['location'] as String?)?.isNotEmpty ?? false
-              ? data['location']
-              : (data['job_location_detail'] as List<dynamic>?)?.isNotEmpty ?? false
-              ? (data['job_location_detail'] as List<dynamic>)
-              .map((loc) => loc['city_name'] as String? ?? 'Unknown')
-              .join(' • ')
-              : 'N/A',
+          'location': data['location'] ?? 'N/A',
           'logoUrl': data['logoUrl'],
           'responsibilities': (data['responsibilities'] as List<dynamic>?)?.cast<String>() ?? [],
           'terms': (data['terms'] as List<dynamic>?)?.cast<String>() ?? [],
@@ -54,6 +48,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
         };
         isLoading = false;
       });
+
     } catch (e) {
       setState(() {
         error = 'Failed to load job details: $e';
@@ -78,7 +73,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(50 * heightScale),
+          preferredSize: Size.fromHeight(40 * heightScale),
           child: Padding(
             padding: EdgeInsets.all(1 * sizeScale),
             child: AppBar(
@@ -288,14 +283,14 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                 child: job?['logoUrl'] != null && (job?['logoUrl'] as String).isNotEmpty
                     ? Image.network(
                   job!['logoUrl'] as String,
-                  height: 48 * widthScale,
-                  width: 48 * widthScale,
+                  height: 44 * widthScale,
+                  width: 44 * widthScale,
                   fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => Image.asset('assets/google.png', height: 48 * widthScale, width: 48 * widthScale),
+                  errorBuilder: (context, error, stackTrace) => Image.asset('assets/google.png', height: 44 * widthScale, width: 44 * widthScale),
                 )
-                    : Image.asset('assets/google.png', height: 48 * widthScale, width: 48 * widthScale),
+                    : Image.asset('assets/google.png', height: 44 * widthScale, width: 44 * widthScale),
               ),
-              SizedBox(width: 10 * widthScale),
+              SizedBox(width: 12 * widthScale),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,7 +301,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                           child: Text(
                             job?['title'] ?? 'Software Engineer',
                             style: TextStyle(
-                              fontSize: 18 * fontScale,
+                              fontSize: 21 * fontScale,
                               fontWeight: FontWeight.bold,
                               color: const Color(0xFF005E6A),
                             ),
@@ -324,7 +319,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                     ),
                     Text(
                       "${job?['company'] ?? 'Company'}\n${job?['location'] ?? 'Location'}",
-                      style: TextStyle(fontSize: 14 * fontScale, color: Colors.grey[700]),
+                      style: TextStyle(fontSize: 15 * fontScale, color: Colors.grey[800]),
                     ),
                   ],
                 ),
@@ -371,7 +366,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("\u2022 ", style: TextStyle(fontSize: 14 * scale)),
+              Text("\u2022 ", style: TextStyle(fontSize: 15 * scale, fontWeight: FontWeight.w700)),
               Expanded(child: Text(e, style: TextStyle(fontSize: 14 * scale))),
             ],
           ),

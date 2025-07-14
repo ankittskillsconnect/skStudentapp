@@ -121,7 +121,7 @@ class _JobScreenbtState extends State<Jobscreenbt> {
                       final job = jobs[index];
                       return InkWell(
                         onTap: () {
-                          // print("Navigating with jobToken: ${job['jobToken']}");
+                          print("Navigating with jobToken: ${job['jobToken']}");
                           Navigator.push(
                             context,
                             MaterialPageRoute(

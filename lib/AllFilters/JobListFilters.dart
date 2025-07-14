@@ -51,7 +51,10 @@ class _JoblistfiltersState extends State<Joblistfilters>
       minChildSize: 0.9,
       builder: (context, scrollController) {
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 20 * sizeScale, vertical: 10 * sizeScale),
+          padding: EdgeInsets.symmetric(
+            horizontal: 20 * sizeScale,
+            vertical: 10 * sizeScale,
+          ),
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -67,7 +70,7 @@ class _JoblistfiltersState extends State<Joblistfilters>
                       child: Text(
                         'Job Filter',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF003840),
                         ),
@@ -136,11 +139,18 @@ class _JoblistfiltersState extends State<Joblistfilters>
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 40,
+                        vertical: 14,
+                      ),
                     ),
                     child: const Text(
                       "Show Results",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -152,59 +162,67 @@ class _JoblistfiltersState extends State<Joblistfilters>
     );
   }
 
-
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 4),
-      child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600)),
+      child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Color(0xFF003840))),
     );
   }
 
+
   Widget _buildTextField(
-    String hint,
-    TextEditingController controller, {
-    bool readOnly = false,
-    IconData? suffixIcon,
-    VoidCallback? onTap,
-  }) {
+      String hint,
+      TextEditingController controller, {
+        bool readOnly = false,
+        IconData? suffixIcon,
+        VoidCallback? onTap,
+        Color? textColor,
+      }) {
     return TextField(
       controller: controller,
       readOnly: readOnly,
       onTap: onTap,
+      style: TextStyle(color: textColor ?? Colors.black),
       decoration: InputDecoration(
         hintText: hint,
+        hintStyle: TextStyle(color: textColor?.withOpacity(0.6) ?? Colors.grey),
         suffixIcon: suffixIcon != null ? Icon(suffixIcon, size: 18) : null,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
       ),
     );
   }
+
 
   Widget _buildDropdownField({
     required String? value,
     required List<String> items,
     required void Function(String?) onChanged,
   }) {
-    final displayValue = items.contains(value)
-        ? value
-        : (items.isNotEmpty ? items[0] : null);
+    final List<String> updatedItems = [
+      'Please select',
+      ...items.where((e) => e != 'Please select'),
+    ];
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: DropdownButtonFormField<String>(
         isExpanded: true,
-        value: displayValue,
-        items: items
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-            .toList(),
+        value: updatedItems.contains(value) ? value : 'Please select',
+        items: updatedItems.map((e) {
+          return DropdownMenuItem(
+            value: e,
+            child: Text(
+              e,
+              style: TextStyle(
+                color: e == 'Please select' ? Color(0xff005E6A) : Colors.black,
+                fontWeight: e == 'Please select' ? FontWeight.w500 : FontWeight.normal,
+              ),
+            ),
+          );
+        }).toList(),
         onChanged: (newValue) {
-          if (newValue != null &&
-              newValue != 'No Courses Available' &&
-              newValue != 'No Specializations Available' &&
-              newValue != 'No Colleges Available') {
+          if (newValue != null && newValue != 'Please select') {
             onChanged(newValue);
-            FocusScope.of(context).unfocus();
-            // if (newValue == courseName) {
-            //   _fetchSpecializationList();
-            // }
           }
         },
         decoration: InputDecoration(
@@ -212,10 +230,7 @@ class _JoblistfiltersState extends State<Joblistfilters>
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 10,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         ),
         dropdownColor: Colors.white,
         menuMaxHeight: 250,
@@ -223,4 +238,5 @@ class _JoblistfiltersState extends State<Joblistfilters>
       ),
     );
   }
+
 }
