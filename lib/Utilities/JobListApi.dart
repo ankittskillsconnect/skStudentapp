@@ -9,7 +9,6 @@ class JobApi {
     final connectSid = prefs.getString('connectSid') ?? '';
     final bearerToken =
         'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTA1NDc2LCJlbWFpbCI6ImJoYXZlc2guc2tpbGxzY29ubmVjdCtzdHVkZW50ZHVtbXlAZ21haWwuY29tIiwidXNlcl90eXBlIjo0LCJzb3VyY2UiOiJteXNxbCIsImNvbGxlZ2VfaWQiOjE4MDU4LCJjb2xsZWdlX25hbWUiOiJTa2lsbHNjb25uZWN0IENvbGxlZ2UiLCJtb3UiOiJodHRwczovL3NraWxsc2Nvbm5lY3QuczMuYXAtc291dGgtMS5hbWF6b25hd3MuY29tL2luc3RpdHV0ZU9uYm9hcmRpbmcvYWJoaXNoZWtfMjYwX01PVS5wZGYiLCJtb3Vfc2lnbmVkIjoiaHR0cHM6Ly9za2lsbHNjb25uZWN0LnMzLmFwLXNvdXRoLTEuYW1hem9uYXdzLmNvbS9pbnN0aXR1dGVPbmJvYXJkaW5nL2FiaGlzaGVrXzI2MF9NT1UucGRmIiwiaWF0IjoxNzUyMTI5MDc5LCJleHAiOjE3NTIzMDE4Nzl9.DQUqunhHpM5YCLUYCNhYAT5J-OjSaeQYVYmylCbDM74'; // Replace with dynamic token if needed
-
     final response = await http
         .post(
           Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/jobs'),
@@ -20,7 +19,7 @@ class JobApi {
           },
           body: '',
         )
-        .timeout(const Duration(seconds: 10));
+        .timeout(const Duration(seconds: 20));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       if (data['status'] == true && data['jobs'] is List) {

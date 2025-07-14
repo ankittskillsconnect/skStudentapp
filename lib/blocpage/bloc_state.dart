@@ -128,3 +128,9 @@ class NavigateToMyInterviewVideos extends NavigationState {
   @override
   List<Object> get props => ['NavigateToMyInterviewVideos'];
 }
+
+class NavigateToJobListFilters extends NavigationState {
+  const NavigateToJobListFilters();
+  @override
+  List<Object> get props => ['NavigateToJobListFilters'];
+}

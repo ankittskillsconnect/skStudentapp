@@ -48,7 +48,7 @@ class CustomBottomNavBar extends StatelessWidget {
           ),
           child: Row(
             children: [
-              _buildNavItem(context, currentIndex, 0, Icons.home, 'Home', () {
+              _buildNavItem(context, currentIndex, 0, Icons.home_outlined, 'Home', () {
                 context.read<NavigationBloc>().add(GotoHomeScreen2());
               }, iconSize, textSize, isFirst: true),
               _buildNavItem(context, currentIndex, 1, Icons.work_outline_rounded, 'Jobs', () {

@@ -45,16 +45,12 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
   late TextEditingController phoneController;
   late TextEditingController whatsappController;
   late TextEditingController emailController;
-
   late String selectedState;
   late String selectedCity;
-
   bool isLoadingStates = true;
   bool isLoadingCities = false;
-
   List<String> states = [];
   List<String> cities = ['Select a state first'];
-
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -84,7 +80,6 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
   Future<void> _fetchStateList() async {
     final prefs = await SharedPreferences.getInstance();
     final cachedStates = prefs.getStringList('cached_states');
-
     if (cachedStates != null && cachedStates.isNotEmpty) {
       if (!mounted) return;
       setState(() {
@@ -327,7 +322,6 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
                             );
                             return;
                           }
-
                           widget.onSave({
                             'fullname': fullNameController.text,
                             'dob': dobController.text,

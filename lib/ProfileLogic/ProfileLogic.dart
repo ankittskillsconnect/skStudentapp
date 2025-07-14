@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../BottamTabScreens/AccountsTab/sharedpref.dart';
+import '../../BottamTabScreens/AccountsTab/sharedpref.dart';
 import 'ProfileEvent.dart';
 import 'ProfileState.dart';
 

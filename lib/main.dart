@@ -16,6 +16,7 @@ import 'package:sk_loginscreen1/Pages/loginPage.dart';
 
 import 'ProfileLogic/ProfileEvent.dart';
 import 'ProfileLogic/ProfileLogic.dart';
+import 'blocpage/JobFiltersBloc/JobFilter_logic.dart';
 
 
 
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(create: (_) => JobFilterBloc()),
         BlocProvider(create: (_) => NavigationBloc()),
         BlocProvider(create: (_) => ProfileBloc()..add(LoadProfileData())),
       ],

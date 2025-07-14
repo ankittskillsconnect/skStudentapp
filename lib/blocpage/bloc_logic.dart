@@ -107,5 +107,9 @@ class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
       print('Handling NavigateToMyInterviewVideos');
       emit(const NavigateToMyInterviewVideos());
     });
+    on<GoToJobListFilters>((event, emit) {
+      print('Handling NavigateToJobListFilters');
+      emit(const NavigateToJobListFilters());
+    });
   }
 }

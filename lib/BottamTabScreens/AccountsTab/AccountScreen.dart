@@ -131,7 +131,7 @@ class _AccountScreenState extends State<AccountScreen> {
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: const Color(0xFF005E6A),
-                                width: 1,
+                                width: 2,
                               ),
                             ),
                             child: ClipOval(
@@ -141,7 +141,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                 fit: BoxFit.cover,
                               )
                                   : const Image(
-                                image: AssetImage('assets/portrait.png'),
+                                image: AssetImage('assets/placeholder.jpg'),
                                 fit: BoxFit.cover,
                               ),
                             ),

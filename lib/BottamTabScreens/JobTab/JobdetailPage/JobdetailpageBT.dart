@@ -160,8 +160,8 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                 _buildHeader(jobDetail, widthScale, fontScale),
                 _sectionTitle('Responsibilities of the Candidate:'),
                 _bulletSection(jobDetail?['responsibilities'] ?? [], sizeScale),
-                _sectionTitle('Terms and Condition :-'),
-                _bulletSection(jobDetail?['terms'] ?? [], sizeScale),
+                // _sectionTitle('Terms and Condition :-'),
+                // _bulletSection(jobDetail?['terms'] ?? [], sizeScale),
                 _sectionTitle('Requirements:'),
                 _bulletSection(jobDetail?['requirements'] ?? [], sizeScale),
                 _sectionTitle('Nice to Have:'),
@@ -210,10 +210,10 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
 
   Widget _buildShimmer(double scale, double widthScale) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300, // static background grey
-      highlightColor: Colors.grey.shade100.withOpacity(0.6), // shiny slide effect
-      direction: ShimmerDirection.ltr, // left to right slide
-      period: const Duration(seconds: 2), // smooth speed
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100.withOpacity(0.6),
+      direction: ShimmerDirection.ltr,
+      period: const Duration(seconds: 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -269,8 +269,6 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
       ),
     );
   }
-
-
 
   Widget _buildHeader(Map<String, dynamic>? job, double widthScale, double fontScale) {
     return Padding(

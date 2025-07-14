@@ -24,7 +24,7 @@ class JobCardBT extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("Rendering JobCardBT - Title: $jobTitle, Company: $company, Location: $location, Tags: $tags, LogoUrl: $logoUrl"); // Debug log
+    // print("Rendering JobCardBT - Title: $jobTitle, Company: $company, Location: $location, Tags: $tags, LogoUrl: $logoUrl"); // Debug log
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
       padding: const EdgeInsets.all(8),

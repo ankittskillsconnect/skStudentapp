@@ -61,7 +61,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
                 height: popularJobListHeight.clamp(220.0, 240.0),
                 child: InkWell(
                   onTap: () {
-                    // Navigator.push(context, MaterialPageRoute(builder: (_) => JobDetailPage2(jobToken: '',)));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => JobDetailPage2(jobToken: '',)));
                   },
                   child: ListView(
                     scrollDirection: Axis.horizontal,
@@ -101,10 +101,10 @@ class _HomeScreen2State extends State<HomeScreen2> {
                       ),
                     ].map((card) {
                       try {
-                        return card; // Ensure widget builds without errors
+                        return card;
                       } catch (e) {
-                        print("Error building PopularJobCard: $e"); // Debug log
-                        return const SizedBox.shrink(); // Fallback to empty widget
+                        print("Error building PopularJobCard: $e");
+                        return const SizedBox.shrink();
                       }
                     }).toList(),
                   ),
