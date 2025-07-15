@@ -40,11 +40,16 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
           'company': data['company'] ?? 'Unknown Company',
           'location': data['location'] ?? 'N/A',
           'logoUrl': data['logoUrl'],
-          'responsibilities': (data['responsibilities'] as List<dynamic>?)?.cast<String>() ?? [],
+          'responsibilities':
+              (data['responsibilities'] as List<dynamic>?)?.cast<String>() ??
+              [],
           'terms': (data['terms'] as List<dynamic>?)?.cast<String>() ?? [],
-          'requirements': (data['requirements'] as List<dynamic>?)?.cast<String>() ?? [],
-          'niceToHave': (data['niceToHave'] as List<dynamic>?)?.cast<String>() ?? [],
-          'aboutCompany': (data['aboutCompany'] as List<dynamic>?)?.cast<String>() ?? [],
+          'requirements':
+              (data['requirements'] as List<dynamic>?)?.cast<String>() ?? [],
+          'niceToHave':
+              (data['niceToHave'] as List<dynamic>?)?.cast<String>() ?? [],
+          'aboutCompany':
+              (data['aboutCompany'] as List<dynamic>?)?.cast<String>() ?? [],
           'tags': (data['tags'] as List<dynamic>?)?.cast<String>() ?? [],
         };
         isLoading = false;
@@ -141,40 +146,62 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
         ),
         body: isLoading
             ? Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16 * sizeScale, vertical: 16 * sizeScale),
-          child: _buildShimmer(sizeScale, widthScale),
-        )
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16 * sizeScale,
+                  vertical: 16 * sizeScale,
+                ),
+                child: _buildShimmer(sizeScale, widthScale),
+              )
             : error != null
-            ? Center(child: Text(error!, style: const TextStyle(color: Colors.red)))
+            ? Center(
+                child: Text(error!, style: const TextStyle(color: Colors.red)),
+              )
             : SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16 * sizeScale, vertical: 5 * sizeScale),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(jobDetail, widthScale, fontScale),
-                _sectionTitle('Responsibilities of the Candidate:'),
-                _bulletSection(jobDetail?['responsibilities'] ?? [], sizeScale),
-                _sectionTitle('Requirements:'),
-                _bulletSection(jobDetail?['requirements'] ?? [], sizeScale),
-                _sectionTitle('Nice to Have:'),
-                _bulletSection(jobDetail?['niceToHave'] ?? [], sizeScale),
-                _sectionTitle('About Company'),
-                _bulletSection(jobDetail?['aboutCompany'] ?? [], sizeScale),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
-        ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16 * sizeScale,
+                    vertical: 5 * sizeScale,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(jobDetail, widthScale, fontScale),
+                      _sectionTitle('Responsibilities of the Candidate:'),
+                      _bulletSection(
+                        jobDetail?['responsibilities'] ?? [],
+                        sizeScale,
+                      ),
+                      _sectionTitle('Requirements:'),
+                      _bulletSection(
+                        jobDetail?['requirements'] ?? [],
+                        sizeScale,
+                      ),
+                      _sectionTitle('Nice to Have:'),
+                      _bulletSection(jobDetail?['niceToHave'] ?? [], sizeScale),
+                      _sectionTitle('About Company'),
+                      _bulletSection(
+                        jobDetail?['aboutCompany'] ?? [],
+                        sizeScale,
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                ),
+              ),
         bottomNavigationBar: Container(
-          padding: EdgeInsets.symmetric(vertical: 12 * sizeScale, horizontal: 140 * sizeScale),
+          padding: EdgeInsets.symmetric(
+            vertical: 12 * sizeScale,
+            horizontal: 140 * sizeScale,
+          ),
           color: const Color(0xFFEFF8F9),
           child: Row(
             children: [
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    print("Apply button pressed with jobToken: ${widget.jobToken}");
+                    print(
+                      "Apply button pressed with jobToken: ${widget.jobToken}",
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF005E6A),
@@ -263,12 +290,19 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
     );
   }
 
-  Widget _buildHeader(Map<String, dynamic>? job, double widthScale, double fontScale) {
+  Widget _buildHeader(
+    Map<String, dynamic>? job,
+    double widthScale,
+    double fontScale,
+  ) {
     final location = job?['location'] ?? 'Location';
     final company = job?['company'] ?? 'Company';
     final isLocationLong = location.length > 40 || location.contains('\n');
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 5 * widthScale, vertical: 10 * widthScale),
+      padding: EdgeInsets.symmetric(
+        horizontal: 5 * widthScale,
+        vertical: 10 * widthScale,
+      ),
       child: Column(
         children: [
           IntrinsicHeight(
@@ -282,16 +316,26 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: const Color(0xFF005E6A)),
                   ),
-                  child: job?['logoUrl'] != null && (job?['logoUrl'] as String).isNotEmpty
+                  child:
+                      job?['logoUrl'] != null &&
+                          (job?['logoUrl'] as String).isNotEmpty
                       ? Image.network(
-                    job!['logoUrl'] as String,
-                    height: 44 * widthScale,
-                    width: 44 * widthScale,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Image.asset('assets/google.png', height: 44 * widthScale, width: 44 * widthScale),
-                  )
-                      : Image.asset('assets/google.png', height: 44 * widthScale, width: 44 * widthScale),
+                          job!['logoUrl'] as String,
+                          height: 44 * widthScale,
+                          width: 44 * widthScale,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Image.asset(
+                                'assets/google.png',
+                                height: 44 * widthScale,
+                                width: 44 * widthScale,
+                              ),
+                        )
+                      : Image.asset(
+                          'assets/google.png',
+                          height: 44 * widthScale,
+                          width: 44 * widthScale,
+                        ),
                 ),
                 SizedBox(width: 12 * widthScale),
                 Expanded(
@@ -320,8 +364,11 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                       ),
                       Text(
                         company,
-                        style: TextStyle(fontSize: 15 * fontScale, color: Colors.grey[800], height: 0.8),
-
+                        style: TextStyle(
+                          fontSize: 15 * fontScale,
+                          color: Colors.grey[800],
+                          height: 0.8,
+                        ),
                       ),
                       const SizedBox(height: 2),
                       GestureDetector(
@@ -334,12 +381,17 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              isLocationExpanded ? location : _shortenText(location),
-                              style: TextStyle(fontSize: 15 * fontScale, color: Colors.grey[800]),
+                              isLocationExpanded
+                                  ? location
+                                  : _shortenText(location),
+                              style: TextStyle(
+                                fontSize: 15 * fontScale,
+                                color: Colors.grey[800],
+                              ),
                             ),
                             if (isLocationLong)
                               Text(
-                                isLocationExpanded ? 'Show less' : 'Show more +',
+                                isLocationExpanded ? 'Show less' : 'Show more ',
                                 style: TextStyle(
                                   fontSize: 15 * fontScale,
                                   color: const Color(0xFF005E6A),
@@ -355,19 +407,23 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
               ],
             ),
           ),
-
           SizedBox(height: 14 * widthScale),
           Padding(
-            padding: EdgeInsets.only(left: 10 * widthScale),
+            padding: EdgeInsets.only(left: 0 * widthScale),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Wrap(
                 spacing: 10 * widthScale,
-                children: (job?['tags'] as List<String>?)?.map((tag) => _Tag(label: tag)).toList() ?? [
-                  _Tag(label: "Full-time"),
-                  _Tag(label: "In-office"),
-                  _Tag(label: "14 Openings"),
-                ],
+                runSpacing: 8 * widthScale,
+                children:
+                    (job?['tags'] as List<String>?)
+                        ?.map((tag) => _Tag(label: tag))
+                        .toList() ??
+                    [
+                      _Tag(label: "Full-time"),
+                      _Tag(label: "In-office"),
+                      _Tag(label: "14 Openings"),
+                    ],
               ),
             ),
           ),
@@ -375,8 +431,6 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
       ),
     );
   }
-
-
 
   String _shortenText(String text, {int maxChars = 40}) {
     if (text.length <= maxChars) return text;
@@ -387,12 +441,19 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
     padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
     child: Text(
       title,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF003840)),
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF003840),
+      ),
     ),
   );
 
   Widget _bulletSection(List<String> items, double scale) => Container(
-    decoration: BoxDecoration(color: const Color(0xFFEBF6F7), borderRadius: BorderRadius.circular(12 * scale)),
+    decoration: BoxDecoration(
+      color: const Color(0xFFEBF6F7),
+      borderRadius: BorderRadius.circular(12 * scale),
+    ),
     padding: EdgeInsets.symmetric(vertical: 10 * scale, horizontal: 12 * scale),
     margin: EdgeInsets.only(bottom: 8 * scale),
     child: Column(
@@ -403,8 +464,16 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("\u2022 ", style: TextStyle(fontSize: 15 * scale, fontWeight: FontWeight.w700)),
-              Expanded(child: Text(e, style: TextStyle(fontSize: 14 * scale))),
+              Text(
+                "\u2022 ",
+                style: TextStyle(
+                  fontSize: 15 * scale,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Expanded(
+                child: Text(e, style: TextStyle(fontSize: 14 * scale)),
+              ),
             ],
           ),
         );
@@ -416,7 +485,10 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
     final size = MediaQuery.of(context).size;
     final widthScale = size.width / 360;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12 * widthScale, vertical: 6 * widthScale),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12 * widthScale,
+        vertical: 6 * widthScale,
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFFEFF8F9),
         borderRadius: BorderRadius.circular(20 * widthScale),

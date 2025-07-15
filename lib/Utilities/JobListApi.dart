@@ -27,15 +27,12 @@ class JobApi {
 
       if (data['status'] == true && data['jobs'] is List) {
         final jobsList = data['jobs'] as List;
-        print("🟢 Total jobs fetched: ${jobsList.length}");
-
+        // print(" Total jobs fetched: ${jobsList.length}");
         return jobsList.map<Map<String, dynamic>>((job) {
           final title = job['title'] ?? '';
           final company = job['company_name'] ?? '';
           final threeCities = job['three_cities_name'] ?? '';
           final totalCities = job['total_cities'] ?? 0;
-
-          // 🔍 Compose location display
           String location;
           if ((threeCities as String).isNotEmpty) {
             location = totalCities > 3
@@ -44,15 +41,11 @@ class JobApi {
           } else {
             location = 'Location not specified';
           }
-
-          // 🔧 Skills & tags
           final skills = (job['skills'] as String?)?.split(',') ?? [];
           final tags = [
             job['job_type'] as String? ?? '',
             ...skills,
           ].where((tag) => tag.isNotEmpty).toList();
-
-          // 🕒 Post time
           final createdOn = DateTime.tryParse(job['created_on'] ?? '') ?? DateTime.now();
           final now = DateTime.now();
           final diff = now.difference(createdOn);
@@ -61,16 +54,11 @@ class JobApi {
               : diff.inHours < 24
               ? '${diff.inHours} hr ago'
               : '${diff.inDays} days ago';
-
-
           final salary = '₹${job['cost_to_company'] ?? '0'} LPA';
-
           final expiry = _calculateExpiry(job['end_date']);
-
-          print(" Job Title: $title");
-          print(" three_cities_name: $threeCities");
-          print(" Final location for job '$title': $location");
-
+          // print(" Job Title: $title");
+          // print(" three_cities_name: $threeCities");
+          // print(" Final location for job '$title': $location");
           return {
             'title': title,
             'company': company,
