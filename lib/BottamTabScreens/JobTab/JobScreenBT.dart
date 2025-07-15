@@ -35,10 +35,9 @@ class _JobScreenbtState extends State<Jobscreenbt> {
     });
     try {
       final fetchedJobs = await JobApi.fetchJobs();
-      print("Fetched jobs: $fetchedJobs"); // Debug log for fetched data
+      print("Fetched jobs: $fetchedJobs");
       setState(() {
         jobs = fetchedJobs.map((job) {
-
           final location = (job['location'] as String?)?.isNotEmpty ?? false
               ? job['location']
               : (job['job_location_detail'] as List<dynamic>?)?.isNotEmpty ?? false

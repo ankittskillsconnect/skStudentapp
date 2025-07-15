@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyAccount.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyInterviewVid/MyInterviewVideos.dart';
+import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/WatchListScreen/WatchList.dart';
 import 'package:sk_loginscreen1/Pages/bottombar.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
@@ -190,6 +191,7 @@ class _AccountScreenState extends State<AccountScreen> {
                         final option = options[index];
                         final isMyAccount = option["label"] == 'My Account';
                         final interviewVideos = option["label"] == "My interview videos";
+                        final watchList = option['label'] == "Watchlist";
                         return _AccountOption(
                           icon: option['icon'] as IconData,
                           label: option['label'] as String,
@@ -216,6 +218,12 @@ class _AccountScreenState extends State<AccountScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (_) => MyInterviewVideos()),
+                              );
+                            }
+                            else if (watchList) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => WishlistPage()),
                               );
                             }
 

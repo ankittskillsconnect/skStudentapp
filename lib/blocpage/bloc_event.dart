@@ -49,3 +49,5 @@ class GoToMyInterviewVideosScreen extends NavigationEvent {}
 class LogintoHomeatab extends NavigationEvent {}
 
 class GoToJobListFilters extends NavigationEvent {}
+
+

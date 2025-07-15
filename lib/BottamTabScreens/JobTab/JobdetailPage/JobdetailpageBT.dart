@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../../Model/Job_Model.dart';
 import '../../../Utilities/JobDetailApi.dart';
+import '../../../blocpage/BookmarkBloc/bookmarkEvent.dart';
+import '../../../blocpage/BookmarkBloc/bookmarkLogic.dart';
+import '../../../blocpage/BookmarkBloc/bookmarkState.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class JobDetailPage2 extends StatefulWidget {
   final String jobToken;
@@ -17,6 +22,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
   bool isLoading = true;
   String? error;
   bool isLocationExpanded = false;
+  bool isBookmarked = false;
 
   @override
   void initState() {
@@ -355,10 +361,44 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                               ),
                             ),
                           ),
-                          Icon(
-                            Icons.bookmark_add_outlined,
-                            size: 26 * widthScale,
-                            color: const Color(0xFF005E6A),
+                          BlocBuilder<BookmarkBloc, BookmarkState>(
+                            builder: (context, state) {
+                              final isBookmarked = state.bookmarkedJobs.any(
+                                (job) => job.jobToken == widget.jobToken,
+                              );
+                              return GestureDetector(
+                                onTap: () {
+                                  final job = JobModel(
+                                    jobToken: widget.jobToken,
+                                    jobTitle: jobDetail?['title'] ?? '',
+                                    company: jobDetail?['company'] ?? '',
+                                    location: jobDetail?['location'] ?? '',
+                                    salary: jobDetail?['salary'] ?? '',
+                                    postTime: jobDetail?['postTime'] ?? '',
+                                    expiry: jobDetail?['expiry'] ?? '',
+                                    tags: (jobDetail?['tags'] as List?)?.map((e) => e.toString()).toList() ?? [],
+                                    logoUrl: jobDetail?['logoUrl'],
+                                  );
+
+                                  if (isBookmarked) {
+                                    context.read<BookmarkBloc>().add(
+                                      RemoveBookmarkEvent(widget.jobToken),
+                                    );
+                                  } else {
+                                    context.read<BookmarkBloc>().add(
+                                      AddBookmarkEvent(job),
+                                    );
+                                  }
+                                },
+                                child: Icon(
+                                  isBookmarked
+                                      ? Icons.bookmark
+                                      : Icons.bookmark_add_outlined,
+                                  size: 24 * widthScale,
+                                  color: const Color(0xFF005E6A),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),

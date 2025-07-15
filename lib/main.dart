@@ -7,13 +7,13 @@ import 'package:sk_loginscreen1/BottamTabScreens/JobTab/JobScreenBT.dart';
 import 'package:sk_loginscreen1/Pages/splashScreen.dart';
 import 'package:sk_loginscreen1/Pages/forgotPasswordPage.dart';
 import 'package:sk_loginscreen1/Utilities/auth/LoginUserApi.dart';
+import 'package:sk_loginscreen1/blocpage/BookmarkBloc/bookmarkLogic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_state.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/Interveiwtab/InterviewScreen.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/homeScreen.dart';
 import 'package:sk_loginscreen1/Pages/loginPage.dart';
-
 import 'ProfileLogic/ProfileEvent.dart';
 import 'ProfileLogic/ProfileLogic.dart';
 import 'blocpage/JobFiltersBloc/JobFilter_logic.dart';
@@ -33,9 +33,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => JobFilterBloc()),
         BlocProvider(create: (_) => NavigationBloc()),
         BlocProvider(create: (_) => ProfileBloc()..add(LoadProfileData())),
+        BlocProvider(create: (_) => BookmarkBloc()),
+        BlocProvider(create: (_) => JobFilterBloc()),
       ],
       child: MaterialApp(debugShowCheckedModeBanner: false, home: MainApp()),
     );
