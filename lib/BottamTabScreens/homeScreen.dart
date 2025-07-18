@@ -26,7 +26,6 @@ class _HomeScreen2State extends State<HomeScreen2> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final double screenHeight = mediaQuery.size.height;
-
     const double appBarHeight = 56.0;
     const double bottomNavBarHeight = 60.0;
     const double sectionHeaderHeight = 48.0;
@@ -34,8 +33,8 @@ class _HomeScreen2State extends State<HomeScreen2> {
     const double knowHowBannerHeight = 100.0;
     const double paddingHeight = 16.0 * 2;
     const double marginHeight = 45.0 + 5.0;
-
-    final double totalFixedHeight = appBarHeight +
+    final double totalFixedHeight =
+        appBarHeight +
         bottomNavBarHeight +
         (sectionHeaderHeight * 2) +
         sizedBoxHeight +
@@ -61,52 +60,62 @@ class _HomeScreen2State extends State<HomeScreen2> {
                 height: popularJobListHeight.clamp(220.0, 240.0),
                 child: InkWell(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => JobDetailPage2(jobToken: '',)));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => JobDetailPage2(jobToken: ''),
+                      ),
+                    );
                   },
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    children: [
-                      PopularJobCard(
-                        title: 'Product Manager',
-                        subtitile: "Google",
-                        description: 'Collaborate with cross-functional teams to define projects, requirements, and timelinesCollaborate with cross-functional teams to define projects, requirements, and timelines.',
-                        salary: '1.25L/month',
-                        time: 'Posted 7 mins ago',
-                        immageAsset: 'assets/google.png',
-                      ),
-                      PopularJobCard(
-                        title: 'UI/UX',
-                        subtitile: "Zuno Studios",
-                        description: 'Work on UI/UX projects with a focus on user experience and designCollaborate with cross-functional teams to define projects, requirements, and timelines.',
-                        salary: '25K/month',
-                        time: 'Posted 7 mins ago',
-                        immageAsset: 'assets/UIUXpurple.png',
-                      ),
-                      PopularJobCard(
-                        title: 'UI Designer',
-                        subtitile: "Zuno Studios",
-                        description: 'Design intuitive user interfaces for web and mobile applications.',
-                        salary: '22K/month',
-                        time: 'Posted 10 mins ago',
-                        immageAsset: 'assets/UIUXpurple.png',
-                      ),
-                      PopularJobCard(
-                        title: 'Interaction Designer',
-                        subtitile: "Zuno Studios",
-                        description: 'Create interactive prototypes and design user flows.',
-                        salary: '23K/month',
-                        time: 'Posted 20 mins ago',
-                        immageAsset: 'assets/UIUXpurple.png',
-                      ),
-                    ].map((card) {
-                      try {
-                        return card;
-                      } catch (e) {
-                        print("Error building PopularJobCard: $e");
-                        return const SizedBox.shrink();
-                      }
-                    }).toList(),
+                    children:
+                        [
+                          PopularJobCard(
+                            title: 'Product Manager',
+                            subtitile: "Google",
+                            description:
+                                'Collaborate with cross-functional teams to define projects, requirements, and timelinesCollaborate with cross-functional teams to define projects, requirements, and timelines.',
+                            salary: '1.25L/month',
+                            time: 'Posted 7 mins ago',
+                            immageAsset: 'assets/google.png',
+                          ),
+                          PopularJobCard(
+                            title: 'UI/UX',
+                            subtitile: "Zune Studios",
+                            description:
+                                'Work on UI/UX projects with a focus on user experience and designCollaborate with cross-functional teams to define projects, requirements, and timelines.',
+                            salary: '35K/month',
+                            time: 'Posted 7 mins ago',
+                            immageAsset: 'assets/UIUXpurple.png',
+                          ),
+                          PopularJobCard(
+                            title: 'UI Designer',
+                            subtitile: "Zune Studios",
+                            description:
+                                'Design intuitive user interfaces for web and mobile applications.',
+                            salary: '25K/month',
+                            time: 'Posted 10 mins ago',
+                            immageAsset: 'assets/UIUXpurple.png',
+                          ),
+                          PopularJobCard(
+                            title: 'Interaction Designer',
+                            subtitile: "Zune Studios",
+                            description:
+                                'Create interactive prototypes and design user flows.',
+                            salary: '23K/month',
+                            time: 'Posted 20 mins ago',
+                            immageAsset: 'assets/UIUXpurple.png',
+                          ),
+                        ].map((card) {
+                          try {
+                            return card;
+                          } catch (e) {
+                            print("Error building PopularJobCard: $e");
+                            return const SizedBox.shrink();
+                          }
+                        }).toList(),
                   ),
                 ),
               ),

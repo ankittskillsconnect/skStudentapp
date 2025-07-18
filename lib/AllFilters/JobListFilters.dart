@@ -68,7 +68,7 @@ class _JoblistfiltersState extends State<Joblistfilters>
                   children: [
                     const Expanded(
                       child: Text(
-                        'Job Filter',
+                        'Apply Filters',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -90,7 +90,6 @@ class _JoblistfiltersState extends State<Joblistfilters>
                   items: const ['Remote', 'In-office'],
                   onChanged: (val) => setState(() => jobType = val ?? ''),
                 ),
-
                 _buildLabel('Job Title'),
                 _buildTextField('Enter Jobs title', jobTitleController),
                 _buildLabel('Work culture'),
@@ -127,7 +126,6 @@ class _JoblistfiltersState extends State<Joblistfilters>
                   items: const ['Mumbai', 'Bangalore', 'New Delhi'],
                   onChanged: (val) => setState(() => selectedCity = val ?? ''),
                 ),
-
                 const SizedBox(height: 20),
                 Center(
                   child: ElevatedButton(
@@ -192,7 +190,6 @@ class _JoblistfiltersState extends State<Joblistfilters>
     );
   }
 
-
   Widget _buildDropdownField({
     required String? value,
     required List<String> items,
@@ -202,7 +199,6 @@ class _JoblistfiltersState extends State<Joblistfilters>
       'Please select',
       ...items.where((e) => e != 'Please select'),
     ];
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: DropdownButtonFormField<String>(
@@ -238,5 +234,4 @@ class _JoblistfiltersState extends State<Joblistfilters>
       ),
     );
   }
-
 }

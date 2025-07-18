@@ -45,8 +45,8 @@ class _JobScreenbtState extends State<Jobscreenbt> {
               .map((loc) => loc['city_name'] as String? ?? 'Unknown')
               .join(' • ')
               : 'N/A';
-          // print("Job ${job['title']} - Location mapped to: $location"); // Debug location
-          // print("Job ${job['title']} - LogoUrl: ${job['logoUrl']}"); // Debug logo
+          // print("Job ${job['title']} - Location mapped to: $location"); // Debug location can be deleted
+          // print("Job ${job['title']} - LogoUrl: ${job['logoUrl']}"); // Debug logo can be deleted
           return {
             'title': job['title'] ?? 'Untitled',
             'company': job['company'] ?? 'Unknown Company',
@@ -66,9 +66,10 @@ class _JobScreenbtState extends State<Jobscreenbt> {
       setState(() {
         isLoading = false;
         errorMessage = 'Failed to load jobs: $e';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load jobs: $e')),
-        );
+        //Snackbar not necessary
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Failed to load jobs: $e')),
+        // );
       });
     }
   }
@@ -120,7 +121,7 @@ class _JobScreenbtState extends State<Jobscreenbt> {
                       final job = jobs[index];
                       return InkWell(
                         onTap: () {
-                          print("Navigating with jobToken: ${job['jobToken']}");
+                          // print("Navigating with jobToken: ${job['jobToken']}");
                           Navigator.push(
                             context,
                             MaterialPageRoute(

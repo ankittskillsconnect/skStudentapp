@@ -42,7 +42,6 @@ class WishlistPage extends StatelessWidget {
             itemCount: state.bookmarkedJobs.length,
             itemBuilder: (context, index) {
               final job = state.bookmarkedJobs[index];
-
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: GestureDetector(
@@ -65,7 +64,6 @@ class WishlistPage extends StatelessWidget {
                     ),
                     onDismissed: (_) {
                       context.read<BookmarkBloc>().add(RemoveBookmarkEvent(job.jobToken));
-
                     },
                     child: JobCardBT(
                       jobTitle: job.jobTitle,

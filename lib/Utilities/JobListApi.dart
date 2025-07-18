@@ -21,10 +21,8 @@ class JobApi {
       body: '',
     )
         .timeout(const Duration(seconds: 20));
-
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-
       if (data['status'] == true && data['jobs'] is List) {
         final jobsList = data['jobs'] as List;
         // print(" Total jobs fetched: ${jobsList.length}");

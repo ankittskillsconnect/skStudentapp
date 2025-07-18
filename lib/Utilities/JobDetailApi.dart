@@ -13,15 +13,13 @@ class JobDetailApi {
     final prefs = await SharedPreferences.getInstance();
     final authToken = prefs.getString('authToken') ?? '';
     final connectSid = prefs.getString('connectSid') ?? '';
-
     final headers = {
       'Content-Type': 'application/json',
       'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
     };
     final body = jsonEncode({"job_id": "", "slug": "", "token": token});
-
     final response = await http
-        .post(
+          .post(
           Uri.parse(
             'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/jobs/details',
           ),
@@ -34,12 +32,11 @@ class JobDetailApi {
       try {
         final data = json.decode(response.body);
         print('📥 Full API Response: $data');
-
         if (data['status'] == true &&
             data['job_details'] != null &&
             data['job_details'] is Map) {
           final jobDetails = data['job_details'] as Map<String, dynamic>;
-          print('✅ Parsed job_details keys: ${jobDetails.keys}');
+          print(' Parsed job_details keys: ${jobDetails.keys}');
 
           String jobDescription = jobDetails['job_description'] ?? '';
           List<String> responsibilities = [];
@@ -71,7 +68,6 @@ class JobDetailApi {
                 .toList();
             responsibilities.addAll(respText);
           }
-
           if (jobDescription.contains('<strong>Requirements:</strong>')) {
             final reqStart =
                 jobDescription.indexOf('<strong>Requirements:</strong>') +
@@ -97,7 +93,6 @@ class JobDetailApi {
                 .toList();
             requirements.addAll(reqText);
           }
-
           if (jobDescription.contains('<strong>Nice to Have:</strong>')) {
             final niceStart =
                 jobDescription.indexOf('<strong>Nice to Have:</strong>') +
@@ -116,11 +111,9 @@ class JobDetailApi {
                 .toList();
             niceToHave.addAll(niceText);
           }
-          print('🔍 Looking for job_location_detail...');
           final rawLocation =
               data['job_location_detail'] ?? jobDetails['job_location_detail'];
-          print('🔍 Raw job_location_detail: $rawLocation');
-          //converting list of state and city name to be readable
+          print(' Raw job_location_detail: $rawLocation');
           String formattedLocation = 'N/A';
           if (rawLocation is List) {
             final locationMap = <String, Set<String>>{};
@@ -134,8 +127,7 @@ class JobDetailApi {
               final cities = entry.value.toList()..sort();
               return '${cities.join(', ')}, ${entry.key}';
             }).toList();
-
-            groupedLocations.sort(); // optional alphabetic sorting
+            groupedLocations.sort();
             formattedLocation = groupedLocations.join(' • ');
             print(' Final formatted location: $formattedLocation');
           } else {
@@ -166,7 +158,6 @@ class JobDetailApi {
                     .map((e) => e.trim())
                     .where((e) => e.isNotEmpty)
             ],
-
             'salary': '₹${jobDetails['cost_to_company'] ?? '0'} LPA',
             'postTime': _calculatePostTime(jobDetails['posted_on']),
             'expiry': _calculateExpiry(jobDetails['end_date']),

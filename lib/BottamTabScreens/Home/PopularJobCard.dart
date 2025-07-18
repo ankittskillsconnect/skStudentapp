@@ -15,9 +15,9 @@ class PopularJobCard extends StatelessWidget {
     required this.description,
     required this.salary,
     required this.time,
-    this.onTap,
     required this.immageAsset,
     required this.subtitile,
+    this.onTap,
   });
 
   @override
