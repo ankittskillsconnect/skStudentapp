@@ -83,7 +83,6 @@ class _JoblistfiltersState extends State<Joblistfilters>
                   ],
                 ),
                 const Divider(thickness: 1),
-
                 _buildLabel('Jobs Type'),
                 _buildDropdownField(
                   value: jobType,
@@ -105,21 +104,18 @@ class _JoblistfiltersState extends State<Joblistfilters>
                   items: const ['Open', 'Closed', 'Urgent'],
                   onChanged: (val) {},
                 ),
-
                 _buildLabel('Course'),
                 _buildDropdownField(
                   value: courses,
                   items: const ['B.Tech', 'BBA', 'B.Sc', 'MBA'],
                   onChanged: (val) => setState(() => courses = val ?? ''),
                 ),
-
                 _buildLabel('State'),
                 _buildDropdownField(
                   value: selectedState,
                   items: const ['Maharashtra', 'Karnataka', 'UP'],
                   onChanged: (val) => setState(() => selectedState = val ?? ''),
                 ),
-
                 _buildLabel('City'),
                 _buildDropdownField(
                   value: selectedCity,
@@ -163,19 +159,25 @@ class _JoblistfiltersState extends State<Joblistfilters>
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 4),
-      child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Color(0xFF003840))),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+          color: Color(0xFF003840),
+        ),
+      ),
     );
   }
 
-
   Widget _buildTextField(
-      String hint,
-      TextEditingController controller, {
-        bool readOnly = false,
-        IconData? suffixIcon,
-        VoidCallback? onTap,
-        Color? textColor,
-      }) {
+    String hint,
+    TextEditingController controller, {
+    bool readOnly = false,
+    IconData? suffixIcon,
+    VoidCallback? onTap,
+    Color? textColor,
+  }) {
     return TextField(
       controller: controller,
       readOnly: readOnly,
@@ -211,7 +213,9 @@ class _JoblistfiltersState extends State<Joblistfilters>
               e,
               style: TextStyle(
                 color: e == 'Please select' ? Color(0xff005E6A) : Colors.black,
-                fontWeight: e == 'Please select' ? FontWeight.w500 : FontWeight.normal,
+                fontWeight: e == 'Please select'
+                    ? FontWeight.w500
+                    : FontWeight.normal,
               ),
             ),
           );
@@ -226,7 +230,10 @@ class _JoblistfiltersState extends State<Joblistfilters>
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 10,
+          ),
         ),
         dropdownColor: Colors.white,
         menuMaxHeight: 250,

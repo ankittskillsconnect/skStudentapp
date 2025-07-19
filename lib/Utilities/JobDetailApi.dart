@@ -31,13 +31,12 @@ class JobDetailApi {
     if (response.statusCode == 200) {
       try {
         final data = json.decode(response.body);
-        print('📥 Full API Response: $data');
+        // print('📥 Full API Response: $data');
         if (data['status'] == true &&
             data['job_details'] != null &&
             data['job_details'] is Map) {
           final jobDetails = data['job_details'] as Map<String, dynamic>;
-          print(' Parsed job_details keys: ${jobDetails.keys}');
-
+          // print(' Parsed job_details keys: ${jobDetails.keys}');
           String jobDescription = jobDetails['job_description'] ?? '';
           List<String> responsibilities = [];
           List<String> requirements = [];

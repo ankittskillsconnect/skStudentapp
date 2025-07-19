@@ -12,7 +12,7 @@ class Appbarjobscreen extends StatefulWidget implements PreferredSizeWidget {
   State<Appbarjobscreen> createState() => _AppbarjobscreenState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(75); // Adjusted height
+  Size get preferredSize => const Size.fromHeight(75);
 }
 
 class _AppbarjobscreenState extends State<Appbarjobscreen> {
@@ -51,6 +51,7 @@ class _AppbarjobscreenState extends State<Appbarjobscreen> {
                         height: 45,
                         decoration: BoxDecoration(
                           color: Colors.white,
+
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(

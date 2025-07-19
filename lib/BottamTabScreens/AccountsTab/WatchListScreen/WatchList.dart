@@ -6,8 +6,8 @@ import '../../../blocpage/BookmarkBloc/bookmarkEvent.dart';
 import '../../JobTab/JobCardBT.dart';
 import '../../JobTab/JobdetailPage/JobdetailpageBT.dart';
 
-class WishlistPage extends StatelessWidget {
-  const WishlistPage({super.key});
+class WatchListPage extends StatelessWidget {
+  const WatchListPage({super.key});
 
   @override
   Widget build(BuildContext context) {

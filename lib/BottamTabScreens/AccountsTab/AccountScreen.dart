@@ -67,7 +67,8 @@ class _AccountScreenState extends State<AccountScreen> {
       final date = DateFormat('dd, MMM yyyy').parse(dob);
       final today = DateTime.now();
       int age = today.year - date.year;
-      if (today.month < date.month || (today.month == date.month && today.day < date.day)) {
+      if (today.month < date.month ||
+          (today.month == date.month && today.day < date.day)) {
         age--;
       }
       if (age < 0 || age > 120) {
@@ -89,8 +90,7 @@ class _AccountScreenState extends State<AccountScreen> {
     final double spacing = media.height * 0.015;
 
     return BlocListener<NavigationBloc, NavigationState>(
-      listener: (context, state) {
-      },
+      listener: (context, state) {},
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
@@ -137,13 +137,15 @@ class _AccountScreenState extends State<AccountScreen> {
                             child: ClipOval(
                               child: state.profileImage != null
                                   ? Image.file(
-                                state.profileImage!,
-                                fit: BoxFit.cover,
-                              )
+                                      state.profileImage!,
+                                      fit: BoxFit.cover,
+                                    )
                                   : const Image(
-                                image: AssetImage('assets/placeholder.jpg'),
-                                fit: BoxFit.cover,
-                              ),
+                                      image: AssetImage(
+                                        'assets/placeholder.jpg',
+                                      ),
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
                           ),
                           SizedBox(height: spacing * 1.7),
@@ -166,9 +168,7 @@ class _AccountScreenState extends State<AccountScreen> {
                         ],
                       );
                     } else {
-                      return CircularProgressIndicator(
-                        color: Colors.teal,
-                      );
+                      return CircularProgressIndicator(color: Colors.teal);
                       //   Text(
                       //   'Unable to load profile data',
                       //   style: TextStyle(
@@ -190,7 +190,8 @@ class _AccountScreenState extends State<AccountScreen> {
                       itemBuilder: (context, index) {
                         final option = options[index];
                         final isMyAccount = option["label"] == 'My Account';
-                        final interviewVideos = option["label"] == "My interview videos";
+                        final interviewVideos =
+                            option["label"] == "My interview videos";
                         final watchList = option['label'] == "Watchlist";
                         return _AccountOption(
                           icon: option['icon'] as IconData,
@@ -200,40 +201,52 @@ class _AccountScreenState extends State<AccountScreen> {
                             setState(() {
                               selectedOptionIndex = index;
                             });
-
                             if (index == 6) {
                               _logout();
                             } else if (isMyAccount) {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const MyAccount()),
+                                MaterialPageRoute(
+                                  builder: (_) => const MyAccount(),
+                                ),
                               ).then((_) {
-                                Future.delayed(const Duration(milliseconds: 200), () {
-                                  if (mounted) {
-                                    context.read<ProfileBloc>().add(LoadProfileData());
-                                  }
-                                });
+                                Future.delayed(
+                                  const Duration(milliseconds: 200),
+                                  () {
+                                    if (mounted) {
+                                      context.read<ProfileBloc>().add(
+                                        LoadProfileData(),
+                                      );
+                                    }
+                                  },
+                                );
                               });
                             } else if (interviewVideos) {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => MyInterviewVideos()),
+                                MaterialPageRoute(
+                                  builder: (_) => MyInterviewVideos(),
+                                ),
                               );
-                            }
-                            else if (watchList) {
+                            } else if (watchList) {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => WishlistPage()),
+                                MaterialPageRoute(
+                                  builder: (_) => WatchListPage(),
+                                ),
                               );
                             }
 
-                            Future.delayed(const Duration(milliseconds: 50), () {
-                              if (mounted) {
-                                setState(() {
-                                  selectedOptionIndex = -1;
-                                });
-                              }
-                            });
+                            Future.delayed(
+                              const Duration(milliseconds: 50),
+                              () {
+                                if (mounted) {
+                                  setState(() {
+                                    selectedOptionIndex = -1;
+                                  });
+                                }
+                              },
+                            );
                           },
                         );
                       },

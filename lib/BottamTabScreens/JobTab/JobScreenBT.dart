@@ -6,6 +6,8 @@ import 'package:sk_loginscreen1/BottamTabScreens/JobTab/JobdetailPage/Jobdetailp
 import 'package:sk_loginscreen1/Pages/bottombar.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_state.dart';
+import '../../ProfileLogic/ProfileEvent.dart';
+import '../../ProfileLogic/ProfileLogic.dart';
 import '../../Utilities/JobListApi.dart';
 import 'JobCardBT.dart';
 
@@ -62,7 +64,7 @@ class _JobScreenbtState extends State<Jobscreenbt> {
         isLoading = false;
       });
     } catch (e) {
-      print("Error fetching jobs: $e");
+      print("Error fetching jobs: $e");// debug print
       setState(() {
         isLoading = false;
         errorMessage = 'Failed to load jobs: $e';
@@ -72,6 +74,11 @@ class _JobScreenbtState extends State<Jobscreenbt> {
         // );
       });
     }
+  }
+
+  Future<void> _onRefresh() async {
+    context.read<ProfileBloc>().add(_fetchJobs() as ProfileEvent);
+    await Future.delayed(const Duration(seconds: 1));
   }
 
   void _onItemTapped(int index) {
@@ -94,56 +101,59 @@ class _JobScreenbtState extends State<Jobscreenbt> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: Appbarjobscreen(),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                Expanded(
-                  child: isLoading
-                      ? ListView.builder(
-                    itemCount: 5,
-                    itemBuilder: (context, index) => _buildShimmerCard(),
-                  )
-                      : errorMessage != null
-                      ? Center(
-                    child: Text(
-                      errorMessage!,
-                      style: const TextStyle(color: Colors.red),
+        body: RefreshIndicator(
+          onRefresh:_onRefresh,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: isLoading
+                        ? ListView.builder(
+                      itemCount: 5,
+                      itemBuilder: (context, index) => _buildShimmerCard(),
+                    )
+                        : errorMessage != null
+                        ? Center(
+                      child: Text(
+                       errorMessage!,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    )
+                        : jobs.isEmpty
+                        ? const Center(child: Text('No jobs found'))
+                        : ListView.builder(
+                      itemCount: jobs.length,
+                      itemBuilder: (context, index) {
+                        final job = jobs[index];
+                        return InkWell(
+                          onTap: () {
+                            // print("Navigating with jobToken: ${job['jobToken']}");
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => JobDetailPage2(jobToken: job['jobToken']),
+                              ),
+                            );
+                          },
+                          child: JobCardBT(
+                            jobTitle: job['title'],
+                            company: job['company'],
+                            location: job['location'],
+                            salary: job['salary'],
+                            postTime: job['postTime'],
+                            expiry: job['expiry'],
+                            tags: job['tags'],
+                            logoUrl: job['logoUrl'],
+                          ),
+                        );
+                      },
                     ),
                   )
-                      : jobs.isEmpty
-                      ? const Center(child: Text('No jobs found'))
-                      : ListView.builder(
-                    itemCount: jobs.length,
-                    itemBuilder: (context, index) {
-                      final job = jobs[index];
-                      return InkWell(
-                        onTap: () {
-                          // print("Navigating with jobToken: ${job['jobToken']}");
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => JobDetailPage2(jobToken: job['jobToken']),
-                            ),
-                          );
-                        },
-                        child: JobCardBT(
-                          jobTitle: job['title'],
-                          company: job['company'],
-                          location: job['location'],
-                          salary: job['salary'],
-                          postTime: job['postTime'],
-                          expiry: job['expiry'],
-                          tags: job['tags'],
-                          logoUrl: job['logoUrl'],
-                        ),
-                      );
-                    },
-                  ),
-                )
-              ],
+                ],
+              ),
             ),
           ),
         ),
