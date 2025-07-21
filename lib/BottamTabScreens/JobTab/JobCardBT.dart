@@ -66,7 +66,7 @@ class JobCardBT extends StatelessWidget {
                               errorBuilder: (context, error, stackTrace) {
                                 print(
                                   "Image load error for $logoUrl: $error",
-                                ); // Debug error
+                                );
                                 return Image.asset(
                                   "assets/google.png",
                                   width: 40,
@@ -95,14 +95,28 @@ class JobCardBT extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          Text(
-                            "$company\n${location.isNotEmpty ? location : 'NA'}",
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Color(0xFF827B7B),
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                company,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Color(0xFF827B7B),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                location.isNotEmpty ? location : 'NA',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Color(0xFF827B7B),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
                         ],
                       ),

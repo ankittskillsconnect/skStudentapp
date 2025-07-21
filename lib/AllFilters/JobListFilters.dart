@@ -97,11 +97,10 @@ class _JoblistfiltersState extends State<Joblistfilters>
                   items: const ['Hybrid', 'Flexible', 'Strict'],
                   onChanged: (val) => setState(() => workCulture = val ?? ''),
                 ),
-
                 _buildLabel('Jobs status'),
                 _buildDropdownField(
                   value: '',
-                  items: const ['Open', 'Closed', 'Urgent'],
+                  items: const ['Open', 'Closed'],
                   onChanged: (val) {},
                 ),
                 _buildLabel('Course'),
@@ -138,12 +137,24 @@ class _JoblistfiltersState extends State<Joblistfilters>
                         vertical: 14,
                       ),
                     ),
-                    child: const Text(
-                      "Show Results",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context, {
+                          'jobType': jobType,
+                          'jobTitle': jobTitleController.text,
+                          'workCulture': workCulture,
+                          'courses': courses,
+                          'cities': selectedCity,
+                          'states': selectedState,
+                        });
+                      },
+                      child: const Text(
+                        "Show Results",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),

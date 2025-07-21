@@ -46,16 +46,11 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
           'company': data['company'] ?? 'Unknown Company',
           'location': data['location'] ?? 'N/A',
           'logoUrl': data['logoUrl'],
-          'responsibilities':
-              (data['responsibilities'] as List<dynamic>?)?.cast<String>() ??
-              [],
+          'responsibilities': (data['responsibilities'] as List<dynamic>?)?.cast<String>() ?? [],
           'terms': (data['terms'] as List<dynamic>?)?.cast<String>() ?? [],
-          'requirements':
-              (data['requirements'] as List<dynamic>?)?.cast<String>() ?? [],
-          'niceToHave':
-              (data['niceToHave'] as List<dynamic>?)?.cast<String>() ?? [],
-          'aboutCompany':
-              (data['aboutCompany'] as List<dynamic>?)?.cast<String>() ?? [],
+          'requirements': (data['requirements'] as List<dynamic>?)?.cast<String>() ?? [],
+          'niceToHave': (data['niceToHave'] as List<dynamic>?)?.cast<String>() ?? [],
+          'aboutCompany': (data['aboutCompany'] as List<dynamic>?)?.cast<String>() ?? [],
           'tags': (data['tags'] as List<dynamic>?)?.cast<String>() ?? [],
         };
         isLoading = false;
@@ -376,7 +371,11 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                                     salary: jobDetail?['salary'] ?? '',
                                     postTime: jobDetail?['postTime'] ?? '',
                                     expiry: jobDetail?['expiry'] ?? '',
-                                    tags: (jobDetail?['tags'] as List?)?.map((e) => e.toString()).toList() ?? [],
+                                    tags:
+                                        (jobDetail?['tags'] as List?)
+                                            ?.map((e) => e.toString())
+                                            .toList() ??
+                                        [],
                                     logoUrl: jobDetail?['logoUrl'],
                                   );
 

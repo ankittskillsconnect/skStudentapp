@@ -48,7 +48,8 @@ class SharedPrefHelper {
     required List<Map<String, dynamic>> projects,
     required List<Map<String, dynamic>> certificates,
     required List<Map<String, dynamic>> workExperiences,
-    File? profileImage, required List<Map<String, dynamic>> languages,
+    File? profileImage,
+    required List<Map<String, dynamic>> languages,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     print(
@@ -140,24 +141,23 @@ class SharedPrefHelper {
     return loadedData;
   }
 
-
   static List<Map<String, dynamic>> _decodeListMap(List<String> jsonList) {
     return jsonList
         .map((json) {
-      if (json.isNotEmpty) {
-        try {
-          final decoded = jsonDecode(json);
-          if (decoded is Map) {
-            return decoded.map(
+          if (json.isNotEmpty) {
+            try {
+              final decoded = jsonDecode(json);
+              if (decoded is Map) {
+                return decoded.map(
                   (key, value) => MapEntry(key.toString(), value),
-            );
+                );
+              }
+            } catch (e) {
+              print('Error decoding JSON: $e, json: $json');
+            }
           }
-        } catch (e) {
-          print('Error decoding JSON: $e, json: $json');
-        }
-      }
-      return <String, dynamic>{};
-    })
+          return <String, dynamic>{};
+        })
         .toList()
         .cast<Map<String, dynamic>>();
   }

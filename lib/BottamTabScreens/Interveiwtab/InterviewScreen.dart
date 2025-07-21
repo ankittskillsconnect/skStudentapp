@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sk_loginscreen1/BottamTabScreens/JobTab/AppBarJobScreen.dart';
 import 'package:sk_loginscreen1/Pages/bottombar.dart';
+import '../../Model/InterviewScreenModel.dart';
+import '../../Utilities/InterviewScreenApi.dart';
 import 'interviewCard.dart';
 
 class InterviewScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class InterviewScreen extends StatefulWidget {
 
 class _InterviewScreenState extends State<InterviewScreen> {
   int _selectedIndex = 0;
+  late Future<List<InterviewModel>> _interviewFuture;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -20,67 +22,17 @@ class _InterviewScreenState extends State<InterviewScreen> {
     });
   }
 
-  final List<Map<String, dynamic>> cardData = [
-    {
-      "title": "Group Discussion | Social Media Discussion",
-      "companyName": "Google",
-      "status" : "Live",
-      "time": "12:00 PM to 01:00 PM",
-      "date": "15th March, 2025",
-      "hrName" : "Hr. Namita",
-      "platform": "online"
-      // "invited": 15,
-      // "images": [
-      //   "assets/profile1.png",
-      //   "assets/profile2.png",
-      //   "assets/profile3.png",
-      // ]
-    },
-    {
-      "title": "Mock Interview | Infosys HR",
-      "companyName": "Accenture",
-      "status" : "Live",
-      "time": "3:00 PM to 4:00 PM",
-      "date": "18th March, 2025",
-      "hrName" : "Hr. Namita",
-      "platform": "online"
-      // "invited": 12,
-      // "images": [
-      //   "assets/profile1.png",
-      //   "assets/profile2.png",
-      // ]
-    },
-    {
-      "title": "Coding Test | Web Dev Role",
-      "companyName": "JP Morgan",
-      "status" : "Live",
-      "time": "9:00 AM to 10:00 AM",
-      "date": "20th March, 2025",
-      "hrName" : "Hr. Namita",
-      "platform": "online"
-      // "invited": 20,
-      // "images": [
-      //   "assets/profile1.png",
-      //   "assets/profile2.png",
-      //   "assets/profile1.png",
-      // ]
-    },
-    {
-      "title": "Group Discussion | Social Media Di...",
-      "companyName": "Amazon",
-      "status" : "Live",
-      "time": "12:00 PM to 01:00 PM",
-      "date": "15th March, 2025",
-      "hrName" : "Hr. Namita",
-      "platform": "online"
-      // "invited": 15,
-      // "images": [
-      //   "assets/profile1.png",
-      //   "assets/profile2.png",
-      //   "assets/profile3.png",
-      // ]
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _interviewFuture = InterviewApi.fetchInterviews();
+  }
+
+  Future<void> _refreshInterviewList() async {
+    setState(() {
+      _interviewFuture = InterviewApi.fetchInterviews();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,44 +42,115 @@ class _InterviewScreenState extends State<InterviewScreen> {
         statusBarIconBrightness: Brightness.dark,
       ),
       child: Container(
-        color: const  Color(0xFFEBF6F7),
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          appBar: const Appbarjobscreen(),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Column(
-                children: cardData.map((item) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: DiscussionCard(
-                      title: item['title'],
-                      companyName: item['companyName'],
-                      status: item['status'],
-                      time: item['time'],
-                      date: item['date'],
-                      hrName: item["hrName"],
-                      platform: item['platform'],
-                      // invitedCount: item['invited'],
-                      // profileImageUrls: List<String>.from(item['images']),
-                      onJoinTap: () {
-                        print("Join tapped for: ${item['title']}");// debug
-                      },
-                    ),
-                  );
-                }).toList(),
+        color: const Color(0xFFEBF6F7),
+        child: RefreshIndicator(
+          onRefresh: _refreshInterviewList,
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(75),
+              child: SafeArea(
+                child: Container(
+                  color: Colors.white,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 6),
+                                height: 45,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.4),
+                                      spreadRadius: 1,
+                                      blurRadius: 2,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: const TextField(
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 10),
+                                    border: InputBorder.none,
+                                    prefixIcon: Icon(Icons.search, color: Colors.black),
+                                    hintText: 'Search',
+                                    hintStyle: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            _iconCircleButton(Icons.filter_list),
+                            _iconCircleButton(Icons.notifications_outlined),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
-          bottomNavigationBar: CustomBottomNavBar(
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
+            body: SafeArea(
+              child: FutureBuilder<List<InterviewModel>>(
+                future: _interviewFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text(" Failed to load interviews"));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("No interviews Scheduled yet"));
+                  }
+
+                  final data = snapshot.data!;
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: Column(
+                      children: data.map((item) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: InterviewCard(
+                            model: item,
+                            onJoinTap: () {
+                              print("Join tapped for: ${item.jobTitle}");
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  );
+                },
+              ),
+            ),
+            bottomNavigationBar: CustomBottomNavBar(
+              currentIndex: _selectedIndex,
+              onTap: _onItemTapped,
+            ),
           ),
         ),
       ),
     );
   }
-  // @override
-  // Size get preferredSize => const Size.fromHeight(90); // Controlled height
+
+  Widget _iconCircleButton(IconData icon, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 6),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.grey.withOpacity(0.4)),
+          color: Colors.transparent,
+        ),
+        child: Icon(icon, size: 22, color: Colors.black),
+      ),
+    );
+  }
 }

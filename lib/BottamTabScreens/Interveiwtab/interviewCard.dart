@@ -1,31 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:sk_loginscreen1/Pages/BlinkAnimatedStatus.dart';
+import '../../Model/InterviewScreenModel.dart';
 
-class DiscussionCard extends StatelessWidget {
-  final String title;
-  final String companyName;
-  final String status;
-  final String time;
-  final String date;
-  final String hrName;
-  final String platform;
-
-  // final int invitedCount;
-  // final List<String> profileImageUrls;
+class InterviewCard extends StatelessWidget {
+  final InterviewModel model;
   final VoidCallback onJoinTap;
 
-  const DiscussionCard({
+  const InterviewCard({
     super.key,
-    required this.title,
-    required this.companyName,
-    required this.status,
-    required this.time,
-    required this.date,
-    required this.hrName,
-    required this.platform,
-    // required this.invitedCount,
-    // required this.profileImageUrls,
+    required this.model,
     required this.onJoinTap,
   });
 
@@ -37,16 +21,17 @@ class DiscussionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFEBF6F7),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Color(0xFFBCD8DB), width: 1),
+        border: Border.all(color: const Color(0xFFBCD8DB), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Job title
           Row(
             children: [
               Expanded(
                 child: Text(
-                  title,
+                  model.jobTitle,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -56,10 +41,11 @@ class DiscussionCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              // const Icon(Icons.circle, size: 8, color: Colors.green),
             ],
           ),
           const SizedBox(height: 12),
+
+          // Main container box
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -74,14 +60,10 @@ class DiscussionCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(
-                          Icons.maps_home_work_outlined,
-                          size: 18,
-                          color: Color(0xFF003840),
-                        ),
+                        const Icon(Icons.maps_home_work_outlined, size: 18, color: Color(0xFF003840)),
                         const SizedBox(width: 8),
                         Text(
-                          companyName,
+                          model.company,
                           style: const TextStyle(
                             fontSize: 14,
                             color: Color(0xFF003840),
@@ -90,40 +72,16 @@ class DiscussionCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    // Container(
-                    //   padding: const EdgeInsets.symmetric(
-                    //     horizontal: 8,
-                    //     vertical: 4,
-                    //   ),
-                    //   decoration: BoxDecoration(
-                    //     color: Color(0xFFEA4D4D),
-                    //     borderRadius: BorderRadius.circular(18),
-                    //     border: Border.all(color: Color(0xFFBCD8DB)),
-                    //   ),
-                    //   child: Text(
-                    //     status,
-                    //     style: const TextStyle(
-                    //       color: Colors.white,
-                    //       fontSize: 14,
-                    //       fontWeight: FontWeight.w600,
-                    //     ),
-                    //   ),
-                    // ),
-                    //
-                    LiveSlidingText(status: status),
+                    LiveSlidingText(status: model.isActive ? 'Active' : 'Inactive'),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.calendar_month_outlined,
-                      size: 18,
-                      color: Color(0xFF003840),
-                    ),
+                    const Icon(Icons.calendar_month_outlined, size: 18, color: Color(0xFF003840)),
                     const SizedBox(width: 8),
                     Text(
-                      "$date | $time",
+                      "${model.date} | ${model.startTime} - ${model.endTime}",
                       style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF003840),
@@ -133,19 +91,16 @@ class DiscussionCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        const Icon(
-                          Icons.person_outline_outlined,
-                          size: 18,
-                          color: Color(0xFF003840),
-                        ),
+                        const Icon(Icons.person_outline_outlined, size: 18, color: Color(0xFF003840)),
                         const SizedBox(width: 8),
                         Text(
-                          hrName,
+                          model.moderator,
                           style: const TextStyle(
                             fontSize: 14,
                             color: Color(0xFF003840),
@@ -157,7 +112,7 @@ class DiscussionCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          platform,
+                          model.meetingMode,
                           style: const TextStyle(
                             fontSize: 14,
                             color: Color(0xFF003840),
@@ -165,48 +120,17 @@ class DiscussionCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 5),
-                        Brand(Brands.zoom, size: 23),
+                        Brand(Brands.zoom, size: 23), // static for now
                       ],
                     ),
                   ],
                 ),
-                // const SizedBox(height: 8),
-                //
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //   children: [
-                //     Container(
-                //       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                //       decoration: BoxDecoration(
-                //         color: const Color(0xFFEFF6F6),
-                //         borderRadius: BorderRadius.circular(20),
-                //         border: Border.all(color: const Color(0xFFBCD8DB)),
-                //       ),
-                //       child: Row(
-                //         children: const [
-                //           Icon(Icons.groups, size: 18, color: Color(0xFF003840)),
-                //           SizedBox(width: 6),
-                //           Text(
-                //             '15 Invited',
-                //             style: TextStyle(
-                //               fontWeight: FontWeight.w500,
-                //               color: Color(0xFF003840),
-                //             ),
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //
-                //     // Overlapping Profile Images
-                //     // buildOverlappingAvatars(
-                //     //  profileImageUrls
-                //     // ),
-                //   ],
-                // )
               ],
             ),
           ),
           const SizedBox(height: 12),
+
+          // Join Now Button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -230,50 +154,3 @@ class DiscussionCard extends StatelessWidget {
     );
   }
 }
-
-// Widget buildOverlappingAvatars(List<String> imageUrls) {
-//   double overlap = 20;
-//
-//   List<Widget> avatars = [];
-//   for (int i = 0; i < imageUrls.length; i++) {
-//     avatars.add(Positioned(
-//       left: i * overlap,
-//       child: CircleAvatar(
-//         radius: 16,
-//         backgroundColor: Colors.white,
-//         child: CircleAvatar(
-//           radius: 14,
-//           backgroundImage: AssetImage(imageUrls[i]),
-//         ),
-//       ),
-//     ));
-//   }
-//
-//   avatars.add(Positioned(
-//     left: imageUrls.length * overlap,
-//     child: CircleAvatar(
-//       radius: 16,
-//       backgroundColor: Colors.white,
-//       child: CircleAvatar(
-//         radius: 14,
-//         backgroundColor: Color(0xFF003840),
-//         child: Icon(Icons.add, size: 16, color: Colors.white),
-//       ),
-//     ),
-//   ));
-//
-//   return SizedBox(
-//     height: 32,
-//     width: (imageUrls.length + 1) * overlap + 12, // adjust for spacing
-//     child: Stack(
-//       children: avatars,
-//     ),
-//   );
-// }
-// Text(
-//   _calculateAge(state.dob),
-//   style: TextStyle(
-//     fontSize: media.width * 0.04,
-//     color: const Color(0xFF6A8E92),
-//   ),
-// ),

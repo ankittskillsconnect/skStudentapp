@@ -16,10 +16,7 @@ import 'package:sk_loginscreen1/BottamTabScreens/homeScreen.dart';
 import 'package:sk_loginscreen1/Pages/loginPage.dart';
 import 'ProfileLogic/ProfileEvent.dart';
 import 'ProfileLogic/ProfileLogic.dart';
-import 'blocpage/JobFiltersBloc/JobFilter_logic.dart';
-
-
-
+import 'blocpage/jobFilterBloc/jobFilter_logic.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,9 +39,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-
 
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
@@ -90,7 +84,6 @@ class _MainAppState extends State<MainApp> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return BlocListener<NavigationBloc, NavigationState>(
@@ -100,7 +93,8 @@ class _MainAppState extends State<MainApp> {
             context,
             MaterialPageRoute(builder: (_) => const ForgotpasswordPage()),
           );
-        } else if (state is NavigateToLoginPage || state is NavigateBacktoLoginin) {
+        } else if (state is NavigateToLoginPage ||
+            state is NavigateBacktoLoginin) {
           Navigator.popUntil(context, (route) => route.isFirst);
         } else if (state is NavigateToMyAccount) {
           Navigator.push(
@@ -114,7 +108,11 @@ class _MainAppState extends State<MainApp> {
       child: BlocBuilder<NavigationBloc, NavigationState>(
         builder: (context, state) {
           if (_showSplashScreen) return const SplashScreen();
-          if (_isCheckingToken) return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          if (_isCheckingToken) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
 
           if (state is NavigateToLoginPage ||
               state is NavigateBacktoLoginin ||
@@ -137,6 +135,5 @@ class _MainAppState extends State<MainApp> {
         },
       ),
     );
-
   }
 }

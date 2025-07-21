@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sk_loginscreen1/AllFilters/JobListFilters.dart';
-import '../../blocpage/JobFiltersBloc/JobFilter_event.dart';
-import '../../blocpage/JobFiltersBloc/JobFilter_logic.dart';
-import '../../blocpage/JobFiltersBloc/JobFilter_state.dart';
+import 'package:sk_loginscreen1/blocpage/JobApiBloc/job_event.dart';
+import '../../blocpage/jobFilterBloc/jobFilter_event.dart';
+import '../../blocpage/jobFilterBloc/jobFilter_logic.dart';
+import '../../blocpage/jobFilterBloc/jobFilter_state.dart';
 
 class Appbarjobscreen extends StatefulWidget implements PreferredSizeWidget {
   const Appbarjobscreen({super.key});
@@ -19,9 +20,9 @@ class _AppbarjobscreenState extends State<Appbarjobscreen> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<JobFilterBloc, JobFilterState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is JobFilterSheetVisible) {
-          showModalBottomSheet(
+          final selectedFilters = await showModalBottomSheet<Map<String, dynamic>>(
             context: context,
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
@@ -34,6 +35,10 @@ class _AppbarjobscreenState extends State<Appbarjobscreen> {
               states: '',
             ),
           );
+          if (selectedFilters != null) {
+            context.read<JobFilterBloc>().add(FetchJobsEvent() as JobFilterEvent);
+
+          }
         }
       },
       child: SafeArea(
@@ -51,7 +56,6 @@ class _AppbarjobscreenState extends State<Appbarjobscreen> {
                         height: 45,
                         decoration: BoxDecoration(
                           color: Colors.white,
-
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
