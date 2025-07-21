@@ -6,7 +6,6 @@ import '../../Utilities/InterviewScreenApi.dart';
 import 'interviewCard.dart';
 import 'package:shimmer/shimmer.dart';
 
-
 class InterviewScreen extends StatefulWidget {
   const InterviewScreen({super.key});
 
@@ -18,6 +17,8 @@ class _InterviewScreenState extends State<InterviewScreen> {
   int _selectedIndex = 0;
   late Future<List<InterviewModel>> _interviewFuture;
   bool isLoading = false;
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -33,8 +34,32 @@ class _InterviewScreenState extends State<InterviewScreen> {
 
   Future<void> _refreshInterviewList() async {
     setState(() {
+      _startDate = null;
+      _endDate = null;
       _interviewFuture = InterviewApi.fetchInterviews();
     });
+  }
+
+
+  Future<void> _pickDateRange() async {
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      initialDateRange: DateTimeRange(
+        start: DateTime.now(),
+        end: DateTime.now().add(const Duration(days: 1)),
+      ),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _startDate = picked.start;
+        _endDate = picked.end;
+      });
+
+      print("📅 Selected range: $_startDate - $_endDate");
+    }
   }
 
   @override
@@ -46,6 +71,8 @@ class _InterviewScreenState extends State<InterviewScreen> {
       ),
       child: Container(
         color: const Color(0xFFEBF6F7),
+        child: RefreshIndicator(
+          onRefresh: _refreshInterviewList,
           child: Scaffold(
             backgroundColor: Colors.white,
             appBar: PreferredSize(
@@ -70,24 +97,69 @@ class _InterviewScreenState extends State<InterviewScreen> {
                                     BoxShadow(
                                       color: Colors.grey.withOpacity(0.4),
                                       spreadRadius: 1,
-                                      blurRadius: 2,
+                                      blurRadius: 1,
                                       offset: const Offset(0, 2),
                                     ),
                                   ],
                                 ),
-                                child: const TextField(
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(vertical: 10),
-                                    border: InputBorder.none,
-                                    prefixIcon: Icon(Icons.search, color: Colors.black),
-                                    hintText: 'Search',
-                                    hintStyle: TextStyle(color: Colors.black),
+                                child: GestureDetector(
+                                  onTap: _pickDateRange,
+                                  child: Container(
+                                    height: 45,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(24),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.4),
+                                          spreadRadius: 1,
+                                          blurRadius: 2,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.date_range,
+                                          color: Colors.black,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            _startDate != null && _endDate != null
+                                                ? "${_startDate!.toLocal().toString().split(' ')[0]} → ${_endDate!.toLocal().toString().split(' ')[0]}"
+                                                : "Select date range",
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                        const Icon(
+                                          Icons.arrow_drop_down,
+                                          color: Colors.black,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                             const SizedBox(width: 4),
-                            _iconCircleButton(Icons.filter_list),
+                            if (_startDate != null && _endDate != null)
+                              _iconCircleButton(
+                                Icons.close,
+                                onTap: () {
+                                  setState(() {
+                                    _startDate = null;
+                                    _endDate = null;
+                                    _interviewFuture = InterviewApi.fetchInterviews();
+                                  });
+                                },
+                              ),
                             _iconCircleButton(Icons.notifications_outlined),
                           ],
                         ),
@@ -97,31 +169,64 @@ class _InterviewScreenState extends State<InterviewScreen> {
                 ),
               ),
             ),
-            body: RefreshIndicator(
-              onRefresh: _refreshInterviewList,
-              child: SafeArea(
+            body: SafeArea(
                 child: FutureBuilder<List<InterviewModel>>(
                   future: _interviewFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 16,
+                        ),
                         itemCount: 5,
                         itemBuilder: (context, index) => _buildShimmerCard(),
                       );
-                  } else if (snapshot.hasError) {
-                      return const Center(child: Text(" Failed to load interviews"));
+                    } else if (snapshot.hasError) {
+                      return const Center(
+                        child: Text(" Failed to load interviews"),
+                      );
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text("No interviews Scheduled yet"));
+                      return const Center(
+                        child: Text("No interviews Scheduled yet"),
+                      );
                     }
                     final data = snapshot.data!;
+
+                    final filteredData = (_startDate != null && _endDate != null)
+                        ? data.where((item) {
+                            final interviewDate = DateTime.parse(item.date);
+                            return interviewDate.isAfter(
+                                  _startDate!.subtract(const Duration(days: 1)),
+                                ) &&
+                                interviewDate.isBefore(
+                                  _endDate!.add(const Duration(days: 1)),
+                                );
+                          }).toList()
+                        : data;
+
                     return SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                       child: Column(
-                        children: data.map((item) {
+                        children: filteredData.isEmpty
+                            ? [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 40),
+                            child: Center(
+                              child: Text(
+                                'No interviews found',
+                                style: TextStyle(fontSize: 16, color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                        ]
+                            : filteredData.map((item) {
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: 16.0),
+                            padding: const EdgeInsets.only(bottom: 10.0),
                             child: InterviewCard(
                               model: item,
                               onJoinTap: () {
@@ -132,9 +237,9 @@ class _InterviewScreenState extends State<InterviewScreen> {
                         }).toList(),
                       ),
                     );
+
                   },
                 ),
-              ),
             ),
             bottomNavigationBar: CustomBottomNavBar(
               currentIndex: _selectedIndex,
@@ -142,7 +247,7 @@ class _InterviewScreenState extends State<InterviewScreen> {
             ),
           ),
         ),
-
+      ),
     );
   }
 
@@ -163,14 +268,11 @@ class _InterviewScreenState extends State<InterviewScreen> {
   }
 }
 
-
 Widget _buildShimmerCard() {
   return Container(
     margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
     padding: const EdgeInsets.all(8),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(25),
-    ),
+    decoration: BoxDecoration(borderRadius: BorderRadius.circular(25)),
     child: Shimmer.fromColors(
       baseColor: Colors.grey.shade300,
       highlightColor: Colors.grey.shade100,
@@ -216,11 +318,7 @@ Widget _buildShimmerCard() {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Container(
-                      height: 16,
-                      width: 50,
-                      color: Colors.white,
-                    ),
+                    Container(height: 16, width: 50, color: Colors.white),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -247,16 +345,8 @@ Widget _buildShimmerCard() {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  height: 14,
-                  width: 80,
-                  color: Colors.white,
-                ),
-                Container(
-                  height: 14,
-                  width: 60,
-                  color: Colors.white,
-                ),
+                Container(height: 14, width: 80, color: Colors.white),
+                Container(height: 14, width: 60, color: Colors.white),
               ],
             ),
           ),

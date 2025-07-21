@@ -26,7 +26,6 @@ class InterviewCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Job title
           Row(
             children: [
               Expanded(
@@ -79,12 +78,27 @@ class InterviewCard extends StatelessWidget {
                   children: [
                     const Icon(Icons.calendar_month_outlined, size: 18, color: Color(0xFF003840)),
                     const SizedBox(width: 8),
-                    Text(
-                      "${model.date} | ${model.startTime} - ${model.endTime}",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF003840),
-                        fontWeight: FontWeight.w500,
+                    Flexible(
+                      child: Text(
+                        model.date,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF003840),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Icon(Icons.access_time_outlined, size: 18, color: Color(0xFF003840)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        "${model.startTime} - ${model.endTime}",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF003840),
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ],
@@ -128,8 +142,6 @@ class InterviewCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-
-          // Join Now Button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
