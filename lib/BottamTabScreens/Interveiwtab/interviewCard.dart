@@ -45,7 +45,6 @@ class InterviewCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // Main container box
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -120,7 +119,7 @@ class InterviewCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 5),
-                        Brand(Brands.zoom, size: 23), // static for now
+                        Brand(Brands.zoom, size: 23),
                       ],
                     ),
                   ],
