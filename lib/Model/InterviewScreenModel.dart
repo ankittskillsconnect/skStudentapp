@@ -1,7 +1,7 @@
 class InterviewModel {
   final String jobTitle;
   final String company;
-  final String date;        // formatted as 'yyyy-MM-dd'
+  final String date;
   final String startTime;
   final String endTime;
   final String moderator;

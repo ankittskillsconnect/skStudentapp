@@ -9,13 +9,11 @@ class InterviewApi {
       final prefs = await SharedPreferences.getInstance();
       final authToken = prefs.getString('authToken') ?? '';
       final connectSid = prefs.getString('connectSid') ?? '';
-
       var url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/interview-room/list');
       var headers = {
         'Content-Type': 'application/json',
         'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
       };
-
       var request = http.Request('POST', url);
       request.body = json.encode({
         "job_id": "",
@@ -34,11 +32,11 @@ class InterviewApi {
         final List<dynamic> data = jsonData['scheduled_meeting_list'];
         return data.map((item) => InterviewModel.fromJson(item)).toList();
       } else {
-        print('🔴 Failed with status: ${response.statusCode}');
+        print(' Failed with status: ${response.statusCode}');
         return [];
       }
     } catch (e) {
-      print('🔴 Error fetching interview list: $e');
+      print(' Error fetching interview list: $e');
       return [];
     }
   }

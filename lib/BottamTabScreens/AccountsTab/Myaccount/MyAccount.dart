@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditCertificateBottomSheet.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditProjectBottomSheet.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditWorkExperienceBottomSheet.dart';
-import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyAccountAppbar.dart';
+import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/Myaccount/MyAccountAppbar.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/sharedpref.dart';
-import 'BottomSheets/EditEducationBottomSheet.dart';
-import 'BottomSheets/EditLanguageBottomSheet.dart';
-import 'BottomSheets/EditPersonalDetailSheet.dart';
-import 'BottomSheets/EditSkillsBottomSheet.dart';
+import '../BottomSheets/EditEducationBottomSheet.dart';
+import '../BottomSheets/EditLanguageBottomSheet.dart';
+import '../BottomSheets/EditPersonalDetailSheet.dart';
+import '../BottomSheets/EditSkillsBottomSheet.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:icons_plus/icons_plus.dart';
 

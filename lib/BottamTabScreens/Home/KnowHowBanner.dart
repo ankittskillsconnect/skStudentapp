@@ -26,24 +26,24 @@ class _KnowHowBannerState extends State<KnowHowBanner> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Know How",
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF003840),
-                fontSize: 16,
-              ),
-            ),
-            const Icon(
-              Icons.keyboard_arrow_down,
-              size: 20,
-              color: Color(0xFF003840),
-            ),
-          ],
-        ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     Text(
+        //       "Know How",
+        //       style: TextStyle(
+        //         fontWeight: FontWeight.w600,
+        //         color: const Color(0xFF003840),
+        //         fontSize: 16,
+        //       ),
+        //     ),
+        //     const Icon(
+        //       Icons.keyboard_arrow_down,
+        //       size: 20,
+        //       color: Color(0xFF003840),
+        //     ),
+        //   ],
+        // ),
         const SizedBox(height: 15),
         Container(
           height: 160,

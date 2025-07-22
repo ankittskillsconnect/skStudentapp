@@ -135,3 +135,8 @@ class NavigateToJobListFilters extends NavigationState {
   List<Object> get props => ['NavigateToJobListFilters'];
 }
 
+class NavigateToMyJob extends NavigationState {
+  const NavigateToMyJob();
+  @override
+  List<Object> get props => ['NavigateToMyJob'];
+}

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/AccountScreen.dart';
-import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyAccount.dart';
+import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/Myaccount/MyAccount.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/ContactsTab/ContactsScreen.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/JobTab/JobScreenBT.dart';
 import 'package:sk_loginscreen1/Pages/splashScreen.dart';

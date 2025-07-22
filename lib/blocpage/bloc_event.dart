@@ -50,4 +50,6 @@ class LogintoHomeatab extends NavigationEvent {}
 
 class GoToJobListFilters extends NavigationEvent {}
 
+class GoToMyJobs extends NavigationEvent {}
+
 

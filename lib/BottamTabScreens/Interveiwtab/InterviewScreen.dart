@@ -16,7 +16,6 @@ class InterviewScreen extends StatefulWidget {
 class _InterviewScreenState extends State<InterviewScreen> {
   int _selectedIndex = 0;
   late Future<List<InterviewModel>> _interviewFuture;
-  bool isLoading = false;
   DateTime? _startDate;
   DateTime? _endDate;
 
@@ -40,16 +39,37 @@ class _InterviewScreenState extends State<InterviewScreen> {
     });
   }
 
-
   Future<void> _pickDateRange() async {
     final picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
-      initialDateRange: DateTimeRange(
+      initialDateRange: _startDate != null && _endDate != null
+          ? DateTimeRange(start: _startDate!, end: _endDate!)
+          : DateTimeRange(
         start: DateTime.now(),
-        end: DateTime.now().add(const Duration(days: 1)),
+        end: DateTime.now().add(Duration(days: 1)),
       ),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF005E6A),
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+              surface: Color(0xFFEBF6F7),
+            ),
+            dialogBackgroundColor: Color(0xFFEBF6F7),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Color(0xFFEBF6F7),
+                textStyle: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null) {
@@ -57,13 +77,14 @@ class _InterviewScreenState extends State<InterviewScreen> {
         _startDate = picked.start;
         _endDate = picked.end;
       });
-
       print("📅 Selected range: $_startDate - $_endDate");
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
+    final scaleFactor = MediaQuery.of(context).size.width / 375;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.tealAccent,
@@ -76,170 +97,176 @@ class _InterviewScreenState extends State<InterviewScreen> {
           child: Scaffold(
             backgroundColor: Colors.white,
             appBar: PreferredSize(
-              preferredSize: const Size.fromHeight(75),
+              preferredSize: Size.fromHeight(75 * scaleFactor),
               child: SafeArea(
                 child: Container(
                   color: Colors.white,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 6),
-                                height: 45,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(24),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.4),
-                                      spreadRadius: 1,
-                                      blurRadius: 1,
-                                      offset: const Offset(0, 2),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      20 * scaleFactor,
+                      20 * scaleFactor,
+                      20 * scaleFactor,
+                      0,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.symmetric(
+                              horizontal: 6 * scaleFactor,
+                            ),
+                            height: 35 * scaleFactor,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(
+                                24 * scaleFactor,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.4),
+                                  spreadRadius: 1,
+                                  blurRadius: 1,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: GestureDetector(
+                              onTap: _pickDateRange,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 11 * scaleFactor,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.date_range,
+                                      color: Colors.black,
+                                      size: 20 * scaleFactor,
+                                    ),
+                                    SizedBox(width: 10 * scaleFactor),
+                                    Flexible(
+                                      child: Text(
+                                        _startDate != null && _endDate != null
+                                            ? "${_startDate!.toLocal().toString().split(' ')[0]} → ${_endDate!.toLocal().toString().split(' ')[0]}"
+                                            : "Select date range",
+                                        style: TextStyle(
+                                          fontSize: 10 * scaleFactor,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.arrow_drop_down,
+                                      color: Colors.black,
+                                      size: 20 * scaleFactor,
                                     ),
                                   ],
                                 ),
-                                child: GestureDetector(
-                                  onTap: _pickDateRange,
-                                  child: Container(
-                                    height: 45,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(24),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.4),
-                                          spreadRadius: 1,
-                                          blurRadius: 2,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.date_range,
-                                          color: Colors.black,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            _startDate != null && _endDate != null
-                                                ? "${_startDate!.toLocal().toString().split(' ')[0]} → ${_endDate!.toLocal().toString().split(' ')[0]}"
-                                                : "Select date range",
-                                            style: const TextStyle(
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ),
-                                        const Icon(
-                                          Icons.arrow_drop_down,
-                                          color: Colors.black,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
                               ),
                             ),
-                            const SizedBox(width: 4),
-                            if (_startDate != null && _endDate != null)
-                              _iconCircleButton(
-                                Icons.close,
-                                onTap: () {
-                                  setState(() {
-                                    _startDate = null;
-                                    _endDate = null;
-                                    _interviewFuture = InterviewApi.fetchInterviews();
-                                  });
-                                },
-                              ),
-                            _iconCircleButton(Icons.notifications_outlined),
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 4 * scaleFactor),
+                        if (_startDate != null && _endDate != null)
+                          _iconCircleButton(
+                            Icons.close,
+                            scaleFactor,
+                            onTap: () {
+                              setState(() {
+                                _startDate = null;
+                                _endDate = null;
+                                _interviewFuture =
+                                    InterviewApi.fetchInterviews();
+                              });
+                            },
+                          ),
+                        _iconCircleButton(
+                          Icons.notifications_outlined,
+                          scaleFactor,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
             body: SafeArea(
-                child: FutureBuilder<List<InterviewModel>>(
-                  future: _interviewFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 16,
-                        ),
-                        itemCount: 5,
-                        itemBuilder: (context, index) => _buildShimmerCard(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return const Center(
-                        child: Text(" Failed to load interviews"),
-                      );
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(
-                        child: Text("No interviews Scheduled yet"),
-                      );
-                    }
-                    final data = snapshot.data!;
-
-                    final filteredData = (_startDate != null && _endDate != null)
-                        ? data.where((item) {
-                            final interviewDate = DateTime.parse(item.date);
-                            return interviewDate.isAfter(
-                                  _startDate!.subtract(const Duration(days: 1)),
-                                ) &&
-                                interviewDate.isBefore(
-                                  _endDate!.add(const Duration(days: 1)),
-                                );
-                          }).toList()
-                        : data;
-
-                    return SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
+              child: FutureBuilder<List<InterviewModel>>(
+                future: _interviewFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 10 * scaleFactor,
+                        horizontal: 16 * scaleFactor,
                       ),
-                      child: Column(
-                        children: filteredData.isEmpty
-                            ? [
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 40),
-                            child: Center(
-                              child: Text(
-                                'No interviews found',
-                                style: TextStyle(fontSize: 16, color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                        ]
-                            : filteredData.map((item) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 10.0),
-                            child: InterviewCard(
-                              model: item,
-                              onJoinTap: () {
-                                print("Join tapped for: ${item.jobTitle}");
-                              },
-                            ),
-                          );
-                        }).toList(),
-                      ),
+                      itemCount: 5,
+                      itemBuilder: (context, index) =>
+                          _buildShimmerCard(scaleFactor),
                     );
+                  } else if (snapshot.hasError) {
+                    return const Center(
+                      child: Text("Failed to load interviews"),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text("No interviews Scheduled yet"),
+                    );
+                  }
+                  final data = snapshot.data!;
+                  final filteredData = (_startDate != null && _endDate != null)
+                      ? data.where((item) {
+                          final interviewDate = DateTime.parse(item.date);
+                          return interviewDate.isAfter(
+                                _startDate!.subtract(const Duration(days: 1)),
+                              ) &&
+                              interviewDate.isBefore(
+                                _endDate!.add(const Duration(days: 1)),
+                              );
+                        }).toList()
+                      : data;
 
-                  },
-                ),
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16 * scaleFactor,
+                      vertical: 10 * scaleFactor,
+                    ),
+                    child: Column(
+                      children: filteredData.isEmpty
+                          ? [
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 40 * scaleFactor,
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'No interviews found',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ]
+                          : filteredData.map((item) {
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: 10 * scaleFactor,
+                                ),
+                                child: InterviewCard(
+                                  model: item,
+                                  onJoinTap: () {
+                                    print("Join tapped for: ${item.jobTitle}");
+                                  },
+                                ),
+                              );
+                            }).toList(),
+                    ),
+                  );
+                },
+              ),
             ),
             bottomNavigationBar: CustomBottomNavBar(
               currentIndex: _selectedIndex,
@@ -251,27 +278,34 @@ class _InterviewScreenState extends State<InterviewScreen> {
     );
   }
 
-  Widget _iconCircleButton(IconData icon, {VoidCallback? onTap}) {
+  Widget _iconCircleButton(
+    IconData icon,
+    double scaleFactor, {
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 6),
-        padding: const EdgeInsets.all(10),
+        margin: EdgeInsets.symmetric(horizontal: 6 * scaleFactor),
+        padding: EdgeInsets.all(10 * scaleFactor),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(color: Colors.grey.withOpacity(0.4)),
           color: Colors.transparent,
         ),
-        child: Icon(icon, size: 22, color: Colors.black),
+        child: Icon(icon, size: 22 * scaleFactor, color: Colors.black),
       ),
     );
   }
 }
 
-Widget _buildShimmerCard() {
+Widget _buildShimmerCard(double scaleFactor) {
   return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-    padding: const EdgeInsets.all(8),
+    margin: EdgeInsets.symmetric(
+      horizontal: 6 * scaleFactor,
+      vertical: 10 * scaleFactor,
+    ),
+    padding: EdgeInsets.all(8 * scaleFactor),
     decoration: BoxDecoration(borderRadius: BorderRadius.circular(25)),
     child: Shimmer.fromColors(
       baseColor: Colors.grey.shade300,
@@ -280,58 +314,61 @@ Widget _buildShimmerCard() {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(12 * scaleFactor),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12 * scaleFactor),
             ),
             child: Column(
               children: [
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      width: 40,
-                      height: 40,
+                      width: 40 * scaleFactor,
+                      height: 40 * scaleFactor,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8 * scaleFactor),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12 * scaleFactor),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            height: 18,
-                            width: 120,
+                            height: 18 * scaleFactor,
+                            width: 120 * scaleFactor,
                             color: Colors.white,
                           ),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6 * scaleFactor),
                           Container(
-                            height: 14,
-                            width: 180,
+                            height: 14 * scaleFactor,
+                            width: 180 * scaleFactor,
                             color: Colors.white,
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Container(height: 16, width: 50, color: Colors.white),
+                    SizedBox(width: 8 * scaleFactor),
+                    Container(
+                      height: 16 * scaleFactor,
+                      width: 50 * scaleFactor,
+                      color: Colors.white,
+                    ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12 * scaleFactor),
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 8 * scaleFactor,
+                  runSpacing: 8 * scaleFactor,
                   children: List.generate(3, (index) {
                     return Container(
-                      height: 20,
-                      width: 60,
+                      height: 20 * scaleFactor,
+                      width: 60 * scaleFactor,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20 * scaleFactor),
                       ),
                     );
                   }),
@@ -339,14 +376,22 @@ Widget _buildShimmerCard() {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10 * scaleFactor),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 8 * scaleFactor),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(height: 14, width: 80, color: Colors.white),
-                Container(height: 14, width: 60, color: Colors.white),
+                Container(
+                  height: 14 * scaleFactor,
+                  width: 80 * scaleFactor,
+                  color: Colors.white,
+                ),
+                Container(
+                  height: 14 * scaleFactor,
+                  width: 60 * scaleFactor,
+                  color: Colors.white,
+                ),
               ],
             ),
           ),

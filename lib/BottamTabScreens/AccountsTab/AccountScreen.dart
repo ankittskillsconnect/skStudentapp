@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyAccount.dart';
+import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyJobs/AppliedJobs.dart';
+import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/Myaccount/MyAccount.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyInterviewVid/MyInterviewVideos.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/WatchListScreen/WatchList.dart';
 import 'package:sk_loginscreen1/Pages/bottombar.dart';
@@ -193,6 +194,7 @@ class _AccountScreenState extends State<AccountScreen> {
                         final interviewVideos =
                             option["label"] == "My interview videos";
                         final watchList = option['label'] == "Watchlist";
+                        final myJobs = option['label'] == "My Jobs";
                         return _AccountOption(
                           icon: option['icon'] as IconData,
                           label: option['label'] as String,
@@ -235,8 +237,14 @@ class _AccountScreenState extends State<AccountScreen> {
                                   builder: (_) => WatchListPage(),
                                 ),
                               );
+                            }else if (myJobs) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => Appliedjobs(),
+                                ),
+                              );
                             }
-
                             Future.delayed(
                               const Duration(milliseconds: 50),
                               () {
