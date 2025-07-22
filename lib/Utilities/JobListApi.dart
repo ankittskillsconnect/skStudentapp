@@ -54,9 +54,6 @@ class JobApi {
               : '${diff.inDays} days ago';
           final salary = '₹${job['cost_to_company'] ?? '0'} LPA';
           final expiry = _calculateExpiry(job['end_date']);
-          // print(" Job Title: $title");
-          // print(" three_cities_name: $threeCities");
-          // print(" Final location for job '$title': $location");
           return {
             'title': title,
             'company': company,

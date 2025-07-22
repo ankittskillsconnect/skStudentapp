@@ -241,7 +241,7 @@ class _AccountScreenState extends State<AccountScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => Appliedjobs(),
+                                  builder: (_) => AppliedJobsPage(),
                                 ),
                               );
                             }

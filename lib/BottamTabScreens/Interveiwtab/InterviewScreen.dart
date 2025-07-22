@@ -226,7 +226,6 @@ class _InterviewScreenState extends State<InterviewScreen> {
                               );
                         }).toList()
                       : data;
-
                   return SingleChildScrollView(
                     padding: EdgeInsets.symmetric(
                       horizontal: 16 * scaleFactor,
@@ -262,7 +261,7 @@ class _InterviewScreenState extends State<InterviewScreen> {
                                   },
                                 ),
                               );
-                            }).toList(),
+                          }).toList(),
                     ),
                   );
                 },

@@ -31,7 +31,6 @@ class JobModel {
   @override
   int get hashCode => jobToken.hashCode;
 
-  // Optional: for saving to SharedPreferences or API integration
   factory JobModel.fromJson(Map<String, dynamic> json) {
     return JobModel(
       jobToken: json['jobToken'],

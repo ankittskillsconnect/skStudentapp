@@ -57,14 +57,17 @@ class _KnowHowBannerState extends State<KnowHowBanner> {
               });
             },
             itemBuilder: (context, index) {
-              return Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFBDE4E7),
-                  borderRadius: BorderRadius.circular(12),
-                  image: DecorationImage(
-                    image: AssetImage(widget.imageAsset),
-                    fit: BoxFit.cover,
+              return Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFBDE4E7),
+                    borderRadius: BorderRadius.circular(12),
+                    image: DecorationImage(
+                      image: AssetImage(widget.imageAsset),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               );
