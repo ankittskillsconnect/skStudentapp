@@ -48,7 +48,6 @@ class AppliedJobCardBT extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Logo
                     Container(
                       padding: const EdgeInsets.all(3),
                       margin: const EdgeInsets.only(bottom: 0),
@@ -77,10 +76,7 @@ class AppliedJobCardBT extends StatelessWidget {
                         height: 40,
                       ),
                     ),
-
                     const SizedBox(width: 12),
-
-                    // Title, company, location
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,14 +114,11 @@ class AppliedJobCardBT extends StatelessWidget {
                         ],
                       ),
                     ),
-
                     const SizedBox(width: 8),
-
-                    // Salary with fixed width to prevent overflow
                     ConstrainedBox(
                       constraints: const BoxConstraints(minWidth: 50, maxWidth: 100),
                       child: Text(
-                        '${salary} LPA',
+                        '$salary LPA',
                         textAlign: TextAlign.end,
                         style: const TextStyle(
                           fontSize: 18,
@@ -138,31 +131,46 @@ class AppliedJobCardBT extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 12),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: tags.map((tag) {
-                      return Container(
-                        margin: const EdgeInsets.only(right: 10),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFF827B7B)),
-                        ),
-                        child: Text(
-                          tag,
-                          style: const TextStyle(
+                      if (tags == null || tags.isEmpty || tags.every((tag) => tag.trim().isEmpty)) {
+                        return const Text(
+                          "No Skills listed",
+                          style: TextStyle(
                             color: Color(0xFF003840),
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
-                        ),
+                        );
+                      }
+                      return Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: tags.where((tag) => tag.trim().isNotEmpty).map((tag) {
+                          return Container(
+                            margin: const EdgeInsets.only(right: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Color(0xFF827B7B)),
+                            ),
+                            child: Text(
+                              tag,
+                              style: const TextStyle(
+                                color: Color(0xFF003840),
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       );
                     }).toList(),
                   ),
@@ -172,7 +180,6 @@ class AppliedJobCardBT extends StatelessWidget {
           ),
 
           const SizedBox(height: 10),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Row(
@@ -211,7 +218,7 @@ class AppliedJobCardBT extends StatelessWidget {
                 //       fontWeight: FontWeight.w600,
                 //     ),
                 //   ),
-                // ),
+                // ), (expiry != null &&  expiry.isNotEmpty) ? uncomment : del ;
               ],
             ),
           ),

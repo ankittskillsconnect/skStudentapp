@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../Model/applied_jobs_model.dart';
+import '../Model/Applied_Jobs_Model.dart';
 
 class AppliedJobsApi {
   static Future<List<AppliedJobModel>> fetchAppliedJobs() async {

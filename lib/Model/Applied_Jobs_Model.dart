@@ -5,7 +5,7 @@ class AppliedJobModel {
   final String jobType;
   final String companyLogo;
   final List<String> tags;
-  final String postTime; // ✅ Human readable
+  final String postTime;
   final String location;
   final String salary;
   final String expiry;

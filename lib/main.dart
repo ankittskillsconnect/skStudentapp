@@ -12,7 +12,7 @@ import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_state.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/Interveiwtab/InterviewScreen.dart';
-import 'package:sk_loginscreen1/BottamTabScreens/homeScreen.dart';
+import 'package:sk_loginscreen1/BottamTabScreens/Home/homeScreen.dart';
 import 'package:sk_loginscreen1/Pages/loginPage.dart';
 import 'ProfileLogic/ProfileEvent.dart';
 import 'ProfileLogic/ProfileLogic.dart';

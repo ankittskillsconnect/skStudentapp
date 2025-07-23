@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:sk_loginscreen1/Pages/BlinkAnimatedStatus.dart';
-import '../../Model/InterviewScreenModel.dart';
+import '../../Model/InterviewScreen_Model.dart';
 
 class InterviewCard extends StatelessWidget {
   final InterviewModel model;

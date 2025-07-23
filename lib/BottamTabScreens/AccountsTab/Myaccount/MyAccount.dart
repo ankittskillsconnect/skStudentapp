@@ -5,12 +5,15 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditPr
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditWorkExperienceBottomSheet.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/Myaccount/MyAccountAppbar.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/sharedpref.dart';
+import '../../../Model/EducationDetail_Model.dart';
+import '../../../Utilities/MyAccount_Get_Post/Get/EducationDetailApi.dart';
 import '../BottomSheets/EditEducationBottomSheet.dart';
 import '../BottomSheets/EditLanguageBottomSheet.dart';
 import '../BottomSheets/EditPersonalDetailSheet.dart';
 import '../BottomSheets/EditSkillsBottomSheet.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyAccount extends StatefulWidget {
   const MyAccount({super.key});
@@ -29,7 +32,7 @@ class _MyAccountState extends State<MyAccount> {
   String city = "Mumbai";
   String country = "India";
 
-  String? educationDetail;
+  EducationDetailModel? educationDetail;
   String degreeType = "Undergrad";
   String courseName = "Bsc IT";
   String college = "Birla College kalyan";
@@ -44,6 +47,8 @@ class _MyAccountState extends State<MyAccount> {
   List<Map<String, dynamic>> certificates = [];
   List<Map<String, dynamic>> workExperiences = [];
   List<Map<String, dynamic>> languages = [];
+  List<EducationDetailModel> educationDetails = [];
+  bool isLoadingEducation = true;
   String? internshipDetail;
   String? workExperienceDetail;
   File? _profileImage;
@@ -51,112 +56,139 @@ class _MyAccountState extends State<MyAccount> {
   @override
   void initState() {
     super.initState();
-    _loadSavedData();
-    // Initial data for testing
-    projects.add({
-      'projectDetail': null,
-      'projectName': 'Project A',
-      'companyName': 'Tech Corp',
-      'projectType': 'Project',
-      'skills': 'HTML, CSS, Flutter',
-      'startDate': '2025-06-01',
-      'endDate': '2025-12-01',
-      'projectDetailDesc': 'A sample project description',
-    });
-    certificates.add({
-      'certificateDetail': null,
-      'certificateName': 'Cert A',
-      'issuedBy': 'Cert Authority',
-      'credentialId': '12345',
-      'issuedDate': '2025-01-01',
-      'expiredDate': '2026-01-01',
-      'description': 'Sample certificate description',
-    });
-    workExperiences.add({
-      'WorkExp': null,
-      'jobTitle': 'Developer',
-      'companyName': 'Work Corp',
-      'skills': 'Java, Python',
-      'fromDate': '2024-06-01',
-      'toDate': '2025-06-26',
-      'experienceInYear': '1',
-      'experienceInMonths': '6',
-      'annualSalary': '10 LPA',
-      'jobDetail': 'Sample work experience description',
-    });
-    languages.add({'Language': null, 'language': 'English'});
+    // _loadSavedData();
+    fetchEducationDetails();
+    // projects.add({
+    //   'projectDetail': null,
+    //   'projectName': 'Project A',
+    //   'companyName': 'Tech Corp',
+    //   'projectType': 'Project',
+    //   'skills': 'HTML, CSS, Flutter',
+    //   'startDate': '2025-06-01',
+    //   'endDate': '2025-12-01',
+    //   'projectDetailDesc': 'A sample project description',
+    // });
+    // certificates.add({
+    //   'certificateDetail': null,
+    //   'certificateName': 'Cert A',
+    //   'issuedBy': 'Cert Authority',
+    //   'credentialId': '12345',
+    //   'issuedDate': '2025-01-01',
+    //   'expiredDate': '2026-01-01',
+    //   'description': 'Sample certificate description',
+    // });
+    // workExperiences.add({
+    //   'WorkExp': null,
+    //   'jobTitle': 'Developer',
+    //   'companyName': 'Work Corp',
+    //   'skills': 'Java, Python',
+    //   'fromDate': '2024-06-01',
+    //   'toDate': '2025-06-26',
+    //   'experienceInYear': '1',
+    //   'experienceInMonths': '6',
+    //   'annualSalary': '10 LPA',
+    //   'jobDetail': 'Sample work experience description',
+    // });
+    // languages.add({'Language': null, 'language': 'English'});
   }
 
-  Future<void> _loadSavedData() async {
+  Future<void> fetchEducationDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('authToken') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
     try {
-      final data = await SharedPrefHelper.loadData();
+      final educationDetailsFromApi = await EducationDetailApi.fetchEducationDetails(
+        authToken: authToken,
+        connectSid: connectSid,
+      );
+
       setState(() {
-        fullname = data['fullname'] as String? ?? fullname;
-        dob = data['dob'] as String? ?? dob;
-        phone = data['phone'] as String? ?? phone;
-        whatsapp = data['whatsapp'] as String? ?? whatsapp;
-        email = data['email'] as String? ?? email;
-        state = data['state'] as String? ?? state;
-        city = data['city'] as String? ?? city;
-        country = data['country'] as String? ?? country;
-        educationDetail = data['educationDetail'] as String?;
-        degreeType = data['degreeType'] as String? ?? degreeType;
-        courseName = data['courseName'] as String? ?? courseName;
-        college = data['college'] as String? ?? college;
-        specilization = data['specilization'] as String? ?? specilization;
-        courseType = data['courseType'] as String? ?? courseType;
-        gradingSystem = data['gradingSystem'] as String? ?? gradingSystem;
-        percentage = data['percentage'] as String? ?? percentage;
-        passingYear = data['passingYear'] as String? ?? passingYear;
-        skills = List<String>.from(data['skills'] as List<dynamic>? ?? []);
-        projects = List<Map<String, dynamic>>.from(
-          data['projects'] as List<dynamic>? ?? [],
-        );
-        certificates = List<Map<String, dynamic>>.from(
-          data['certificates'] as List<dynamic>? ?? [],
-        );
-        workExperiences = List<Map<String, dynamic>>.from(
-          data['workExperiences'] as List<dynamic>? ?? [],
-        );
-        languages = List<Map<String, dynamic>>.from(
-          data['languages'] as List<dynamic>? ?? [],
-        );
-        _profileImage = data['profileImage'] as File?;
+        educationDetail = educationDetailsFromApi.isNotEmpty
+            ? educationDetailsFromApi.first
+            : null;
+
+        educationDetails = educationDetailsFromApi;
+        isLoadingEducation = false;
       });
+
     } catch (e) {
-      print('Error loading data: $e');
+      print("❌ Error fetching education details: $e");
+      setState(() {
+        isLoadingEducation = false;
+      });
     }
   }
 
-  Future<void> _saveData() async {
-    print('Attempting to save data in MyAccount');
-    await SharedPrefHelper.saveData(
-      fullname: fullname,
-      dob: dob,
-      phone: phone,
-      whatsapp: whatsapp,
-      email: email,
-      state: state,
-      city: city,
-      country: country,
-      educationDetail: educationDetail,
-      degreeType: degreeType,
-      courseName: courseName,
-      college: college,
-      specilization: specilization,
-      courseType: courseType,
-      gradingSystem: gradingSystem,
-      percentage: percentage,
-      passingYear: passingYear,
-      skills: skills,
-      projects: projects,
-      certificates: certificates,
-      workExperiences: workExperiences,
-      languages: languages,
-      profileImage: _profileImage,
-    );
-    print('Data save completed in MyAccount');
-  }
+  // Future<void> _loadSavedData() async {
+  //   try {
+  //     final data = await SharedPrefHelper.loadData();
+  //     setState(() {
+  //       fullname = data['fullname'] as String? ?? fullname;
+  //       dob = data['dob'] as String? ?? dob;
+  //       phone = data['phone'] as String? ?? phone;
+  //       whatsapp = data['whatsapp'] as String? ?? whatsapp;
+  //       email = data['email'] as String? ?? email;
+  //       state = data['state'] as String? ?? state;
+  //       city = data['city'] as String? ?? city;
+  //       country = data['country'] as String? ?? country;
+  //       educationDetail = data['educationDetail'] as String?;
+  //       degreeType = data['degreeType'] as String? ?? degreeType;
+  //       courseName = data['courseName'] as String? ?? courseName;
+  //       college = data['college'] as String? ?? college;
+  //       specilization = data['specilization'] as String? ?? specilization;
+  //       courseType = data['courseType'] as String? ?? courseType;
+  //       gradingSystem = data['gradingSystem'] as String? ?? gradingSystem;
+  //       percentage = data['percentage'] as String? ?? percentage;
+  //       passingYear = data['passingYear'] as String? ?? passingYear;
+  //       skills = List<String>.from(data['skills'] as List<dynamic>? ?? []);
+  //       projects = List<Map<String, dynamic>>.from(
+  //         data['projects'] as List<dynamic>? ?? [],
+  //       );
+  //       certificates = List<Map<String, dynamic>>.from(
+  //         data['certificates'] as List<dynamic>? ?? [],
+  //       );
+  //       workExperiences = List<Map<String, dynamic>>.from(
+  //         data['workExperiences'] as List<dynamic>? ?? [],
+  //       );
+  //       languages = List<Map<String, dynamic>>.from(
+  //         data['languages'] as List<dynamic>? ?? [],
+  //       );
+  //       _profileImage = data['profileImage'] as File?;
+  //     });
+  //   } catch (e) {
+  //     print('Error loading data: $e');
+  //   }
+  // }
+
+  // Future<void> _saveData() async {
+  //   print('Attempting to save data in MyAccount');
+  //   await SharedPrefHelper.saveData(
+  //     fullname: fullname,
+  //     dob: dob,
+  //     phone: phone,
+  //     whatsapp: whatsapp,
+  //     email: email,
+  //     state: state,
+  //     city: city,
+  //     country: country,
+  //     educationDetail: educationDetail,
+  //     degreeType: degreeType,
+  //     courseName: courseName,
+  //     college: college,
+  //     specilization: specilization,
+  //     courseType: courseType,
+  //     gradingSystem: gradingSystem,
+  //     percentage: percentage,
+  //     passingYear: passingYear,
+  //     skills: skills,
+  //     projects: projects,
+  //     certificates: certificates,
+  //     workExperiences: workExperiences,
+  //     languages: languages,
+  //     profileImage: _profileImage,
+  //   );
+  //   print('Data save completed in MyAccount');
+  // }
 
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -165,7 +197,7 @@ class _MyAccountState extends State<MyAccount> {
       setState(() {
         _profileImage = File(pickedFile.path);
       });
-      await _saveData();
+      // await _saveData();
     }
   }
 
@@ -217,7 +249,7 @@ class _MyAccountState extends State<MyAccount> {
                 onTap: () {
                   Navigator.pop(context);
                   setState(() => _profileImage = null);
-                  _saveData();
+                  // _saveData();
                 },
               ),
           ],
@@ -276,7 +308,7 @@ class _MyAccountState extends State<MyAccount> {
                             city = updatedData['city'] ?? city;
                             country = updatedData['country'] ?? country;
                           });
-                          _saveData();
+                          // _saveData();
                           Navigator.pop(innerContext);
                         },
                       ),
@@ -306,6 +338,7 @@ class _MyAccountState extends State<MyAccount> {
                     ),
                   ],
                 ),
+                //education from here
                 const SizedBox(height: 20),
                 _buildSectionHeader(
                   "Education Details",
@@ -316,32 +349,16 @@ class _MyAccountState extends State<MyAccount> {
                       isScrollControlled: true,
                       backgroundColor: Colors.white,
                       builder: (_) => EditEducationBottomSheet(
-                        initialData: educationDetail,
-                        onSave: (data) {
-                          setState(() {
-                            educationDetail = data['educationDetail'];
-                            degreeType = data['degreeType'] ?? degreeType;
-                            courseName = data['courseName'] ?? courseName;
-                            specilization =
-                                data['specilization'] ?? specilization;
-                            courseType = data['courseType'] ?? courseType;
-                            college = data['college'] ?? college;
-                            gradingSystem =
-                                data['gradingSystem'] ?? gradingSystem;
-                            percentage = data['percentage'] ?? percentage;
-                            passingYear = data['passingYear'] ?? passingYear;
-                          });
-                          _saveData();
-                          Navigator.pop(innerContext);
-                        },
-                        degreeType: degreeType,
-                        courseName: courseName,
-                        college: college,
-                        specilization: specilization,
-                        courseType: courseType,
-                        percentage: percentage,
-                        passingYear: passingYear,
-                        gradingSystem: gradingSystem,
+                        initialData: educationDetails.isNotEmpty ? educationDetails.first : null,
+                          onSave: (data) {
+                            setState(() {
+                              educationDetail = data['educationDetail'];
+                              educationDetails = [data['educationDetail']];
+                            });
+
+                            Navigator.pop(innerContext);
+                          }
+
                       ),
                     );
                   },
@@ -352,107 +369,109 @@ class _MyAccountState extends State<MyAccount> {
                       isScrollControlled: true,
                       backgroundColor: Colors.white,
                       builder: (_) => EditEducationBottomSheet(
-                        onSave: (data) {
-                          setState(() {
-                            educationDetail = data['educationDetail'];
-                            degreeType = data['degreeType'] ?? degreeType;
-                            courseName = data['courseName'] ?? courseName;
-                            specilization =
-                                data['specilization'] ?? specilization;
-                            courseType = data['courseType'] ?? courseType;
-                            college = data['college'] ?? college;
-                            gradingSystem =
-                                data['gradingSystem'] ?? gradingSystem;
-                            percentage = data['percentage'] ?? percentage;
-                            passingYear = data['passingYear'] ?? passingYear;
-                          });
-                          _saveData();
-                          Navigator.pop(innerContext);
-                        },
-                        degreeType: degreeType,
-                        courseName: courseName,
-                        college: college,
-                        specilization: specilization,
-                        courseType: courseType,
-                        percentage: percentage,
-                        passingYear: passingYear,
-                        gradingSystem: gradingSystem,
+                          onSave: (data) {
+                            setState(() {
+                              educationDetail = data['educationDetail'];
+                              educationDetails = [data['educationDetail']];
+                            });
+                            Navigator.pop(innerContext);
+                          }
+
                       ),
                     );
                   },
                 ),
-                if (educationDetail != null)
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(14 * sizeScale),
-                    margin: const EdgeInsets.only(top: 8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFBCD8DB)),
-                      borderRadius: BorderRadius.circular(12 * sizeScale),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(6 * sizeScale),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEBF6F7),
-                            borderRadius: BorderRadius.circular(12),
+                if (isLoadingEducation)
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (educationDetails.isNotEmpty)
+                  ...educationDetails.map((edu) {
+                    return Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(14 * sizeScale),
+                      margin: const EdgeInsets.only(top: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFBCD8DB)),
+                        borderRadius: BorderRadius.circular(12 * sizeScale),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(6 * sizeScale),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEBF6F7),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.school_outlined,
+                              size: 24,
+                              color: Color(0xFF005E6A),
+                            ),
                           ),
-                          child: const Icon(
-                            Icons.school_outlined,
-                            size: 24,
-                            color: Color(0xFF005E6A),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                degreeType,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14 * fontScale,
-                                  color: const Color(0xFF005E6A),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  edu.degreeName,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14 * fontScale,
+                                    color: const Color(0xFF005E6A),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '$courseName | $specilization | $percentage',
-                                style: TextStyle(
-                                  fontSize: 14 * fontScale,
-                                  color: const Color(0xFF003840),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${edu.courseName} | ${edu.specializationName} | ${edu.marks}',
+                                  style: TextStyle(
+                                    fontSize: 14 * fontScale,
+                                    color: const Color(0xFF003840),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '$courseType - $college\n$passingYear',
-                                style: TextStyle(
-                                  fontSize: 13 * fontScale,
-                                  color: Colors.grey[600],
-                                  height: 1.4,
+                                const SizedBox(height: 2),
+                                Text(
+                                  '${edu.collegeMasterName}\n${edu.passingYear}',
+                                  style: TextStyle(
+                                    fontSize: 13 * fontScale,
+                                    color: Colors.grey[600],
+                                    height: 1.4,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: Colors.red,
+                          IconButton(
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: Colors.red,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                educationDetails.remove(edu);
+                              });
+                            },
                           ),
-                          onPressed: () {
-                            setState(() {
-                              educationDetail = null;
-                            });
-                            _saveData();
-                          },
-                        ),
-                      ],
+                        ],
+                      ),
+                    );
+                  }).toList()
+                else
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      "No education details found.",
+                      style: TextStyle(
+                        fontSize: 14 * fontScale,
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ),
+
+
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -523,7 +542,7 @@ class _MyAccountState extends State<MyAccount> {
                         initialSkills: skills,
                         onSave: (updatedSkills) {
                           setState(() => skills = updatedSkills);
-                          _saveData();
+                          // _saveData();
                           Navigator.pop(innerContext);
                         },
                       ),
@@ -538,7 +557,7 @@ class _MyAccountState extends State<MyAccount> {
                         initialSkills: skills,
                         onSave: (updatedSkills) {
                           setState(() => skills = updatedSkills);
-                          _saveData();
+                          // _saveData();
                           Navigator.pop(innerContext);
                         },
                       ),
@@ -564,7 +583,7 @@ class _MyAccountState extends State<MyAccount> {
                           ),
                           onDeleted: () {
                             setState(() => skills.remove(skill));
-                            _saveData();
+                            // _saveData();
                           },
                           deleteIconColor: const Color(0xFF005E6A),
                           backgroundColor: const Color(0xFFEBF6F7),
@@ -588,7 +607,7 @@ class _MyAccountState extends State<MyAccount> {
                           setState(() {
                             projects.add(data);
                           });
-                          _saveData();
+                          // _saveData();
                           Navigator.pop(innerContext);
                         },
                         projectName: '',
@@ -714,7 +733,7 @@ class _MyAccountState extends State<MyAccount> {
                                   setState(() {
                                     projects[i] = data;
                                   });
-                                  _saveData();
+                                  // _saveData();
                                   Navigator.pop(innerContext);
                                 },
                                 projectName: projects[i]['projectName'],
@@ -737,7 +756,7 @@ class _MyAccountState extends State<MyAccount> {
                             setState(() {
                               projects.removeAt(i);
                             });
-                            _saveData();
+                            // _saveData();
                           },
                         ),
                       ],
@@ -758,7 +777,7 @@ class _MyAccountState extends State<MyAccount> {
                           setState(() {
                             certificates.add(data);
                           });
-                          _saveData();
+                          // _saveData();
                           Navigator.pop(innerContext);
                         },
                         certificateName: '',
@@ -861,7 +880,7 @@ class _MyAccountState extends State<MyAccount> {
                                   setState(() {
                                     certificates[i] = data;
                                   });
-                                  _saveData();
+                                  // _saveData();
                                   Navigator.pop(innerContext);
                                 },
                                 certificateName:
@@ -884,7 +903,7 @@ class _MyAccountState extends State<MyAccount> {
                             setState(() {
                               certificates.removeAt(i);
                             });
-                            _saveData();
+                            // _saveData();
                           },
                         ),
                       ],
@@ -916,7 +935,7 @@ class _MyAccountState extends State<MyAccount> {
                               'jobDetail': data['jobDetail'],
                             });
                           });
-                          _saveData();
+                          // _saveData();
                           Navigator.pop(innerContext);
                         },
                         jobTitle: '',
@@ -1042,7 +1061,7 @@ class _MyAccountState extends State<MyAccount> {
                                       'jobDetail': data['jobDetail'],
                                     };
                                   });
-                                  _saveData();
+                                  // _saveData();
                                   Navigator.pop(innerContext);
                                 },
                                 jobTitle: workExperiences[i]['jobTitle'] ?? '',
@@ -1074,7 +1093,7 @@ class _MyAccountState extends State<MyAccount> {
                             setState(() {
                               workExperiences.removeAt(i);
                             });
-                            _saveData();
+                            // _saveData();
                           },
                         ),
                       ],
@@ -1100,7 +1119,7 @@ class _MyAccountState extends State<MyAccount> {
                               'proficiency': data['proficiency'],
                             });
                           });
-                          _saveData();
+                          // _saveData();
                         },
                       ),
                     );
@@ -1175,7 +1194,7 @@ class _MyAccountState extends State<MyAccount> {
                                       'proficiency': data['proficiency'],
                                     };
                                   });
-                                  _saveData();
+                                  // _saveData();
                                 },
                               ),
                             );
@@ -1190,7 +1209,7 @@ class _MyAccountState extends State<MyAccount> {
                             setState(() {
                               languages.removeAt(i);
                             });
-                            _saveData();
+                            // _saveData();
                           },
                         ),
                       ],

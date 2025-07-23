@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../Model/applied_jobs_model.dart';
-import '../../../Utilities/AppliedJobsApi.dart';
+import '../../../Model/Applied_Jobs_Model.dart';
+import '../../../Utilities/AppliedJobs_Api.dart';
+import '../../JobTab/JobdetailPage/JobdetailpageBT.dart';
 import 'AppliedJobCard.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -31,7 +32,7 @@ class _AppliedJobsPageState extends State<AppliedJobsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "My Applied Jobs",
+          "Applied Jobs",
           style: TextStyle(
             color: Color(0xFF003840),
             fontWeight: FontWeight.bold,
@@ -77,15 +78,25 @@ class _AppliedJobsPageState extends State<AppliedJobsPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               itemBuilder: (context, index) {
                 final job = jobs[index];
-                return AppliedJobCardBT(
-                  jobTitle: job.title,
-                  company: job.companyName,
-                  location: job.location,
-                  salary: job.salary,
-                  postTime: job.postTime,
-                  expiry: job.expiry,
-                  tags: job.tags,
-                  logoUrl: job.companyLogo,
+                return GestureDetector(
+                  onTap: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => JobDetailPage2(jobToken: job.token),
+                      ),
+                    );
+                  },
+                  child: AppliedJobCardBT(
+                    jobTitle: job.title,
+                    company: job.companyName,
+                    location: job.location,
+                    salary: job.salary,
+                    postTime: job.postTime,
+                    expiry: job.expiry,
+                    tags: job.tags,
+                    logoUrl: job.companyLogo,
+                  ),
                 );
               },
             ),

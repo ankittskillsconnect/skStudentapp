@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../Model/InterviewScreenModel.dart';
+import '../Model/InterviewScreen_Model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class InterviewApi {

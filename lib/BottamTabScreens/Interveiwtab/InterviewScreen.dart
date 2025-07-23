@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sk_loginscreen1/Pages/bottombar.dart';
-import '../../Model/InterviewScreenModel.dart';
-import '../../Utilities/InterviewScreenApi.dart';
+import '../../Model/InterviewScreen_Model.dart';
+import '../../Utilities/InterviewScreen_Api.dart';
 import 'interviewCard.dart';
 import 'package:shimmer/shimmer.dart';
 

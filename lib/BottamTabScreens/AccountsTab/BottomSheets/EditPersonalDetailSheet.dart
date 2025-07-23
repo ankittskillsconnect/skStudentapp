@@ -6,8 +6,8 @@ import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../ProfileLogic/ProfileEvent.dart';
 import '../../../ProfileLogic/ProfileLogic.dart';
-import '../../../Utilities/StateListApi.dart';
-import '../../../Utilities/CityListApi.dart';
+import '../../../Utilities/StateList_Api.dart';
+import '../../../Utilities/CityList_Api.dart';
 
 class EditPersonalDetailsSheet extends StatefulWidget {
   final String fullname;

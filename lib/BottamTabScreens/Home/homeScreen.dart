@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/Home/CustomAppbarBT.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/JobTab/JobdetailPage/JobdetailpageBT.dart';
-import '../Pages/bottombar.dart';
-import 'Home/KnowHowBanner.dart';
-import 'Home/PopularJobCard.dart';
-import 'Home/FeaturedJobCard.dart';
+import '../../Pages/bottombar.dart';
+import 'KnowHowBanner.dart';
+import 'PopularJobCard.dart';
+import 'FeaturedJobCard.dart';
 
 class HomeScreen2 extends StatefulWidget {
   const HomeScreen2({super.key});
