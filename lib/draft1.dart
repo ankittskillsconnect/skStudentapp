@@ -7,7 +7,7 @@
 // import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/Myaccount/MyAccountAppbar.dart';
 // import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/sharedpref.dart';
 // import '../../../Model/EducationDetail_Model.dart';
-// import '../../../Utilities/MyAccount_Get_Post/Get/EducationDetailApi.dart';
+// import '../../../Utilities/MyAccount_Get_Post/Get/EducationDetail_Api.dart';
 // import '../BottomSheets/EditEducationBottomSheet.dart';
 // import '../BottomSheets/EditLanguageBottomSheet.dart';
 // import '../BottomSheets/EditPersonalDetailSheet.dart';

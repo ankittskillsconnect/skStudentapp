@@ -5,8 +5,10 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditPr
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditWorkExperienceBottomSheet.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/Myaccount/MyAccountAppbar.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/sharedpref.dart';
+import 'package:sk_loginscreen1/Model/Internship_Projects_Model.dart';
+import 'package:sk_loginscreen1/Utilities/MyAccount_Get_Post/Get/InternshipProject_Api.dart';
 import '../../../Model/EducationDetail_Model.dart';
-import '../../../Utilities/MyAccount_Get_Post/Get/EducationDetailApi.dart';
+import '../../../Utilities/MyAccount_Get_Post/Get/EducationDetail_Api.dart';
 import '../BottomSheets/EditEducationBottomSheet.dart';
 import '../BottomSheets/EditLanguageBottomSheet.dart';
 import '../BottomSheets/EditPersonalDetailSheet.dart';
@@ -43,14 +45,13 @@ class _MyAccountState extends State<MyAccount> {
   String passingYear = "2025";
 
   List<String> skills = [];
-  List<Map<String, dynamic>> projects = [];
+  List<InternshipProjectModel> projects = [];
   List<Map<String, dynamic>> certificates = [];
   List<Map<String, dynamic>> workExperiences = [];
   List<Map<String, dynamic>> languages = [];
   List<EducationDetailModel> educationDetails = [];
   bool isLoadingEducation = true;
-  String? internshipDetail;
-  String? workExperienceDetail;
+  bool isLoadingProject = true;
   File? _profileImage;
 
   @override
@@ -58,6 +59,7 @@ class _MyAccountState extends State<MyAccount> {
     super.initState();
     // _loadSavedData();
     fetchEducationDetails();
+    fetchInternShipProjectDetails();
     // projects.add({
     //   'projectDetail': null,
     //   'projectName': 'Project A',
@@ -97,7 +99,8 @@ class _MyAccountState extends State<MyAccount> {
     final authToken = prefs.getString('authToken') ?? '';
     final connectSid = prefs.getString('connectSid') ?? '';
     try {
-      final educationDetailsFromApi = await EducationDetailApi.fetchEducationDetails(
+      final educationDetailsFromApi = await EducationDetailApi
+          .fetchEducationDetails(
         authToken: authToken,
         connectSid: connectSid,
       );
@@ -110,7 +113,6 @@ class _MyAccountState extends State<MyAccount> {
         educationDetails = educationDetailsFromApi;
         isLoadingEducation = false;
       });
-
     } catch (e) {
       print("❌ Error fetching education details: $e");
       setState(() {
@@ -118,6 +120,28 @@ class _MyAccountState extends State<MyAccount> {
       });
     }
   }
+
+  Future<void> fetchInternShipProjectDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('authToken') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
+    try {
+      final internshipProjectApi = await InternshipProjectApi.fetchInternshipProjects(
+        authToken: authToken,
+        connectSid: connectSid,
+      );
+      setState(() {
+        projects = internshipProjectApi;
+        isLoadingProject = false;
+      });
+    } catch (e) {
+      print("❌ Error fetching project details: $e");
+      setState(() {
+        isLoadingProject = false;
+      });
+    }
+  }
+
 
   // Future<void> _loadSavedData() async {
   //   try {
@@ -260,7 +284,9 @@ class _MyAccountState extends State<MyAccount> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery
+        .of(context)
+        .size;
     final double widthScale = size.width / 360;
     final double fontScale = widthScale.clamp(0.98, 1.02);
     final double sizeScale = widthScale.clamp(0.98, 1.02);
@@ -269,970 +295,1011 @@ class _MyAccountState extends State<MyAccount> {
       appBar: AccountAppBar(),
       backgroundColor: Colors.white,
       body: Builder(
-        builder: (innerContext) => SafeArea(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: 16 * sizeScale,
-              vertical: 20 * sizeScale,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildProfileHeader(),
-                const SizedBox(height: 25),
-                _buildSectionHeader(
-                  "Personal Details",
-                  showEdit: true,
-                  onEdit: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder: (_) => EditPersonalDetailsSheet(
-                        fullname: fullname,
-                        dob: dob,
-                        phone: phone,
-                        whatsapp: whatsapp,
-                        email: email,
-                        state: state,
-                        city: city,
-                        country: country,
-                        onSave: (updatedData) {
-                          setState(() {
-                            fullname = updatedData['fullname'] ?? fullname;
-                            dob = updatedData['dob'] ?? dob;
-                            phone = updatedData['phone'] ?? phone;
-                            whatsapp = updatedData['whatsapp'] ?? whatsapp;
-                            email = updatedData['email'] ?? email;
-                            state = updatedData['state'] ?? state;
-                            city = updatedData['city'] ?? city;
-                            country = updatedData['country'] ?? country;
-                          });
-                          // _saveData();
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
+        builder: (innerContext) =>
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16 * sizeScale,
+                  vertical: 20 * sizeScale,
                 ),
-                _buildCardBody(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    _DetailRow(
-                      icon: Icons.perm_identity_outlined,
-                      text: fullname,
+                    _buildProfileHeader(),
+                    const SizedBox(height: 25),
+                    _buildSectionHeader(
+                      "Personal Details",
+                      showEdit: true,
+                      onEdit: () {
+                        showModalBottomSheet(
+                          context: innerContext,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) =>
+                              EditPersonalDetailsSheet(
+                                fullname: fullname,
+                                dob: dob,
+                                phone: phone,
+                                whatsapp: whatsapp,
+                                email: email,
+                                state: state,
+                                city: city,
+                                country: country,
+                                onSave: (updatedData) {
+                                  setState(() {
+                                    fullname =
+                                        updatedData['fullname'] ?? fullname;
+                                    dob = updatedData['dob'] ?? dob;
+                                    phone = updatedData['phone'] ?? phone;
+                                    whatsapp =
+                                        updatedData['whatsapp'] ?? whatsapp;
+                                    email = updatedData['email'] ?? email;
+                                    state = updatedData['state'] ?? state;
+                                    city = updatedData['city'] ?? city;
+                                    country = updatedData['country'] ?? country;
+                                  });
+                                  // _saveData();
+                                  Navigator.pop(innerContext);
+                                },
+                              ),
+                        );
+                      },
                     ),
-                    _DetailRow(icon: Icons.cake_outlined, text: dob),
-                    _DetailRow(icon: Icons.phone_outlined, text: phone),
-                    _DetailRow(icon: Icons.message_outlined, text: whatsapp),
-                    _DetailRow(
-                      icon: Icons.location_on_outlined,
-                      text: state.isEmpty ? 'Not provided' : '$state , $city',
+                    _buildCardBody(
+                      children: [
+                        _DetailRow(
+                          icon: Icons.perm_identity_outlined,
+                          text: fullname,
+                        ),
+                        _DetailRow(icon: Icons.cake_outlined, text: dob),
+                        _DetailRow(icon: Icons.phone_outlined, text: phone),
+                        _DetailRow(
+                            icon: Icons.message_outlined, text: whatsapp),
+                        _DetailRow(
+                          icon: Icons.location_on_outlined,
+                          text: state.isEmpty
+                              ? 'Not provided'
+                              : '$state , $city',
+                        ),
+                        // _DetailRow(
+                        //   icon: Icons.location_on_outlined,
+                        //   text: city.isEmpty ? 'Not provided' : city,
+                        // ),
+                        _DetailRow(
+                          icon: Icons.mark_email_read_outlined,
+                          text: email,
+                        ),
+                      ],
                     ),
-                    // _DetailRow(
-                    //   icon: Icons.location_on_outlined,
-                    //   text: city.isEmpty ? 'Not provided' : city,
-                    // ),
-                    _DetailRow(
-                      icon: Icons.mark_email_read_outlined,
-                      text: email,
+                    //education from here
+                    const SizedBox(height: 20),
+                    _buildSectionHeader(
+                      "Education Details",
+                      showEdit: educationDetail != null,
+                      onEdit: () {
+                        showModalBottomSheet(
+                          context: innerContext,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.white,
+                          builder: (_) =>
+                              EditEducationBottomSheet(
+                                  initialData: educationDetails.isNotEmpty
+                                      ? educationDetails.first
+                                      : null,
+                                  onSave: (data) {
+                                    setState(() {
+                                      educationDetail = data['educationDetail'];
+                                      educationDetails =
+                                      [data['educationDetail']];
+                                    });
+
+                                    Navigator.pop(innerContext);
+                                  }
+
+                              ),
+                        );
+                      },
+                      showAdd: educationDetail == null,
+                      onAdd: () {
+                        showModalBottomSheet(
+                          context: innerContext,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.white,
+                          builder: (_) =>
+                              EditEducationBottomSheet(
+                                  onSave: (data) {
+                                    setState(() {
+                                      educationDetail = data['educationDetail'];
+                                      educationDetails =
+                                      [data['educationDetail']];
+                                    });
+                                    Navigator.pop(innerContext);
+                                  }
+
+                              ),
+                        );
+                      },
                     ),
-                  ],
-                ),
-                //education from here
-                const SizedBox(height: 20),
-                _buildSectionHeader(
-                  "Education Details",
-                  showEdit: educationDetail != null,
-                  onEdit: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => EditEducationBottomSheet(
-                        initialData: educationDetails.isNotEmpty ? educationDetails.first : null,
-                          onSave: (data) {
-                            setState(() {
-                              educationDetail = data['educationDetail'];
-                              educationDetails = [data['educationDetail']];
-                            });
+                    if (isLoadingEducation)
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else
+                      if (educationDetails.isNotEmpty)
+                        ...educationDetails.map((edu) {
+                          return Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(14 * sizeScale),
+                            margin: const EdgeInsets.only(top: 8),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: const Color(0xFFBCD8DB)),
+                              borderRadius: BorderRadius.circular(
+                                  12 * sizeScale),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(6 * sizeScale),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEBF6F7),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    Icons.school_outlined,
+                                    size: 24,
+                                    color: Color(0xFF005E6A),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .start,
+                                    children: [
+                                      Text(
+                                        edu.degreeName,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14 * fontScale,
+                                          color: const Color(0xFF005E6A),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${edu.courseName} | ${edu
+                                            .specializationName} | ${edu
+                                            .marks}',
+                                        style: TextStyle(
+                                          fontSize: 14 * fontScale,
+                                          color: const Color(0xFF003840),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '${edu.collegeMasterName}\n${edu
+                                            .passingYear}',
+                                        style: TextStyle(
+                                          fontSize: 13 * fontScale,
+                                          color: Colors.grey[600],
+                                          height: 1.4,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete_outline,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      educationDetails.remove(edu);
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList()
+                      else
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            "No education details found.",
+                            style: TextStyle(
+                              fontSize: 14 * fontScale,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ),
 
-                            Navigator.pop(innerContext);
-                          }
+                    //education end
+                    //resume
 
-                      ),
-                    );
-                  },
-                  showAdd: educationDetail == null,
-                  onAdd: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => EditEducationBottomSheet(
-                          onSave: (data) {
-                            setState(() {
-                              educationDetail = data['educationDetail'];
-                              educationDetails = [data['educationDetail']];
-                            });
-                            Navigator.pop(innerContext);
-                          }
-
-                      ),
-                    );
-                  },
-                ),
-                if (isLoadingEducation)
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                else if (educationDetails.isNotEmpty)
-                  ...educationDetails.map((edu) {
-                    return Container(
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Resume",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF005E6A),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16 * sizeScale,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  30 * sizeScale),
+                            ),
+                          ),
+                          onPressed: () {},
+                          child: Text(
+                            "Update",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14 * fontScale,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
                       width: double.infinity,
-                      padding: EdgeInsets.all(14 * sizeScale),
-                      margin: const EdgeInsets.only(top: 8),
+                      padding: EdgeInsets.symmetric(vertical: 20 * sizeScale),
                       decoration: BoxDecoration(
                         border: Border.all(color: const Color(0xFFBCD8DB)),
                         borderRadius: BorderRadius.circular(12 * sizeScale),
                       ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Column(
                         children: [
-                          Container(
-                            padding: EdgeInsets.all(6 * sizeScale),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFEBF6F7),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.school_outlined,
-                              size: 24,
-                              color: Color(0xFF005E6A),
-                            ),
+                          Icon(
+                            Icons.upload,
+                            size: 30 * sizeScale,
+                            color: const Color(0xFF005E6A),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  edu.degreeName,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14 * fontScale,
-                                    color: const Color(0xFF005E6A),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${edu.courseName} | ${edu.specializationName} | ${edu.marks}',
-                                  style: TextStyle(
-                                    fontSize: 14 * fontScale,
-                                    color: const Color(0xFF003840),
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '${edu.collegeMasterName}\n${edu.passingYear}',
-                                  style: TextStyle(
-                                    fontSize: 13 * fontScale,
-                                    color: Colors.grey[600],
-                                    height: 1.4,
-                                  ),
-                                ),
-                              ],
+                          const SizedBox(height: 10),
+                          Text(
+                            "Upload Resume",
+                            style: TextStyle(
+                              color: const Color(0xFF005E6A),
+                              fontSize: 14 * fontScale,
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.delete_outline,
-                              color: Colors.red,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                educationDetails.remove(edu);
-                              });
-                            },
                           ),
                         ],
                       ),
-                    );
-                  }).toList()
-                else
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      "No education details found.",
-                      style: TextStyle(
-                        fontSize: 14 * fontScale,
-                        color: Colors.grey[600],
-                      ),
                     ),
-                  ),
+                    const SizedBox(height: 20),
 
+                    //resume end
+                    // skills
 
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Resume",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF005E6A),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16 * sizeScale,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30 * sizeScale),
-                        ),
-                      ),
-                      onPressed: () {},
-                      child: Text(
-                        "Update",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14 * fontScale,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(vertical: 20 * sizeScale),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFBCD8DB)),
-                    borderRadius: BorderRadius.circular(12 * sizeScale),
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.upload,
-                        size: 30 * sizeScale,
-                        color: const Color(0xFF005E6A),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        "Upload Resume",
-                        style: TextStyle(
-                          color: const Color(0xFF005E6A),
-                          fontSize: 14 * fontScale,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                _buildSectionHeader(
-                  "Skills",
-                  showEdit: skills.isNotEmpty,
-                  onEdit: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      builder: (_) => EditSkillsBottomSheet(
-                        initialSkills: skills,
-                        onSave: (updatedSkills) {
-                          setState(() => skills = updatedSkills);
-                          // _saveData();
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                  showAdd: skills.isEmpty,
-                  onAdd: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      builder: (_) => EditSkillsBottomSheet(
-                        initialSkills: skills,
-                        onSave: (updatedSkills) {
-                          setState(() => skills = updatedSkills);
-                          // _saveData();
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                ),
-                if (skills.isNotEmpty)
-                  Container(
-                    padding: EdgeInsets.all(12 * sizeScale),
-                    margin: const EdgeInsets.only(top: 8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFBCD8DB)),
-                      borderRadius: BorderRadius.circular(12 * sizeScale),
-                    ),
-                    child: Wrap(
-                      spacing: 8 * sizeScale,
-                      runSpacing: 8 * sizeScale,
-                      children: skills.map((skill) {
-                        return Chip(
-                          label: Text(
-                            skill,
-                            style: TextStyle(fontSize: 14 * fontScale),
-                          ),
-                          onDeleted: () {
-                            setState(() => skills.remove(skill));
-                            // _saveData();
-                          },
-                          deleteIconColor: const Color(0xFF005E6A),
-                          backgroundColor: const Color(0xFFEBF6F7),
-                          labelStyle: const TextStyle(color: Color(0xFF003840)),
+                    _buildSectionHeader(
+                      "Skills",
+                      showEdit: skills.isNotEmpty,
+                      onEdit: () {
+                        showModalBottomSheet(
+                          context: innerContext,
+                          isScrollControlled: true,
+                          builder: (_) =>
+                              EditSkillsBottomSheet(
+                                initialSkills: skills,
+                                onSave: (updatedSkills) {
+                                  setState(() => skills = updatedSkills);
+                                  // _saveData();
+                                  Navigator.pop(innerContext);
+                                },
+                              ),
                         );
-                      }).toList(),
-                    ),
-                  ),
-                const SizedBox(height: 20),
-                _buildSectionHeader(
-                  "Project/Internship Details",
-                  showAdd: true,
-                  onAdd: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => EditProjectDetailsBottomSheet(
-                        initialData: null,
-                        onSave: (data) {
-                          setState(() {
-                            projects.add(data);
-                          });
-                          // _saveData();
-                          Navigator.pop(innerContext);
-                        },
-                        projectName: '',
-                        companyName: '',
-                        projectType: 'Internship',
-                        skills: '',
-                        startDate: '',
-                        endDate: '',
-                        projectDetail: '',
-                      ),
-                    );
-                  },
-                ),
-                for (var i = 0; i < projects.length; i++)
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(14 * sizeScale),
-                    margin: const EdgeInsets.only(top: 8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFBCD8DB)),
-                      borderRadius: BorderRadius.circular(12 * sizeScale),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(6 * sizeScale),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEBF6F7),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.workspaces_filled,
-                            size: 24,
-                            color: Color(0xFF005E6A),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 7,
-                                  vertical: 3,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.lightGreen,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: const Color(0xFFBCD8DB),
-                                  ),
-                                ),
-                                child: Text(
-                                  projects[i]['projectType'],
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                projects[i]['projectName'],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14 * fontScale,
-                                  color: const Color(0xFF005E6A),
-                                ),
-                              ),
-                              const SizedBox(height: 0),
-                              Text(
-                                '${projects[i]['companyName']}',
-                                style: TextStyle(
-                                  fontSize: 14 * fontScale,
-                                  color: const Color(0xFF003840),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${projects[i]['startDate']} - ${projects[i]['endDate']}',
-                                style: TextStyle(
-                                  fontSize: 14 * fontScale,
-                                  color: const Color(0xFF003840),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${projects[i]['skills']}',
-                                style: TextStyle(
-                                  fontSize: 13 * fontScale,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                projects[i]['projectDetailDesc'],
-                                style: TextStyle(
-                                  fontSize: 13 * fontScale,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.edit,
-                            color: Color(0xFF005E6A),
-                          ),
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: innerContext,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.white,
-                              builder: (_) => EditProjectDetailsBottomSheet(
-                                initialData: projects[i]['projectDetail'],
-                                onSave: (data) {
-                                  setState(() {
-                                    projects[i] = data;
-                                  });
+                      },
+                      showAdd: skills.isEmpty,
+                      onAdd: () {
+                        showModalBottomSheet(
+                          context: innerContext,
+                          isScrollControlled: true,
+                          builder: (_) =>
+                              EditSkillsBottomSheet(
+                                initialSkills: skills,
+                                onSave: (updatedSkills) {
+                                  setState(() => skills = updatedSkills);
                                   // _saveData();
                                   Navigator.pop(innerContext);
                                 },
-                                projectName: projects[i]['projectName'],
-                                companyName: projects[i]['companyName'],
-                                projectType: projects[i]['projectType'],
-                                skills: projects[i]['skills'],
-                                startDate: projects[i]['startDate'],
-                                endDate: projects[i]['endDate'],
-                                projectDetail: projects[i]['projectDetailDesc'],
                               ),
+                        );
+                      },
+                    ),
+                    if (skills.isNotEmpty)
+                      Container(
+                        padding: EdgeInsets.all(12 * sizeScale),
+                        margin: const EdgeInsets.only(top: 8),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: const Color(0xFFBCD8DB)),
+                          borderRadius: BorderRadius.circular(12 * sizeScale),
+                        ),
+                        child: Wrap(
+                          spacing: 8 * sizeScale,
+                          runSpacing: 8 * sizeScale,
+                          children: skills.map((skill) {
+                            return Chip(
+                              label: Text(
+                                skill,
+                                style: TextStyle(fontSize: 14 * fontScale),
+                              ),
+                              onDeleted: () {
+                                setState(() => skills.remove(skill));
+                                // _saveData();
+                              },
+                              deleteIconColor: const Color(0xFF005E6A),
+                              backgroundColor: const Color(0xFFEBF6F7),
+                              labelStyle: const TextStyle(
+                                  color: Color(0xFF003840)),
                             );
-                          },
+                          }).toList(),
                         ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              projects.removeAt(i);
-                            });
-                            // _saveData();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                const SizedBox(height: 20),
-                _buildSectionHeader(
-                  "Certificate Details",
-                  showAdd: true,
-                  onAdd: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => EditCertificateBottomSheet(
-                        initialData: null,
-                        onSave: (data) {
-                          setState(() {
-                            certificates.add(data);
-                          });
-                          // _saveData();
-                          Navigator.pop(innerContext);
-                        },
-                        certificateName: '',
-                        issuedBy: '',
-                        credentialId: '',
-                        issuedDate: '',
-                        expiredDate: '',
-                        description: '',
                       ),
-                    );
-                  },
-                ),
-                for (var i = 0; i < certificates.length; i++)
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(14 * sizeScale),
-                    margin: const EdgeInsets.only(top: 8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFBCD8DB)),
-                      borderRadius: BorderRadius.circular(12 * sizeScale),
+                    const SizedBox(height: 20),
+
+                    //skills end
+                    // project
+
+                    _buildSectionHeader(
+                      "Project/Internship Details",
+                      showAdd: true,
+                      onAdd: () {
+                        showModalBottomSheet(
+                          context: innerContext,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.white,
+                          builder: (_) => EditProjectDetailsBottomSheet(
+                            initialData: null,
+                            onSave: (data) {
+                              setState(() {
+                                projects.add(data);
+                              });
+                              Navigator.pop(innerContext);
+                            },
+                          ),
+                        );
+                      },
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(6 * sizeScale),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEBF6F7),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.file_copy_outlined,
-                            size: 24,
-                            color: Color(0xFF005E6A),
-                          ),
+                    if (isLoadingProject)
+                      const Center(child: CircularProgressIndicator())
+                    else if (projects.isEmpty)
+                      const Center(
+                        child: Text(
+                          'No projects available',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                certificates[i]['certificateName'],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14 * fontScale,
-                                  color: const Color(0xFF005E6A),
-                                  height: 1.4,
+                      )
+                    else
+                      Column(
+                        children: List.generate(projects.length, (i) {
+                          return Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(14 * sizeScale),
+                            margin: const EdgeInsets.only(top: 8),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: const Color(0xFFBCD8DB)),
+                              borderRadius: BorderRadius.circular(12 * sizeScale),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(6 * sizeScale),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEBF6F7),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    Icons.workspaces_filled,
+                                    size: 24,
+                                    color: Color(0xFF005E6A),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${certificates[i]['issuedBy']}',
-                                style: TextStyle(
-                                  fontSize: 14 * fontScale,
-                                  color: const Color(0xFF003840),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                                        decoration: BoxDecoration(
+                                          color: Colors.lightGreen,
+                                          borderRadius: BorderRadius.circular(20),
+                                          border: Border.all(color: const Color(0xFFBCD8DB)),
+                                        ),
+                                        child: Text(
+                                          projects[i].type,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        projects[i].projectName,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14 * fontScale,
+                                          color: const Color(0xFF005E6A),
+                                        ),
+                                      ),
+                                      Text(
+                                        projects[i].companyName,
+                                        style: TextStyle(
+                                          fontSize: 14 * fontScale,
+                                          color: const Color(0xFF003840),
+                                        ),
+                                      ),
+                                      Text(
+                                        '${projects[i].duration} - ${projects[i].durationPeriod}',
+                                        style: TextStyle(
+                                          fontSize: 14 * fontScale,
+                                          color: const Color(0xFF003840),
+                                        ),
+                                      ),
+                                      Text(
+                                        projects[i].skills,
+                                        style: TextStyle(
+                                          fontSize: 13 * fontScale,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                      Text(
+                                        projects[i].details,
+                                        style: TextStyle(
+                                          fontSize: 13 * fontScale,
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.w700,
+                                          height: 1.4,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${certificates[i]['issuedDate']} - ${certificates[i]['expiredDate']}',
-                                style: TextStyle(
-                                  fontSize: 14 * fontScale,
-                                  color: const Color(0xFF003840),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    color: Color(0xFF005E6A),
+                                  ),
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: innerContext,
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.white,
+                                      builder: (_) => EditProjectDetailsBottomSheet(
+                                        initialData: projects[i],
+                                        onSave: (data) {
+                                          setState(() {
+                                            projects[i] = data;
+                                          });
+                                          Navigator.pop(innerContext);
+                                        },
+                                      ),
+                                    );
+                                  },
                                 ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${certificates[i]['credentialId'] ?? ''}',
-                                style: TextStyle(
-                                  fontSize: 13 * fontScale,
-                                  color: Colors.grey[600],
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete_outline,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      projects.removeAt(i);
+                                    });
+                                  },
                                 ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                certificates[i]['description'],
-                                style: TextStyle(
-                                  fontSize: 13 * fontScale,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.edit,
-                            color: Color(0xFF005E6A),
-                          ),
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: innerContext,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.white,
-                              builder: (_) => EditCertificateBottomSheet(
-                                initialData:
-                                    certificates[i]['certificateDetail'],
+                              ],
+                            ),
+                          );
+                        }),
+                      ),
+
+                    //project end
+                    //certificate
+                    const SizedBox(height: 20),
+                    _buildSectionHeader(
+                      "Certificate Details",
+                      showAdd: true,
+                      onAdd: () {
+                        showModalBottomSheet(
+                          context: innerContext,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.white,
+                          builder: (_) =>
+                              EditCertificateBottomSheet(
+                                initialData: null,
                                 onSave: (data) {
                                   setState(() {
-                                    certificates[i] = data;
+                                    certificates.add(data);
                                   });
                                   // _saveData();
                                   Navigator.pop(innerContext);
                                 },
-                                certificateName:
+                                certificateName: '',
+                                issuedBy: '',
+                                credentialId: '',
+                                issuedDate: '',
+                                expiredDate: '',
+                                description: '',
+                              ),
+                        );
+                      },
+                    ),
+                    for (var i = 0; i < certificates.length; i++)
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(14 * sizeScale),
+                        margin: const EdgeInsets.only(top: 8),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: const Color(0xFFBCD8DB)),
+                          borderRadius: BorderRadius.circular(12 * sizeScale),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(6 * sizeScale),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEBF6F7),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.file_copy_outlined,
+                                size: 24,
+                                color: Color(0xFF005E6A),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
                                     certificates[i]['certificateName'],
-                                issuedBy: certificates[i]['issuedBy'],
-                                credentialId: certificates[i]['credentialId'],
-                                issuedDate: certificates[i]['issuedDate'],
-                                expiredDate: certificates[i]['expiredDate'],
-                                description: certificates[i]['description'],
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14 * fontScale,
+                                      color: const Color(0xFF005E6A),
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${certificates[i]['issuedBy']}',
+                                    style: TextStyle(
+                                      fontSize: 14 * fontScale,
+                                      color: const Color(0xFF003840),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${certificates[i]['issuedDate']} - ${certificates[i]['expiredDate']}',
+                                    style: TextStyle(
+                                      fontSize: 14 * fontScale,
+                                      color: const Color(0xFF003840),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${certificates[i]['credentialId'] ?? ''}',
+                                    style: TextStyle(
+                                      fontSize: 13 * fontScale,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    certificates[i]['description'],
+                                    style: TextStyle(
+                                      fontSize: 13 * fontScale,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            );
-                          },
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.edit,
+                                color: Color(0xFF005E6A),
+                              ),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: innerContext,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.white,
+                                  builder: (_) =>
+                                      EditCertificateBottomSheet(
+                                        initialData:
+                                        certificates[i]['certificateDetail'],
+                                        onSave: (data) {
+                                          setState(() {
+                                            certificates[i] = data;
+                                          });
+                                          // _saveData();
+                                          Navigator.pop(innerContext);
+                                        },
+                                        certificateName:
+                                        certificates[i]['certificateName'],
+                                        issuedBy: certificates[i]['issuedBy'],
+                                        credentialId: certificates[i]['credentialId'],
+                                        issuedDate: certificates[i]['issuedDate'],
+                                        expiredDate: certificates[i]['expiredDate'],
+                                        description: certificates[i]['description'],
+                                      ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  certificates.removeAt(i);
+                                });
+                                // _saveData();
+                              },
+                            ),
+                          ],
                         ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              certificates.removeAt(i);
-                            });
-                            // _saveData();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                const SizedBox(height: 20),
-                _buildSectionHeader(
-                  "Work Experience",
-                  showAdd: true,
-                  onAdd: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => Editworkexperiencebottomsheet(
-                        initialData: null,
-                        onSave: (data) {
-                          setState(() {
-                            workExperiences.add({
-                              'WorkExp': data['WorkExp'],
-                              'jobTitle': data['jobTitle'],
-                              'companyName': data['companyName'],
-                              'skills': data['skills'],
-                              'fromDate': data['fromDate'],
-                              'toDate': data['toDate'],
-                              'experienceInYear': data['experienceInYear'],
-                              'experienceInMonths': data['experienceInMonths'],
-                              'annualSalary': data['annualSalary'],
-                              'jobDetail': data['jobDetail'],
-                            });
-                          });
-                          // _saveData();
-                          Navigator.pop(innerContext);
-                        },
-                        jobTitle: '',
-                        companyName: '',
-                        skills: '',
-                        fromDate: '',
-                        toDate: '',
-                        experienceInYear: '0',
-                        experienceInMonths: '0',
-                        annualSalary: '',
-                        jobDetail: '',
                       ),
-                    );
-                  },
-                ),
-                for (var i = 0; i < workExperiences.length; i++)
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(14 * sizeScale),
-                    margin: const EdgeInsets.only(top: 8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFBCD8DB)),
-                      borderRadius: BorderRadius.circular(12 * sizeScale),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(6 * sizeScale),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEBF6F7),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.work_history_outlined,
-                            size: 24,
-                            color: Color(0xFF005E6A),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                workExperiences[i]['jobTitle'] ?? 'Job Title',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14 * fontScale,
-                                  color: const Color(0xFF005E6A),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${workExperiences[i]['companyName']}',
-                                style: TextStyle(
-                                  fontSize: 14 * fontScale,
-                                  color: const Color(0xFF003840),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${workExperiences[i]['fromDate']} - ${workExperiences[i]['toDate']}',
-                                style: TextStyle(
-                                  fontSize: 14 * fontScale,
-                                  color: const Color(0xFF003840),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Skills: ${workExperiences[i]['skills'] ?? ''}',
-                                style: TextStyle(
-                                  fontSize: 13 * fontScale,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Exp: ${workExperiences[i]['experienceInYear']} yrs ${workExperiences[i]['experienceInMonths']} months | Salary: ${workExperiences[i]['annualSalary'] ?? ''} LPA',
-                                style: TextStyle(
-                                  fontSize: 13 * fontScale,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                workExperiences[i]['jobDetail'] ?? '',
-                                style: TextStyle(
-                                  fontSize: 13 * fontScale,
-                                  color: Colors.grey[600],
-                                  height: 1.4,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.edit,
-                            color: Color(0xFF005E6A),
-                          ),
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: innerContext,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.white,
-                              builder: (_) => Editworkexperiencebottomsheet(
-                                initialData: workExperiences[i]['WorkExp'],
+                    const SizedBox(height: 20),
+                    _buildSectionHeader(
+                      "Work Experience",
+                      showAdd: true,
+                      onAdd: () {
+                        showModalBottomSheet(
+                          context: innerContext,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.white,
+                          builder: (_) =>
+                              Editworkexperiencebottomsheet(
+                                initialData: null,
                                 onSave: (data) {
                                   setState(() {
-                                    workExperiences[i] = {
+                                    workExperiences.add({
                                       'WorkExp': data['WorkExp'],
                                       'jobTitle': data['jobTitle'],
                                       'companyName': data['companyName'],
                                       'skills': data['skills'],
                                       'fromDate': data['fromDate'],
                                       'toDate': data['toDate'],
-                                      'experienceInYear':
-                                          data['experienceInYear'],
-                                      'experienceInMonths':
-                                          data['experienceInMonths'],
+                                      'experienceInYear': data['experienceInYear'],
+                                      'experienceInMonths': data['experienceInMonths'],
                                       'annualSalary': data['annualSalary'],
                                       'jobDetail': data['jobDetail'],
-                                    };
+                                    });
                                   });
                                   // _saveData();
                                   Navigator.pop(innerContext);
                                 },
-                                jobTitle: workExperiences[i]['jobTitle'] ?? '',
-                                companyName:
-                                    workExperiences[i]['companyName'] ?? '',
-                                skills: workExperiences[i]['skills'] ?? '',
-                                fromDate: workExperiences[i]['fromDate'] ?? '',
-                                toDate: workExperiences[i]['toDate'] ?? '',
-                                experienceInYear:
-                                    workExperiences[i]['experienceInYear'] ??
-                                    '0',
-                                experienceInMonths:
-                                    workExperiences[i]['experienceInMonths'] ??
-                                    '0',
-                                annualSalary:
-                                    workExperiences[i]['annualSalary'] ?? '',
-                                jobDetail:
+                                jobTitle: '',
+                                companyName: '',
+                                skills: '',
+                                fromDate: '',
+                                toDate: '',
+                                experienceInYear: '0',
+                                experienceInMonths: '0',
+                                annualSalary: '',
+                                jobDetail: '',
+                              ),
+                        );
+                      },
+                    ),
+                    for (var i = 0; i < workExperiences.length; i++)
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(14 * sizeScale),
+                        margin: const EdgeInsets.only(top: 8),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: const Color(0xFFBCD8DB)),
+                          borderRadius: BorderRadius.circular(12 * sizeScale),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(6 * sizeScale),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEBF6F7),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.work_history_outlined,
+                                size: 24,
+                                color: Color(0xFF005E6A),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    workExperiences[i]['jobTitle'] ??
+                                        'Job Title',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14 * fontScale,
+                                      color: const Color(0xFF005E6A),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${workExperiences[i]['companyName']}',
+                                    style: TextStyle(
+                                      fontSize: 14 * fontScale,
+                                      color: const Color(0xFF003840),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${workExperiences[i]['fromDate']} - ${workExperiences[i]['toDate']}',
+                                    style: TextStyle(
+                                      fontSize: 14 * fontScale,
+                                      color: const Color(0xFF003840),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Skills: ${workExperiences[i]['skills'] ??
+                                        ''}',
+                                    style: TextStyle(
+                                      fontSize: 13 * fontScale,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Exp: ${workExperiences[i]['experienceInYear']} yrs ${workExperiences[i]['experienceInMonths']} months | Salary: ${workExperiences[i]['annualSalary'] ??
+                                        ''} LPA',
+                                    style: TextStyle(
+                                      fontSize: 13 * fontScale,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
                                     workExperiences[i]['jobDetail'] ?? '',
+                                    style: TextStyle(
+                                      fontSize: 13 * fontScale,
+                                      color: Colors.grey[600],
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            );
-                          },
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.edit,
+                                color: Color(0xFF005E6A),
+                              ),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: innerContext,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.white,
+                                  builder: (_) =>
+                                      Editworkexperiencebottomsheet(
+                                        initialData: workExperiences[i]['WorkExp'],
+                                        onSave: (data) {
+                                          setState(() {
+                                            workExperiences[i] = {
+                                              'WorkExp': data['WorkExp'],
+                                              'jobTitle': data['jobTitle'],
+                                              'companyName': data['companyName'],
+                                              'skills': data['skills'],
+                                              'fromDate': data['fromDate'],
+                                              'toDate': data['toDate'],
+                                              'experienceInYear':
+                                              data['experienceInYear'],
+                                              'experienceInMonths':
+                                              data['experienceInMonths'],
+                                              'annualSalary': data['annualSalary'],
+                                              'jobDetail': data['jobDetail'],
+                                            };
+                                          });
+                                          // _saveData();
+                                          Navigator.pop(innerContext);
+                                        },
+                                        jobTitle: workExperiences[i]['jobTitle'] ??
+                                            '',
+                                        companyName:
+                                        workExperiences[i]['companyName'] ?? '',
+                                        skills: workExperiences[i]['skills'] ??
+                                            '',
+                                        fromDate: workExperiences[i]['fromDate'] ??
+                                            '',
+                                        toDate: workExperiences[i]['toDate'] ??
+                                            '',
+                                        experienceInYear:
+                                        workExperiences[i]['experienceInYear'] ??
+                                            '0',
+                                        experienceInMonths:
+                                        workExperiences[i]['experienceInMonths'] ??
+                                            '0',
+                                        annualSalary:
+                                        workExperiences[i]['annualSalary'] ??
+                                            '',
+                                        jobDetail:
+                                        workExperiences[i]['jobDetail'] ?? '',
+                                      ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  workExperiences.removeAt(i);
+                                });
+                                // _saveData();
+                              },
+                            ),
+                          ],
                         ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              workExperiences.removeAt(i);
-                            });
-                            // _saveData();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                const SizedBox(height: 20),
-                _buildSectionHeader(
-                  "Languages",
-                  showAdd: true,
-                  onAdd: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => LanguageBottomSheet(
-                        initialData: null,
-                        language: '',
-                        onSave: (data) {
-                          setState(() {
-                            languages.add({
-                              'Language': data['Language'],
-                              'language': data['language'],
-                              'proficiency': data['proficiency'],
-                            });
-                          });
-                          // _saveData();
-                        },
                       ),
-                    );
-                  },
-                ),
-                for (var i = 0; i < languages.length; i++)
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(14 * sizeScale),
-                    margin: const EdgeInsets.only(top: 8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFBCD8DB)),
-                      borderRadius: BorderRadius.circular(12 * sizeScale),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(6 * sizeScale),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEBF6F7),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.language,
-                            size: 24,
-                            color: Color(0xFF005E6A),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                languages[i]['language'] ?? 'Language',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14 * fontScale,
-                                  color: const Color(0xFF005E6A),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                languages[i]['proficiency'] ?? 'Proficiency',
-                                style: TextStyle(
-                                  fontSize: 12 * fontScale,
-                                  color: Colors.black54,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.edit,
-                            color: Color(0xFF005E6A),
-                          ),
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: innerContext,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.white,
-                              builder: (_) => LanguageBottomSheet(
-                                initialData: languages[i]['Language'],
-                                language: languages[i]['language'] ?? '',
+                    const SizedBox(height: 20),
+                    _buildSectionHeader(
+                      "Languages",
+                      showAdd: true,
+                      onAdd: () {
+                        showModalBottomSheet(
+                          context: innerContext,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.white,
+                          builder: (_) =>
+                              LanguageBottomSheet(
+                                initialData: null,
+                                language: '',
                                 onSave: (data) {
                                   setState(() {
-                                    languages[i] = {
+                                    languages.add({
                                       'Language': data['Language'],
                                       'language': data['language'],
                                       'proficiency': data['proficiency'],
-                                    };
+                                    });
                                   });
                                   // _saveData();
                                 },
                               ),
-                            );
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              languages.removeAt(i);
-                            });
-                            // _saveData();
-                          },
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  ),
+                    for (var i = 0; i < languages.length; i++)
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(14 * sizeScale),
+                        margin: const EdgeInsets.only(top: 8),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: const Color(0xFFBCD8DB)),
+                          borderRadius: BorderRadius.circular(12 * sizeScale),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(6 * sizeScale),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEBF6F7),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.language,
+                                size: 24,
+                                color: Color(0xFF005E6A),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    languages[i]['language'] ?? 'Language',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14 * fontScale,
+                                      color: const Color(0xFF005E6A),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    languages[i]['proficiency'] ??
+                                        'Proficiency',
+                                    style: TextStyle(
+                                      fontSize: 12 * fontScale,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.edit,
+                                color: Color(0xFF005E6A),
+                              ),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: innerContext,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.white,
+                                  builder: (_) =>
+                                      LanguageBottomSheet(
+                                        initialData: languages[i]['Language'],
+                                        language: languages[i]['language'] ??
+                                            '',
+                                        onSave: (data) {
+                                          setState(() {
+                                            languages[i] = {
+                                              'Language': data['Language'],
+                                              'language': data['language'],
+                                              'proficiency': data['proficiency'],
+                                            };
+                                          });
+                                          // _saveData();
+                                        },
+                                      ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  languages.removeAt(i);
+                                });
+                                // _saveData();
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
 
-                const SizedBox(height: 20),
-              ],
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
       ),
     );
   }
 
-  Widget _buildSectionHeader(
-    String title, {
+  Widget _buildSectionHeader(String title, {
     VoidCallback? onEdit,
     VoidCallback? onAdd,
     bool showEdit = false,
     bool showAdd = false,
   }) {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery
+        .of(context)
+        .size;
     final double widthScale = size.width / 360;
     final double fontScale = widthScale.clamp(0.98, 1.02);
     final double sizeScale = widthScale.clamp(0.98, 1.02);
@@ -1291,7 +1358,9 @@ class _MyAccountState extends State<MyAccount> {
   }
 
   Widget _buildCardBody({required List<Widget> children}) {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery
+        .of(context)
+        .size;
     final double sizeScale = size.width / 360;
 
     return Container(
@@ -1310,7 +1379,9 @@ class _MyAccountState extends State<MyAccount> {
   }
 
   Widget _buildProfileHeader() {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery
+        .of(context)
+        .size;
     final double widthScale = size.width / 360;
     final double sizeScale = widthScale.clamp(0.98, 1.02);
 
@@ -1333,9 +1404,9 @@ class _MyAccountState extends State<MyAccount> {
                 child: _profileImage != null
                     ? Image.file(_profileImage!, fit: BoxFit.cover)
                     : const Image(
-                        image: AssetImage('assets/placeholder.jpg'),
-                        fit: BoxFit.cover,
-                      ),
+                  image: AssetImage('assets/placeholder.jpg'),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             Positioned(
@@ -1378,7 +1449,9 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery
+        .of(context)
+        .size;
     final double widthScale = size.width / 360;
     final double fontScale = widthScale.clamp(0.98, 1.02);
     final double sizeScale = widthScale.clamp(0.98, 1.02);
