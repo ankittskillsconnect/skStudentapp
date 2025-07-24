@@ -1,25 +1,14 @@
 import 'package:flutter/material.dart';
+import '../../../Model/CertificateDetails_Model.dart';
 
 class EditCertificateBottomSheet extends StatefulWidget {
-  final String? initialData;
-  final String certificateName;
-  final String issuedBy;
-  final String credentialId;
-  final String issuedDate;
-  final String expiredDate;
-  final String description;
-  final Function(Map<String, dynamic> data) onSave;
+  final CertificateModel? initialData;
+  final Function(CertificateModel model) onSave;
 
   const EditCertificateBottomSheet({
     super.key,
     this.initialData,
     required this.onSave,
-    required this.certificateName,
-    required this.issuedBy,
-    required this.credentialId,
-    required this.issuedDate,
-    required this.expiredDate,
-    required this.description,
   });
 
   @override
@@ -40,22 +29,22 @@ class _EditCertificateBottomSheetState
   void initState() {
     super.initState();
     _certificateNameController = TextEditingController(
-      text: widget.initialData == null ? '' : widget.certificateName,
+      text: widget.initialData?.certificateName ?? '',
     );
     _issuedByController = TextEditingController(
-      text: widget.initialData == null ? '' : widget.issuedBy,
+      text: widget.initialData?.issuedOrgName ?? '',
     );
     _credentialIdController = TextEditingController(
-      text: widget.initialData == null ? '' : widget.credentialId,
+      text: widget.initialData?.credId ?? '',
     );
     _issuedDateController = TextEditingController(
-      text: widget.initialData == null ? '' : widget.issuedDate,
+      text: widget.initialData?.issueDate ?? '',
     );
     _expiredDateController = TextEditingController(
-      text: widget.initialData == null ? '' : widget.expiredDate,
+      text: widget.initialData?.expiryDate ?? '',
     );
     _descriptionController = TextEditingController(
-      text: widget.initialData == null ? '' : widget.description,
+      text: widget.initialData?.description ?? '',
     );
   }
 
@@ -71,12 +60,14 @@ class _EditCertificateBottomSheetState
   }
 
   Future<void> _selectDate(
-    BuildContext context,
-    TextEditingController controller,
-  ) async {
+      BuildContext context,
+      TextEditingController controller,
+      ) async {
     DateTime initialDate = DateTime.now();
     if (controller.text.isNotEmpty) {
-      initialDate = DateTime.parse(controller.text);
+      try {
+        initialDate = DateTime.parse(controller.text);
+      } catch (_) {}
     }
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -89,12 +80,6 @@ class _EditCertificateBottomSheetState
         controller.text = picked.toIso8601String().split('T')[0];
       });
     }
-  }
-
-  String _formatCertificateDetail() {
-    return '''
-${_certificateNameController.text}\nIssued By: ${_issuedByController.text}\nCredential ID: ${_credentialIdController.text}\nIssued: ${_issuedDateController.text} - Expires: ${_expiredDateController.text}\n${_descriptionController.text}
-''';
   }
 
   @override
@@ -165,7 +150,8 @@ ${_certificateNameController.text}\nIssued By: ${_issuedByController.text}\nCred
                       _issuedDateController,
                       suffixIcon: Icons.calendar_today,
                       readOnly: true,
-                      onTap: () => _selectDate(context, _issuedDateController),
+                      onTap: () =>
+                          _selectDate(context, _issuedDateController),
                     ),
                     _buildLabel("Expired Date"),
                     _buildTextField(
@@ -173,7 +159,8 @@ ${_certificateNameController.text}\nIssued By: ${_issuedByController.text}\nCred
                       _expiredDateController,
                       suffixIcon: Icons.calendar_today,
                       readOnly: true,
-                      onTap: () => _selectDate(context, _expiredDateController),
+                      onTap: () =>
+                          _selectDate(context, _expiredDateController),
                     ),
                     _buildLabel("Description"),
                     _buildTextField(
@@ -190,16 +177,15 @@ ${_certificateNameController.text}\nIssued By: ${_issuedByController.text}\nCred
                         minimumSize: const Size.fromHeight(50),
                       ),
                       onPressed: () {
-                        final data = {
-                          'certificateDetail': _formatCertificateDetail(),
-                          'certificateName': _certificateNameController.text,
-                          'issuedBy': _issuedByController.text,
-                          'credentialId': _credentialIdController.text,
-                          'issuedDate': _issuedDateController.text,
-                          'expiredDate': _expiredDateController.text,
-                          'description': _descriptionController.text,
-                        };
-                        widget.onSave(data);
+                        final model = CertificateModel(
+                          certificateName: _certificateNameController.text,
+                          issuedOrgName: _issuedByController.text,
+                          credId: _credentialIdController.text,
+                          issueDate: _issuedDateController.text,
+                          expiryDate: _expiredDateController.text,
+                          description: _descriptionController.text,
+                        );
+                        widget.onSave(model);
                       },
                       child: const Text(
                         "Save",
@@ -230,39 +216,14 @@ ${_certificateNameController.text}\nIssued By: ${_issuedByController.text}\nCred
       ),
     );
   }
-  //
-  // Widget _dropdownField({
-  //   required String value,
-  //   required List<String> items,
-  //   required void Function(String?) onChanged,
-  // }) {
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(vertical: 6),
-  //     child: DropdownButtonFormField<String>(
-  //       value: value.isEmpty || !items.contains(value) ? items[0] : value,
-  //       items: items
-  //           .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-  //           .toList(),
-  //       onChanged: onChanged,
-  //       decoration: InputDecoration(
-  //         hintText: 'Please select',
-  //         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-  //         contentPadding: const EdgeInsets.symmetric(
-  //           horizontal: 12,
-  //           vertical: 14,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _buildTextField(
-    String hintText,
-    TextEditingController controller, {
-    IconData? suffixIcon,
-    bool readOnly = false,
-    VoidCallback? onTap,
-  }) {
+      String hintText,
+      TextEditingController controller, {
+        IconData? suffixIcon,
+        bool readOnly = false,
+        VoidCallback? onTap,
+      }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: TextField(

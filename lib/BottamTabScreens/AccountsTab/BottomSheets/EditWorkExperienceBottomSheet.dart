@@ -1,31 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../../../Model/WorkExperience_Model.dart';
+
 class Editworkexperiencebottomsheet extends StatefulWidget {
-  final String? initialData;
-  final String jobTitle;
-  final String companyName;
-  final String skills;
-  final String fromDate;
-  final String toDate;
-  final String experienceInYear;
-  final String experienceInMonths;
-  final String annualSalary;
-  final String jobDetail;
-  final Function(Map<String, dynamic> data) onSave;
+  final WorkExperienceModel? initialData;
+  final Function(WorkExperienceModel) onSave;
 
   const Editworkexperiencebottomsheet({
     super.key,
-    this.initialData,
+    required this.initialData,
     required this.onSave,
-    required this.jobTitle,
-    required this.companyName,
-    required this.skills,
-    required this.fromDate,
-    required this.toDate,
-    required this.experienceInYear,
-    required this.experienceInMonths,
-    required this.annualSalary,
-    required this.jobDetail,
   });
 
   @override
@@ -36,56 +20,52 @@ class Editworkexperiencebottomsheet extends StatefulWidget {
 class _EditworkexperiencebottomsheetState
     extends State<Editworkexperiencebottomsheet> {
   late TextEditingController _jobTitleController;
-  late TextEditingController _companyNameController;
+  late TextEditingController _organizationController;
   late TextEditingController _skillsController;
   late TextEditingController _fromDateController;
   late TextEditingController _toDateController;
   late String experienceInYear;
   late String experienceInMonths;
-  late TextEditingController _annualSalaryController;
-  late TextEditingController _jobDetailController;
+  late TextEditingController _salaryInLakhsController;
+  late TextEditingController _jobDescriptionController;
 
   @override
   void initState() {
     super.initState();
     _jobTitleController = TextEditingController(
-      text: widget.initialData == null ? '' : widget.jobTitle,
+      text: widget.initialData?.jobTitle ?? '',
     );
-    _companyNameController = TextEditingController(
-      text: widget.initialData == null ? '' : widget.companyName,
+    _organizationController = TextEditingController(
+      text: widget.initialData?.organization ?? '',
     );
     _skillsController = TextEditingController(
-      text: widget.initialData == null ? '' : widget.skills,
+      text: widget.initialData?.skills ?? '',
     );
     _fromDateController = TextEditingController(
-      text: widget.initialData == null ? '' : widget.fromDate,
+      text: widget.initialData?.workFromDate ?? '',
     );
     _toDateController = TextEditingController(
-      text: widget.initialData == null ? '' : widget.toDate,
+      text: widget.initialData?.workToDate ?? '',
     );
-    experienceInYear = widget.initialData == null
-        ? '0'
-        : widget.experienceInYear;
-    experienceInMonths = widget.initialData == null
-        ? '0'
-        : widget.experienceInMonths;
-    _annualSalaryController = TextEditingController(
-      text: widget.initialData == null ? '' : widget.annualSalary,
+    experienceInYear = widget.initialData?.totalExperienceYears ?? '0';
+    experienceInMonths = widget.initialData?.totalExperienceMonths ?? '0';
+    _salaryInLakhsController = TextEditingController(
+      text: widget.initialData?.salaryInLakhs ?? '',
     );
-    _jobDetailController = TextEditingController(
-      text: widget.initialData == null ? '' : widget.jobDetail,
+    _jobDescriptionController = TextEditingController(
+      text: widget.initialData?.jobDescription ?? '',
     );
   }
 
   @override
   void dispose() {
     _jobTitleController.dispose();
-    _companyNameController.dispose();
+    _organizationController.dispose();
     _skillsController.dispose();
     _fromDateController.dispose();
     _toDateController.dispose();
-    _annualSalaryController.dispose();
-    _jobDetailController.dispose();
+    _salaryInLakhsController.dispose();
+    _jobDescriptionController.dispose();
     super.dispose();
   }
 
@@ -112,8 +92,8 @@ class _EditworkexperiencebottomsheetState
 
   String _formatWorkExpDetail() {
     return '''
-${_jobTitleController.text}\nCompany name : ${_companyNameController.text}\nskills: ${_skillsController.text}\n fromDate: ${_fromDateController.text} - toDate: ${_toDateController.text}- Experience Year - $experienceInYear
-Experience month - $experienceInMonths AnnuaL Salary - ${_annualSalaryController.text} Job detail - ${_jobDetailController.text}
+${_jobTitleController.text}\nCompany name : ${_organizationController.text}\nskills: ${_skillsController.text}\n fromDate: ${_fromDateController.text} - toDate: ${_toDateController.text}- Experience Year - $experienceInYear
+Experience month - $experienceInMonths AnnuaL Salary - ${_salaryInLakhsController.text} Job detail - ${_jobDescriptionController.text}
 ''';
   }
 
@@ -169,7 +149,7 @@ Experience month - $experienceInMonths AnnuaL Salary - ${_annualSalaryController
                     _buildLabel("Company Name"),
                     _buildTextField(
                       "Enter issuing organization",
-                      _companyNameController,
+                      _organizationController,
                     ),
                     _buildLabel("Add Skills"),
                     _buildTextField("Enter skills", _skillsController),
@@ -217,9 +197,9 @@ Experience month - $experienceInMonths AnnuaL Salary - ${_annualSalaryController
                           setState(() => experienceInMonths = val!),
                     ),
                     _buildLabel("Annual Salary "),
-                    _buildTextField("in LPA", _annualSalaryController),
+                    _buildTextField("in LPA", _salaryInLakhsController),
                     _buildLabel("Add Details "),
-                    _buildTextField("Job details ", _jobDetailController),
+                    _buildTextField("Job details ", _jobDescriptionController),
                     const SizedBox(height: 30),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -230,19 +210,20 @@ Experience month - $experienceInMonths AnnuaL Salary - ${_annualSalaryController
                         minimumSize: const Size.fromHeight(50),
                       ),
                       onPressed: () {
-                        final data = {
-                          'WorkExp': _formatWorkExpDetail(),
-                          'jobTitle': _jobTitleController.text,
-                          'companyName': _companyNameController.text,
-                          'skills': _skillsController.text,
-                          'fromDate': _fromDateController.text,
-                          'toDate': _toDateController.text,
-                          'experienceInYear': experienceInYear,
-                          'experienceInMonths': experienceInMonths,
-                          'annualSalary': _annualSalaryController.text,
-                          'jobDetail': _jobDetailController.text,
-                        };
-                        widget.onSave(data);
+                        final workExperience = WorkExperienceModel(
+                          jobTitle: _jobTitleController.text,
+                          organization: _organizationController.text,
+                          skills: _skillsController.text,
+                          workFromDate: _fromDateController.text,
+                          workToDate: _toDateController.text,
+                          totalExperienceYears: experienceInYear,
+                          totalExperienceMonths: experienceInMonths,
+                          salaryInLakhs: _salaryInLakhsController.text,
+                          salaryInThousands: "",
+                          jobDescription: _jobDescriptionController.text,
+                        );
+
+                        widget.onSave(workExperience);
                       },
                       child: const Text(
                         "Save",

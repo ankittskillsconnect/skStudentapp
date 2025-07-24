@@ -4,10 +4,13 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditCe
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditProjectBottomSheet.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditWorkExperienceBottomSheet.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/Myaccount/MyAccountAppbar.dart';
-import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/sharedpref.dart';
+import 'package:sk_loginscreen1/Model/CertificateDetails_Model.dart';
 import 'package:sk_loginscreen1/Model/Internship_Projects_Model.dart';
+import 'package:sk_loginscreen1/Model/WorkExperience_Model.dart';
 import 'package:sk_loginscreen1/Utilities/MyAccount_Get_Post/Get/InternshipProject_Api.dart';
+import 'package:sk_loginscreen1/Utilities/MyAccount_Get_Post/Get/WorkExperience_Api.dart';
 import '../../../Model/EducationDetail_Model.dart';
+import '../../../Utilities/MyAccount_Get_Post/Get/CertificateDetails_APi.dart';
 import '../../../Utilities/MyAccount_Get_Post/Get/EducationDetail_Api.dart';
 import '../BottomSheets/EditEducationBottomSheet.dart';
 import '../BottomSheets/EditLanguageBottomSheet.dart';
@@ -35,31 +38,35 @@ class _MyAccountState extends State<MyAccount> {
   String country = "India";
 
   EducationDetailModel? educationDetail;
-  String degreeType = "Undergrad";
-  String courseName = "Bsc IT";
-  String college = "Birla College kalyan";
-  String specilization = "Flutter";
-  String courseType = "Full-time";
-  String gradingSystem = "CGPa";
-  String percentage = "86.5";
-  String passingYear = "2025";
+
+  // String degreeType = "Undergrad";
+  // String courseName = "Bsc IT";
+  // String college = "Birla College kalyan";
+  // String specilization = "Flutter";
+  // String courseType = "Full-time";
+  // String gradingSystem = "CGPa";
+  // String percentage = "86.5";
+  // String passingYear = "2025";
 
   List<String> skills = [];
   List<InternshipProjectModel> projects = [];
-  List<Map<String, dynamic>> certificates = [];
-  List<Map<String, dynamic>> workExperiences = [];
+  List<CertificateModel> certificatesList = [];
+  List<WorkExperienceModel> workExperiences = [];
   List<Map<String, dynamic>> languages = [];
   List<EducationDetailModel> educationDetails = [];
   bool isLoadingEducation = true;
   bool isLoadingProject = true;
+  bool isLoadingWorkExperience = true;
+  bool isLoadingCertificate = true;
   File? _profileImage;
 
   @override
   void initState() {
     super.initState();
-    // _loadSavedData();
     fetchEducationDetails();
     fetchInternShipProjectDetails();
+    fetchWorkExperienceDetails();
+    fetchCertificateDetails();
     // projects.add({
     //   'projectDetail': null,
     //   'projectName': 'Project A',
@@ -93,55 +100,6 @@ class _MyAccountState extends State<MyAccount> {
     // });
     // languages.add({'Language': null, 'language': 'English'});
   }
-
-  Future<void> fetchEducationDetails() async {
-    final prefs = await SharedPreferences.getInstance();
-    final authToken = prefs.getString('authToken') ?? '';
-    final connectSid = prefs.getString('connectSid') ?? '';
-    try {
-      final educationDetailsFromApi = await EducationDetailApi
-          .fetchEducationDetails(
-        authToken: authToken,
-        connectSid: connectSid,
-      );
-
-      setState(() {
-        educationDetail = educationDetailsFromApi.isNotEmpty
-            ? educationDetailsFromApi.first
-            : null;
-
-        educationDetails = educationDetailsFromApi;
-        isLoadingEducation = false;
-      });
-    } catch (e) {
-      print("❌ Error fetching education details: $e");
-      setState(() {
-        isLoadingEducation = false;
-      });
-    }
-  }
-
-  Future<void> fetchInternShipProjectDetails() async {
-    final prefs = await SharedPreferences.getInstance();
-    final authToken = prefs.getString('authToken') ?? '';
-    final connectSid = prefs.getString('connectSid') ?? '';
-    try {
-      final internshipProjectApi = await InternshipProjectApi.fetchInternshipProjects(
-        authToken: authToken,
-        connectSid: connectSid,
-      );
-      setState(() {
-        projects = internshipProjectApi;
-        isLoadingProject = false;
-      });
-    } catch (e) {
-      print("❌ Error fetching project details: $e");
-      setState(() {
-        isLoadingProject = false;
-      });
-    }
-  }
-
 
   // Future<void> _loadSavedData() async {
   //   try {
@@ -214,6 +172,109 @@ class _MyAccountState extends State<MyAccount> {
   //   print('Data save completed in MyAccount');
   // }
 
+  Future<void> fetchEducationDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('authToken') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
+    try {
+      final educationDetailsFromApi =
+          await EducationDetailApi.fetchEducationDetails(
+            authToken: authToken,
+            connectSid: connectSid,
+          );
+
+      setState(() {
+        educationDetail = educationDetailsFromApi.isNotEmpty
+            ? educationDetailsFromApi.first
+            : null;
+
+        educationDetails = educationDetailsFromApi;
+        isLoadingEducation = false;
+      });
+    } catch (e) {
+      print("❌ Error fetching education details: $e");
+      setState(() {
+        isLoadingEducation = false;
+      });
+    }
+  }
+
+  Future<void> fetchInternShipProjectDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('authToken') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
+    try {
+      final internshipProjectApi =
+          await InternshipProjectApi.fetchInternshipProjects(
+            authToken: authToken,
+            connectSid: connectSid,
+          );
+      setState(() {
+        projects = internshipProjectApi;
+        isLoadingProject = false;
+        print('Projects Fetched');
+      });
+    } catch (e) {
+      print("❌ Error fetching project details: $e");
+      setState(() {
+        isLoadingProject = false;
+      });
+    }
+  }
+
+  Future<void> fetchWorkExperienceDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('authToken') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
+    setState(() {
+      isLoadingWorkExperience = true;
+    });
+    try {
+      final workExperienceApi = await WorkExperienceApi.fetchWorkExperienceApi(
+        authToken: authToken,
+        connectSid: connectSid,
+      );
+      setState(() {
+        workExperiences = workExperienceApi;
+        isLoadingWorkExperience = false;
+        print(' Work experience fetched');
+      });
+    } catch (e) {
+      print("❌ Error fetching work experience: $e");
+      setState(() {
+        isLoadingWorkExperience = false;
+      });
+    }
+  }
+
+  Future<void> fetchCertificateDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('authToken') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
+
+    setState(() {
+      isLoadingCertificate = true;
+    });
+
+    try {
+      final certificates = await CertificateApi.fetchCertificateApi(
+        authToken: authToken,
+        connectSid: connectSid,
+      );
+
+      setState(() {
+        certificatesList = certificates;
+        isLoadingCertificate = false;
+        print(' Certificates fetched successfully');
+      });
+    } catch (e) {
+      print('❌ Error fetching certificates: $e');
+      setState(() {
+        isLoadingCertificate = false;
+      });
+    }
+  }
+
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: source, imageQuality: 85);
@@ -284,912 +345,382 @@ class _MyAccountState extends State<MyAccount> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery
-        .of(context)
-        .size;
+    final size = MediaQuery.of(context).size;
     final double widthScale = size.width / 360;
     final double fontScale = widthScale.clamp(0.98, 1.02);
     final double sizeScale = widthScale.clamp(0.98, 1.02);
-
     return Scaffold(
       appBar: AccountAppBar(),
       backgroundColor: Colors.white,
       body: Builder(
-        builder: (innerContext) =>
-            SafeArea(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16 * sizeScale,
-                  vertical: 20 * sizeScale,
+        builder: (innerContext) => SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(
+              horizontal: 16 * sizeScale,
+              vertical: 20 * sizeScale,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildProfileHeader(),
+                const SizedBox(height: 25),
+                _buildSectionHeader(
+                  "Personal Details",
+                  showEdit: true,
+                  onEdit: () {
+                    showModalBottomSheet(
+                      context: innerContext,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => EditPersonalDetailsSheet(
+                        fullname: fullname,
+                        dob: dob,
+                        phone: phone,
+                        whatsapp: whatsapp,
+                        email: email,
+                        state: state,
+                        city: city,
+                        country: country,
+                        onSave: (updatedData) {
+                          setState(() {
+                            fullname = updatedData['fullname'] ?? fullname;
+                            dob = updatedData['dob'] ?? dob;
+                            phone = updatedData['phone'] ?? phone;
+                            whatsapp = updatedData['whatsapp'] ?? whatsapp;
+                            email = updatedData['email'] ?? email;
+                            state = updatedData['state'] ?? state;
+                            city = updatedData['city'] ?? city;
+                            country = updatedData['country'] ?? country;
+                          });
+                          // _saveData();
+                          Navigator.pop(innerContext);
+                        },
+                      ),
+                    );
+                  },
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                _buildCardBody(
                   children: [
-                    _buildProfileHeader(),
-                    const SizedBox(height: 25),
-                    _buildSectionHeader(
-                      "Personal Details",
-                      showEdit: true,
-                      onEdit: () {
-                        showModalBottomSheet(
-                          context: innerContext,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (_) =>
-                              EditPersonalDetailsSheet(
-                                fullname: fullname,
-                                dob: dob,
-                                phone: phone,
-                                whatsapp: whatsapp,
-                                email: email,
-                                state: state,
-                                city: city,
-                                country: country,
-                                onSave: (updatedData) {
-                                  setState(() {
-                                    fullname =
-                                        updatedData['fullname'] ?? fullname;
-                                    dob = updatedData['dob'] ?? dob;
-                                    phone = updatedData['phone'] ?? phone;
-                                    whatsapp =
-                                        updatedData['whatsapp'] ?? whatsapp;
-                                    email = updatedData['email'] ?? email;
-                                    state = updatedData['state'] ?? state;
-                                    city = updatedData['city'] ?? city;
-                                    country = updatedData['country'] ?? country;
-                                  });
-                                  // _saveData();
-                                  Navigator.pop(innerContext);
-                                },
-                              ),
-                        );
-                      },
+                    _DetailRow(
+                      icon: Icons.perm_identity_outlined,
+                      text: fullname,
                     ),
-                    _buildCardBody(
-                      children: [
-                        _DetailRow(
-                          icon: Icons.perm_identity_outlined,
-                          text: fullname,
-                        ),
-                        _DetailRow(icon: Icons.cake_outlined, text: dob),
-                        _DetailRow(icon: Icons.phone_outlined, text: phone),
-                        _DetailRow(
-                            icon: Icons.message_outlined, text: whatsapp),
-                        _DetailRow(
-                          icon: Icons.location_on_outlined,
-                          text: state.isEmpty
-                              ? 'Not provided'
-                              : '$state , $city',
-                        ),
-                        // _DetailRow(
-                        //   icon: Icons.location_on_outlined,
-                        //   text: city.isEmpty ? 'Not provided' : city,
-                        // ),
-                        _DetailRow(
-                          icon: Icons.mark_email_read_outlined,
-                          text: email,
-                        ),
-                      ],
+                    _DetailRow(icon: Icons.cake_outlined, text: dob),
+                    _DetailRow(icon: Icons.phone_outlined, text: phone),
+                    _DetailRow(icon: Icons.message_outlined, text: whatsapp),
+                    _DetailRow(
+                      icon: Icons.location_on_outlined,
+                      text: state.isEmpty ? 'Not provided' : '$state , $city',
                     ),
-                    //education from here
-                    const SizedBox(height: 20),
-                    _buildSectionHeader(
-                      "Education Details",
-                      showEdit: educationDetail != null,
-                      onEdit: () {
-                        showModalBottomSheet(
-                          context: innerContext,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.white,
-                          builder: (_) =>
-                              EditEducationBottomSheet(
-                                  initialData: educationDetails.isNotEmpty
-                                      ? educationDetails.first
-                                      : null,
-                                  onSave: (data) {
-                                    setState(() {
-                                      educationDetail = data['educationDetail'];
-                                      educationDetails =
-                                      [data['educationDetail']];
-                                    });
-
-                                    Navigator.pop(innerContext);
-                                  }
-
-                              ),
-                        );
-                      },
-                      showAdd: educationDetail == null,
-                      onAdd: () {
-                        showModalBottomSheet(
-                          context: innerContext,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.white,
-                          builder: (_) =>
-                              EditEducationBottomSheet(
-                                  onSave: (data) {
-                                    setState(() {
-                                      educationDetail = data['educationDetail'];
-                                      educationDetails =
-                                      [data['educationDetail']];
-                                    });
-                                    Navigator.pop(innerContext);
-                                  }
-
-                              ),
-                        );
-                      },
+                    // _DetailRow(
+                    //   icon: Icons.location_on_outlined,
+                    //   text: city.isEmpty ? 'Not provided' : city,
+                    // ),
+                    _DetailRow(
+                      icon: Icons.mark_email_read_outlined,
+                      text: email,
                     ),
-                    if (isLoadingEducation)
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Center(child: CircularProgressIndicator()),
-                      )
-                    else
-                      if (educationDetails.isNotEmpty)
-                        ...educationDetails.map((edu) {
-                          return Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(14 * sizeScale),
-                            margin: const EdgeInsets.only(top: 8),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: const Color(0xFFBCD8DB)),
-                              borderRadius: BorderRadius.circular(
-                                  12 * sizeScale),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.all(6 * sizeScale),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFEBF6F7),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Icon(
-                                    Icons.school_outlined,
-                                    size: 24,
-                                    color: Color(0xFF005E6A),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .start,
-                                    children: [
-                                      Text(
-                                        edu.degreeName,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14 * fontScale,
-                                          color: const Color(0xFF005E6A),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '${edu.courseName} | ${edu
-                                            .specializationName} | ${edu
-                                            .marks}',
-                                        style: TextStyle(
-                                          fontSize: 14 * fontScale,
-                                          color: const Color(0xFF003840),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        '${edu.collegeMasterName}\n${edu
-                                            .passingYear}',
-                                        style: TextStyle(
-                                          fontSize: 13 * fontScale,
-                                          color: Colors.grey[600],
-                                          height: 1.4,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete_outline,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      educationDetails.remove(edu);
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList()
-                      else
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Text(
-                            "No education details found.",
-                            style: TextStyle(
-                              fontSize: 14 * fontScale,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ),
+                  ],
+                ),
 
-                    //education end
-                    //resume
+                //education from here
+                const SizedBox(height: 20),
+                _buildSectionHeader(
+                  "Education Details",
+                  showEdit: educationDetail != null,
+                  onEdit: () {
+                    showModalBottomSheet(
+                      context: innerContext,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.white,
+                      builder: (_) => EditEducationBottomSheet(
+                        initialData: educationDetails.isNotEmpty
+                            ? educationDetails.first
+                            : null,
+                        onSave: (data) {
+                          setState(() {
+                            educationDetail = data['educationDetail'];
+                            educationDetails = [data['educationDetail']];
+                          });
 
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Resume",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF005E6A),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16 * sizeScale,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  30 * sizeScale),
-                            ),
-                          ),
-                          onPressed: () {},
-                          child: Text(
-                            "Update",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14 * fontScale,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
+                          Navigator.pop(innerContext);
+                        },
+                      ),
+                    );
+                  },
+                  showAdd: educationDetail == null,
+                  onAdd: () {
+                    showModalBottomSheet(
+                      context: innerContext,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.white,
+                      builder: (_) => EditEducationBottomSheet(
+                        onSave: (data) {
+                          setState(() {
+                            educationDetail = data['educationDetail'];
+                            educationDetails = [data['educationDetail']];
+                          });
+                          Navigator.pop(innerContext);
+                        },
+                      ),
+                    );
+                  },
+                ),
+                if (isLoadingEducation)
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (educationDetails.isNotEmpty)
+                  ...educationDetails.map((edu) {
+                    return Container(
                       width: double.infinity,
-                      padding: EdgeInsets.symmetric(vertical: 20 * sizeScale),
+                      padding: EdgeInsets.all(14 * sizeScale),
+                      margin: const EdgeInsets.only(top: 8),
                       decoration: BoxDecoration(
                         border: Border.all(color: const Color(0xFFBCD8DB)),
                         borderRadius: BorderRadius.circular(12 * sizeScale),
                       ),
-                      child: Column(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            Icons.upload,
-                            size: 30 * sizeScale,
-                            color: const Color(0xFF005E6A),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            "Upload Resume",
-                            style: TextStyle(
-                              color: const Color(0xFF005E6A),
-                              fontSize: 14 * fontScale,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    //resume end
-                    // skills
-
-                    _buildSectionHeader(
-                      "Skills",
-                      showEdit: skills.isNotEmpty,
-                      onEdit: () {
-                        showModalBottomSheet(
-                          context: innerContext,
-                          isScrollControlled: true,
-                          builder: (_) =>
-                              EditSkillsBottomSheet(
-                                initialSkills: skills,
-                                onSave: (updatedSkills) {
-                                  setState(() => skills = updatedSkills);
-                                  // _saveData();
-                                  Navigator.pop(innerContext);
-                                },
-                              ),
-                        );
-                      },
-                      showAdd: skills.isEmpty,
-                      onAdd: () {
-                        showModalBottomSheet(
-                          context: innerContext,
-                          isScrollControlled: true,
-                          builder: (_) =>
-                              EditSkillsBottomSheet(
-                                initialSkills: skills,
-                                onSave: (updatedSkills) {
-                                  setState(() => skills = updatedSkills);
-                                  // _saveData();
-                                  Navigator.pop(innerContext);
-                                },
-                              ),
-                        );
-                      },
-                    ),
-                    if (skills.isNotEmpty)
-                      Container(
-                        padding: EdgeInsets.all(12 * sizeScale),
-                        margin: const EdgeInsets.only(top: 8),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFBCD8DB)),
-                          borderRadius: BorderRadius.circular(12 * sizeScale),
-                        ),
-                        child: Wrap(
-                          spacing: 8 * sizeScale,
-                          runSpacing: 8 * sizeScale,
-                          children: skills.map((skill) {
-                            return Chip(
-                              label: Text(
-                                skill,
-                                style: TextStyle(fontSize: 14 * fontScale),
-                              ),
-                              onDeleted: () {
-                                setState(() => skills.remove(skill));
-                                // _saveData();
-                              },
-                              deleteIconColor: const Color(0xFF005E6A),
-                              backgroundColor: const Color(0xFFEBF6F7),
-                              labelStyle: const TextStyle(
-                                  color: Color(0xFF003840)),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    const SizedBox(height: 20),
-
-                    //skills end
-                    // project
-
-                    _buildSectionHeader(
-                      "Project/Internship Details",
-                      showAdd: true,
-                      onAdd: () {
-                        showModalBottomSheet(
-                          context: innerContext,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.white,
-                          builder: (_) => EditProjectDetailsBottomSheet(
-                            initialData: null,
-                            onSave: (data) {
-                              setState(() {
-                                projects.add(data);
-                              });
-                              Navigator.pop(innerContext);
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                    if (isLoadingProject)
-                      const Center(child: CircularProgressIndicator())
-                    else if (projects.isEmpty)
-                      const Center(
-                        child: Text(
-                          'No projects available',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                        ),
-                      )
-                    else
-                      Column(
-                        children: List.generate(projects.length, (i) {
-                          return Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(14 * sizeScale),
-                            margin: const EdgeInsets.only(top: 8),
+                          Container(
+                            padding: EdgeInsets.all(6 * sizeScale),
                             decoration: BoxDecoration(
-                              border: Border.all(color: const Color(0xFFBCD8DB)),
-                              borderRadius: BorderRadius.circular(12 * sizeScale),
+                              color: const Color(0xFFEBF6F7),
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Row(
+                            child: const Icon(
+                              Icons.school_outlined,
+                              size: 24,
+                              color: Color(0xFF005E6A),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  padding: EdgeInsets.all(6 * sizeScale),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFEBF6F7),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Icon(
-                                    Icons.workspaces_filled,
-                                    size: 24,
-                                    color: Color(0xFF005E6A),
+                                Text(
+                                  edu.degreeName,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14 * fontScale,
+                                    color: const Color(0xFF005E6A),
                                   ),
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                                        decoration: BoxDecoration(
-                                          color: Colors.lightGreen,
-                                          borderRadius: BorderRadius.circular(20),
-                                          border: Border.all(color: const Color(0xFFBCD8DB)),
-                                        ),
-                                        child: Text(
-                                          projects[i].type,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        projects[i].projectName,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14 * fontScale,
-                                          color: const Color(0xFF005E6A),
-                                        ),
-                                      ),
-                                      Text(
-                                        projects[i].companyName,
-                                        style: TextStyle(
-                                          fontSize: 14 * fontScale,
-                                          color: const Color(0xFF003840),
-                                        ),
-                                      ),
-                                      Text(
-                                        '${projects[i].duration} - ${projects[i].durationPeriod}',
-                                        style: TextStyle(
-                                          fontSize: 14 * fontScale,
-                                          color: const Color(0xFF003840),
-                                        ),
-                                      ),
-                                      Text(
-                                        projects[i].skills,
-                                        style: TextStyle(
-                                          fontSize: 13 * fontScale,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                      Text(
-                                        projects[i].details,
-                                        style: TextStyle(
-                                          fontSize: 13 * fontScale,
-                                          color: Colors.grey[600],
-                                          fontWeight: FontWeight.w700,
-                                          height: 1.4,
-                                        ),
-                                      ),
-                                    ],
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${edu.courseName} | ${edu.specializationName} | ${edu.marks}',
+                                  style: TextStyle(
+                                    fontSize: 14 * fontScale,
+                                    color: const Color(0xFF003840),
                                   ),
                                 ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.edit,
-                                    color: Color(0xFF005E6A),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '${edu.collegeMasterName}\n${edu.passingYear}',
+                                  style: TextStyle(
+                                    fontSize: 13 * fontScale,
+                                    color: Colors.grey[600],
+                                    height: 1.4,
                                   ),
-                                  onPressed: () {
-                                    showModalBottomSheet(
-                                      context: innerContext,
-                                      isScrollControlled: true,
-                                      backgroundColor: Colors.white,
-                                      builder: (_) => EditProjectDetailsBottomSheet(
-                                        initialData: projects[i],
-                                        onSave: (data) {
-                                          setState(() {
-                                            projects[i] = data;
-                                          });
-                                          Navigator.pop(innerContext);
-                                        },
-                                      ),
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete_outline,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      projects.removeAt(i);
-                                    });
-                                  },
                                 ),
                               ],
                             ),
-                          );
-                        }),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: Colors.red,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                educationDetails.remove(edu);
+                              });
+                            },
+                          ),
+                        ],
                       ),
+                    );
+                  })
+                else
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      "No education details found.",
+                      style: TextStyle(
+                        fontSize: 14 * fontScale,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ),
 
-                    //project end
-                    //certificate
-                    const SizedBox(height: 20),
-                    _buildSectionHeader(
-                      "Certificate Details",
-                      showAdd: true,
-                      onAdd: () {
-                        showModalBottomSheet(
-                          context: innerContext,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.white,
-                          builder: (_) =>
-                              EditCertificateBottomSheet(
-                                initialData: null,
-                                onSave: (data) {
-                                  setState(() {
-                                    certificates.add(data);
-                                  });
-                                  // _saveData();
-                                  Navigator.pop(innerContext);
-                                },
-                                certificateName: '',
-                                issuedBy: '',
-                                credentialId: '',
-                                issuedDate: '',
-                                expiredDate: '',
-                                description: '',
-                              ),
-                        );
-                      },
+                //education end
+                //resume
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Resume",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    for (var i = 0; i < certificates.length; i++)
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(14 * sizeScale),
-                        margin: const EdgeInsets.only(top: 8),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFBCD8DB)),
-                          borderRadius: BorderRadius.circular(12 * sizeScale),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF005E6A),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16 * sizeScale,
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(6 * sizeScale),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFEBF6F7),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Icon(
-                                Icons.file_copy_outlined,
-                                size: 24,
-                                color: Color(0xFF005E6A),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    certificates[i]['certificateName'],
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14 * fontScale,
-                                      color: const Color(0xFF005E6A),
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${certificates[i]['issuedBy']}',
-                                    style: TextStyle(
-                                      fontSize: 14 * fontScale,
-                                      color: const Color(0xFF003840),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${certificates[i]['issuedDate']} - ${certificates[i]['expiredDate']}',
-                                    style: TextStyle(
-                                      fontSize: 14 * fontScale,
-                                      color: const Color(0xFF003840),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${certificates[i]['credentialId'] ?? ''}',
-                                    style: TextStyle(
-                                      fontSize: 13 * fontScale,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    certificates[i]['description'],
-                                    style: TextStyle(
-                                      fontSize: 13 * fontScale,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.edit,
-                                color: Color(0xFF005E6A),
-                              ),
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: innerContext,
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.white,
-                                  builder: (_) =>
-                                      EditCertificateBottomSheet(
-                                        initialData:
-                                        certificates[i]['certificateDetail'],
-                                        onSave: (data) {
-                                          setState(() {
-                                            certificates[i] = data;
-                                          });
-                                          // _saveData();
-                                          Navigator.pop(innerContext);
-                                        },
-                                        certificateName:
-                                        certificates[i]['certificateName'],
-                                        issuedBy: certificates[i]['issuedBy'],
-                                        credentialId: certificates[i]['credentialId'],
-                                        issuedDate: certificates[i]['issuedDate'],
-                                        expiredDate: certificates[i]['expiredDate'],
-                                        description: certificates[i]['description'],
-                                      ),
-                                );
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.delete_outline,
-                                color: Colors.red,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  certificates.removeAt(i);
-                                });
-                                // _saveData();
-                              },
-                            ),
-                          ],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30 * sizeScale),
                         ),
                       ),
-                    const SizedBox(height: 20),
-                    _buildSectionHeader(
-                      "Work Experience",
-                      showAdd: true,
-                      onAdd: () {
-                        showModalBottomSheet(
-                          context: innerContext,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.white,
-                          builder: (_) =>
-                              Editworkexperiencebottomsheet(
-                                initialData: null,
-                                onSave: (data) {
-                                  setState(() {
-                                    workExperiences.add({
-                                      'WorkExp': data['WorkExp'],
-                                      'jobTitle': data['jobTitle'],
-                                      'companyName': data['companyName'],
-                                      'skills': data['skills'],
-                                      'fromDate': data['fromDate'],
-                                      'toDate': data['toDate'],
-                                      'experienceInYear': data['experienceInYear'],
-                                      'experienceInMonths': data['experienceInMonths'],
-                                      'annualSalary': data['annualSalary'],
-                                      'jobDetail': data['jobDetail'],
-                                    });
-                                  });
-                                  // _saveData();
-                                  Navigator.pop(innerContext);
-                                },
-                                jobTitle: '',
-                                companyName: '',
-                                skills: '',
-                                fromDate: '',
-                                toDate: '',
-                                experienceInYear: '0',
-                                experienceInMonths: '0',
-                                annualSalary: '',
-                                jobDetail: '',
-                              ),
-                        );
-                      },
-                    ),
-                    for (var i = 0; i < workExperiences.length; i++)
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(14 * sizeScale),
-                        margin: const EdgeInsets.only(top: 8),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFBCD8DB)),
-                          borderRadius: BorderRadius.circular(12 * sizeScale),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(6 * sizeScale),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFEBF6F7),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Icon(
-                                Icons.work_history_outlined,
-                                size: 24,
-                                color: Color(0xFF005E6A),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    workExperiences[i]['jobTitle'] ??
-                                        'Job Title',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14 * fontScale,
-                                      color: const Color(0xFF005E6A),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${workExperiences[i]['companyName']}',
-                                    style: TextStyle(
-                                      fontSize: 14 * fontScale,
-                                      color: const Color(0xFF003840),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${workExperiences[i]['fromDate']} - ${workExperiences[i]['toDate']}',
-                                    style: TextStyle(
-                                      fontSize: 14 * fontScale,
-                                      color: const Color(0xFF003840),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'Skills: ${workExperiences[i]['skills'] ??
-                                        ''}',
-                                    style: TextStyle(
-                                      fontSize: 13 * fontScale,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'Exp: ${workExperiences[i]['experienceInYear']} yrs ${workExperiences[i]['experienceInMonths']} months | Salary: ${workExperiences[i]['annualSalary'] ??
-                                        ''} LPA',
-                                    style: TextStyle(
-                                      fontSize: 13 * fontScale,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    workExperiences[i]['jobDetail'] ?? '',
-                                    style: TextStyle(
-                                      fontSize: 13 * fontScale,
-                                      color: Colors.grey[600],
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.edit,
-                                color: Color(0xFF005E6A),
-                              ),
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: innerContext,
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.white,
-                                  builder: (_) =>
-                                      Editworkexperiencebottomsheet(
-                                        initialData: workExperiences[i]['WorkExp'],
-                                        onSave: (data) {
-                                          setState(() {
-                                            workExperiences[i] = {
-                                              'WorkExp': data['WorkExp'],
-                                              'jobTitle': data['jobTitle'],
-                                              'companyName': data['companyName'],
-                                              'skills': data['skills'],
-                                              'fromDate': data['fromDate'],
-                                              'toDate': data['toDate'],
-                                              'experienceInYear':
-                                              data['experienceInYear'],
-                                              'experienceInMonths':
-                                              data['experienceInMonths'],
-                                              'annualSalary': data['annualSalary'],
-                                              'jobDetail': data['jobDetail'],
-                                            };
-                                          });
-                                          // _saveData();
-                                          Navigator.pop(innerContext);
-                                        },
-                                        jobTitle: workExperiences[i]['jobTitle'] ??
-                                            '',
-                                        companyName:
-                                        workExperiences[i]['companyName'] ?? '',
-                                        skills: workExperiences[i]['skills'] ??
-                                            '',
-                                        fromDate: workExperiences[i]['fromDate'] ??
-                                            '',
-                                        toDate: workExperiences[i]['toDate'] ??
-                                            '',
-                                        experienceInYear:
-                                        workExperiences[i]['experienceInYear'] ??
-                                            '0',
-                                        experienceInMonths:
-                                        workExperiences[i]['experienceInMonths'] ??
-                                            '0',
-                                        annualSalary:
-                                        workExperiences[i]['annualSalary'] ??
-                                            '',
-                                        jobDetail:
-                                        workExperiences[i]['jobDetail'] ?? '',
-                                      ),
-                                );
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.delete_outline,
-                                color: Colors.red,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  workExperiences.removeAt(i);
-                                });
-                                // _saveData();
-                              },
-                            ),
-                          ],
+                      onPressed: () {},
+                      child: Text(
+                        "Update",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14 * fontScale,
                         ),
                       ),
-                    const SizedBox(height: 20),
-                    _buildSectionHeader(
-                      "Languages",
-                      showAdd: true,
-                      onAdd: () {
-                        showModalBottomSheet(
-                          context: innerContext,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.white,
-                          builder: (_) =>
-                              LanguageBottomSheet(
-                                initialData: null,
-                                language: '',
-                                onSave: (data) {
-                                  setState(() {
-                                    languages.add({
-                                      'Language': data['Language'],
-                                      'language': data['language'],
-                                      'proficiency': data['proficiency'],
-                                    });
-                                  });
-                                  // _saveData();
-                                },
-                              ),
-                        );
-                      },
                     ),
-                    for (var i = 0; i < languages.length; i++)
-                      Container(
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(vertical: 20 * sizeScale),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: const Color(0xFFBCD8DB)),
+                    borderRadius: BorderRadius.circular(12 * sizeScale),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.upload,
+                        size: 30 * sizeScale,
+                        color: const Color(0xFF005E6A),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        "Upload Resume",
+                        style: TextStyle(
+                          color: const Color(0xFF005E6A),
+                          fontSize: 14 * fontScale,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                //resume end
+                // skills
+                _buildSectionHeader(
+                  "Skills",
+                  showEdit: skills.isNotEmpty,
+                  onEdit: () {
+                    showModalBottomSheet(
+                      context: innerContext,
+                      isScrollControlled: true,
+                      builder: (_) => EditSkillsBottomSheet(
+                        initialSkills: skills,
+                        onSave: (updatedSkills) {
+                          setState(() => skills = updatedSkills);
+                          // _saveData();
+                          Navigator.pop(innerContext);
+                        },
+                      ),
+                    );
+                  },
+                  showAdd: skills.isEmpty,
+                  onAdd: () {
+                    showModalBottomSheet(
+                      context: innerContext,
+                      isScrollControlled: true,
+                      builder: (_) => EditSkillsBottomSheet(
+                        initialSkills: skills,
+                        onSave: (updatedSkills) {
+                          setState(() => skills = updatedSkills);
+                          // _saveData();
+                          Navigator.pop(innerContext);
+                        },
+                      ),
+                    );
+                  },
+                ),
+                if (skills.isNotEmpty)
+                  Container(
+                    padding: EdgeInsets.all(12 * sizeScale),
+                    margin: const EdgeInsets.only(top: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xFFBCD8DB)),
+                      borderRadius: BorderRadius.circular(12 * sizeScale),
+                    ),
+                    child: Wrap(
+                      spacing: 8 * sizeScale,
+                      runSpacing: 8 * sizeScale,
+                      children: skills.map((skill) {
+                        return Chip(
+                          label: Text(
+                            skill,
+                            style: TextStyle(fontSize: 14 * fontScale),
+                          ),
+                          onDeleted: () {
+                            setState(() => skills.remove(skill));
+                            // _saveData();
+                          },
+                          deleteIconColor: const Color(0xFF005E6A),
+                          backgroundColor: const Color(0xFFEBF6F7),
+                          labelStyle: const TextStyle(color: Color(0xFF003840)),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                const SizedBox(height: 20),
+
+                //skills end
+                // project
+                _buildSectionHeader(
+                  "Project/Internship Details",
+                  showAdd: true,
+                  onAdd: () {
+                    showModalBottomSheet(
+                      context: innerContext,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.white,
+                      builder: (_) => EditProjectDetailsBottomSheet(
+                        initialData: null,
+                        onSave: (data) {
+                          setState(() {
+                            projects.add(data);
+                          });
+                          Navigator.pop(innerContext);
+                        },
+                      ),
+                    );
+                  },
+                ),
+                if (isLoadingProject)
+                  const Center(child: CircularProgressIndicator())
+                else if (projects.isEmpty)
+                  const Center(
+                    child: Text(
+                      'No projects available',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  )
+                else
+                  Column(
+                    children: List.generate(projects.length, (i) {
+                      return Container(
                         width: double.infinity,
                         padding: EdgeInsets.all(14 * sizeScale),
                         margin: const EdgeInsets.only(top: 8),
@@ -1207,7 +738,7 @@ class _MyAccountState extends State<MyAccount> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: const Icon(
-                                Icons.language,
+                                Icons.workspaces_filled,
                                 size: 24,
                                 color: Color(0xFF005E6A),
                               ),
@@ -1217,21 +748,64 @@ class _MyAccountState extends State<MyAccount> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    languages[i]['language'] ?? 'Language',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14 * fontScale,
-                                      color: const Color(0xFF005E6A),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.lightGreen,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: const Color(0xFFBCD8DB),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      projects[i].type,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    languages[i]['proficiency'] ??
-                                        'Proficiency',
+                                    projects[i].projectName,
                                     style: TextStyle(
-                                      fontSize: 12 * fontScale,
-                                      color: Colors.black54,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14 * fontScale,
+                                      color: const Color(0xFF005E6A),
+                                    ),
+                                  ),
+                                  Text(
+                                    projects[i].companyName,
+                                    style: TextStyle(
+                                      fontSize: 14 * fontScale,
+                                      color: const Color(0xFF003840),
+                                    ),
+                                  ),
+                                  Text(
+                                    '${projects[i].duration} - ${projects[i].durationPeriod}',
+                                    style: TextStyle(
+                                      fontSize: 14 * fontScale,
+                                      color: const Color(0xFF003840),
+                                    ),
+                                  ),
+                                  Text(
+                                    projects[i].skills,
+                                    style: TextStyle(
+                                      fontSize: 13 * fontScale,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  Text(
+                                    projects[i].details,
+                                    style: TextStyle(
+                                      fontSize: 13 * fontScale,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.4,
                                     ),
                                   ),
                                 ],
@@ -1247,22 +821,15 @@ class _MyAccountState extends State<MyAccount> {
                                   context: innerContext,
                                   isScrollControlled: true,
                                   backgroundColor: Colors.white,
-                                  builder: (_) =>
-                                      LanguageBottomSheet(
-                                        initialData: languages[i]['Language'],
-                                        language: languages[i]['language'] ??
-                                            '',
-                                        onSave: (data) {
-                                          setState(() {
-                                            languages[i] = {
-                                              'Language': data['Language'],
-                                              'language': data['language'],
-                                              'proficiency': data['proficiency'],
-                                            };
-                                          });
-                                          // _saveData();
-                                        },
-                                      ),
+                                  builder: (_) => EditProjectDetailsBottomSheet(
+                                    initialData: projects[i],
+                                    onSave: (data) {
+                                      setState(() {
+                                        projects[i] = data;
+                                      });
+                                      Navigator.pop(innerContext);
+                                    },
+                                  ),
                                 );
                               },
                             ),
@@ -1273,33 +840,428 @@ class _MyAccountState extends State<MyAccount> {
                               ),
                               onPressed: () {
                                 setState(() {
-                                  languages.removeAt(i);
+                                  projects.removeAt(i);
                                 });
-                                // _saveData();
                               },
                             ),
                           ],
                         ),
-                      ),
+                      );
+                    }),
+                  ),
 
-                    const SizedBox(height: 20),
-                  ],
+                //project end
+                //certificate
+                const SizedBox(height: 20),
+                _buildSectionHeader(
+                  "Certificate Details",
+                  showAdd: true,
+                  onAdd: () {
+                    showModalBottomSheet(
+                      context: innerContext,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.white,
+                      builder: (_) => EditCertificateBottomSheet(
+                        initialData: null,
+                        onSave: (data) {
+                          setState(() {
+                            certificatesList.add(data);
+                          });
+                          Navigator.pop(innerContext);
+                        },
+                      ),
+                    );
+                  },
                 ),
-              ),
+
+                for (var i = 0; i < certificatesList.length; i++)
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(14 * sizeScale),
+                    margin: const EdgeInsets.only(top: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xFFBCD8DB)),
+                      borderRadius: BorderRadius.circular(12 * sizeScale),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(6 * sizeScale),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEBF6F7),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.file_copy_outlined,
+                            size: 24,
+                            color: Color(0xFF005E6A),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                certificatesList[i].certificateName,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14 * fontScale,
+                                  color: const Color(0xFF005E6A),
+                                  height: 1.4,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                certificatesList[i].issuedOrgName,
+                                style: TextStyle(
+                                  fontSize: 14 * fontScale,
+                                  color: const Color(0xFF003840),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${certificatesList[i].issueDate} - ${certificatesList[i].expiryDate}',
+                                style: TextStyle(
+                                  fontSize: 14 * fontScale,
+                                  color: const Color(0xFF003840),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                certificatesList[i].credId,
+                                style: TextStyle(
+                                  fontSize: 13 * fontScale,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                certificatesList[i].description,
+                                style: TextStyle(
+                                  fontSize: 13 * fontScale,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Color(0xFF005E6A),
+                          ),
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: innerContext,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.white,
+                              builder: (_) => EditCertificateBottomSheet(
+                                initialData: certificatesList[i],
+                                onSave: (data) {
+                                  setState(() {
+                                    certificatesList[i] = data;
+                                  });
+                                  Navigator.pop(innerContext);
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              certificatesList.removeAt(i);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+                //certificated end
+                //work experience here
+                const SizedBox(height: 20),
+                _buildSectionHeader(
+                  "Work Experience",
+                  showAdd: true,
+                  onAdd: () {
+                    showModalBottomSheet(
+                      context: innerContext,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.white,
+                      builder: (_) => Editworkexperiencebottomsheet(
+                        initialData: null,
+                        onSave: (WorkExperienceModel newData) {
+                          setState(() {
+                            workExperiences.add(newData);
+                          });
+                          Navigator.pop(innerContext);
+                        },
+                      ),
+                    );
+                  },
+                ),
+                for (int i = 0; i < workExperiences.length; i++)
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(14 * sizeScale),
+                    margin: const EdgeInsets.only(top: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xFFBCD8DB)),
+                      borderRadius: BorderRadius.circular(12 * sizeScale),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(6 * sizeScale),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEBF6F7),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.work_history_outlined,
+                            size: 24,
+                            color: Color(0xFF005E6A),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                workExperiences[i].jobTitle,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14 * fontScale,
+                                  color: const Color(0xFF005E6A),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                workExperiences[i].organization,
+                                style: TextStyle(
+                                  fontSize: 14 * fontScale,
+                                  color: const Color(0xFF003840),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${workExperiences[i].workFromDate} - ${workExperiences[i].workToDate}',
+                                style: TextStyle(
+                                  fontSize: 14 * fontScale,
+                                  color: const Color(0xFF003840),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Skills: ${workExperiences[i].skills}',
+                                style: TextStyle(
+                                  fontSize: 13 * fontScale,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Exp: ${workExperiences[i].totalExperienceYears} yrs ${workExperiences[i].totalExperienceMonths} months \n'
+                                'Salary: ${workExperiences[i].salaryInLakhs}.${workExperiences[i].salaryInThousands} LPA',
+                                style: TextStyle(
+                                  fontSize: 13 * fontScale,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                workExperiences[i].jobDescription,
+                                style: TextStyle(
+                                  fontSize: 13 * fontScale,
+                                  color: Colors.grey[600],
+                                  height: 1.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Color(0xFF005E6A),
+                          ),
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: innerContext,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.white,
+                              builder: (_) => Editworkexperiencebottomsheet(
+                                initialData: workExperiences[i],
+                                onSave: (WorkExperienceModel updated) {
+                                  setState(() {
+                                    workExperiences[i] = updated;
+                                  });
+                                  Navigator.pop(innerContext);
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              workExperiences.removeAt(i);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+                //work experience ended
+                //languages begin
+                const SizedBox(height: 20),
+                _buildSectionHeader(
+                  "Languages",
+                  showAdd: true,
+                  onAdd: () {
+                    showModalBottomSheet(
+                      context: innerContext,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.white,
+                      builder: (_) => LanguageBottomSheet(
+                        initialData: null,
+                        language: '',
+                        onSave: (data) {
+                          setState(() {
+                            languages.add({
+                              'Language': data['Language'],
+                              'language': data['language'],
+                              'proficiency': data['proficiency'],
+                            });
+                          });
+                          // _saveData();
+                        },
+                      ),
+                    );
+                  },
+                ),
+                for (var i = 0; i < languages.length; i++)
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(14 * sizeScale),
+                    margin: const EdgeInsets.only(top: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xFFBCD8DB)),
+                      borderRadius: BorderRadius.circular(12 * sizeScale),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(6 * sizeScale),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEBF6F7),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.language,
+                            size: 24,
+                            color: Color(0xFF005E6A),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                languages[i]['language'] ?? 'Language',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14 * fontScale,
+                                  color: const Color(0xFF005E6A),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                languages[i]['proficiency'] ?? 'Proficiency',
+                                style: TextStyle(
+                                  fontSize: 12 * fontScale,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Color(0xFF005E6A),
+                          ),
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: innerContext,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.white,
+                              builder: (_) => LanguageBottomSheet(
+                                initialData: languages[i]['Language'],
+                                language: languages[i]['language'] ?? '',
+                                onSave: (data) {
+                                  setState(() {
+                                    languages[i] = {
+                                      'Language': data['Language'],
+                                      'language': data['language'],
+                                      'proficiency': data['proficiency'],
+                                    };
+                                  });
+                                  // _saveData();
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              languages.removeAt(i);
+                            });
+                            // _saveData();
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(height: 20),
+                //Languages end here
+              ],
             ),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title, {
+  Widget _buildSectionHeader(
+    String title, {
     VoidCallback? onEdit,
     VoidCallback? onAdd,
     bool showEdit = false,
     bool showAdd = false,
   }) {
-    final size = MediaQuery
-        .of(context)
-        .size;
+    final size = MediaQuery.of(context).size;
     final double widthScale = size.width / 360;
     final double fontScale = widthScale.clamp(0.98, 1.02);
     final double sizeScale = widthScale.clamp(0.98, 1.02);
@@ -1358,9 +1320,7 @@ class _MyAccountState extends State<MyAccount> {
   }
 
   Widget _buildCardBody({required List<Widget> children}) {
-    final size = MediaQuery
-        .of(context)
-        .size;
+    final size = MediaQuery.of(context).size;
     final double sizeScale = size.width / 360;
 
     return Container(
@@ -1379,9 +1339,7 @@ class _MyAccountState extends State<MyAccount> {
   }
 
   Widget _buildProfileHeader() {
-    final size = MediaQuery
-        .of(context)
-        .size;
+    final size = MediaQuery.of(context).size;
     final double widthScale = size.width / 360;
     final double sizeScale = widthScale.clamp(0.98, 1.02);
 
@@ -1404,9 +1362,9 @@ class _MyAccountState extends State<MyAccount> {
                 child: _profileImage != null
                     ? Image.file(_profileImage!, fit: BoxFit.cover)
                     : const Image(
-                  image: AssetImage('assets/placeholder.jpg'),
-                  fit: BoxFit.cover,
-                ),
+                        image: AssetImage('assets/placeholder.jpg'),
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             Positioned(
@@ -1449,9 +1407,7 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery
-        .of(context)
-        .size;
+    final size = MediaQuery.of(context).size;
     final double widthScale = size.width / 360;
     final double fontScale = widthScale.clamp(0.98, 1.02);
     final double sizeScale = widthScale.clamp(0.98, 1.02);
