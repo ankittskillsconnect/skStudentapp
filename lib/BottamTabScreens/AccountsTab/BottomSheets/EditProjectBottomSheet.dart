@@ -63,7 +63,6 @@ class _EditProjectDetailsBottomSheetState extends State<EditProjectDetailsBottom
         details: detailsController.text,
       );
       widget.onSave(newData);
-      Navigator.of(context).pop();
     }
   }
 

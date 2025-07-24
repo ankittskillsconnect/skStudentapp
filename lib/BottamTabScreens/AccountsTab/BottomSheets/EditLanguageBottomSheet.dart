@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../Utilities/Language_Api.dart';
+import '../../../Model/Languages_Model.dart';
+import '../../../Utilities/MyAccount_Get_Post/Get/LanguagesGet_Api.dart';
 
 class LanguageBottomSheet extends StatefulWidget {
-  final String? initialData;
-  final String language;
-  final Function(Map<String, dynamic> data) onSave;
+  final LanguagesModel? initialData;
+  final Function(LanguagesModel data) onSave;
 
   const LanguageBottomSheet({
     super.key,
     this.initialData,
     required this.onSave,
-    required this.language,
   });
 
   @override
@@ -22,8 +21,9 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
     with SingleTickerProviderStateMixin {
   late String selectedLanguage;
   late String selectedProficiency;
-  bool isLoadingLanguages = true;
-  List<String> languages = ['Loading languages...'];
+  bool isLoading = true;
+  List<LanguagesModel> allLanguages = [];
+
   final List<String> _proficiencyLevels = ['Basic', 'Intermediate', 'Advanced'];
 
   late AnimationController _animationController;
@@ -32,97 +32,54 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
   @override
   void initState() {
     super.initState();
-    // Clear cache to force fresh API call for debugging
-    () async {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('cached_languages');
-    }();
-
-    // Use initialData if provided, otherwise fallback to widget.language
-    selectedLanguage = widget.initialData ?? widget.language;
-    selectedProficiency = _proficiencyLevels[0];
+    selectedLanguage = widget.initialData?.languageName ?? '';
+    selectedProficiency = widget.initialData?.proficiency ?? _proficiencyLevels[0];
 
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
 
-    _fetchLanguageList();
+    _fetchLanguages();
   }
 
-  Future<void> _fetchLanguageList() async {
+  Future<void> _fetchLanguages() async {
     final prefs = await SharedPreferences.getInstance();
-    final cachedLanguages = prefs.getStringList('cached_languages');
-
     final authToken = prefs.getString('authToken') ?? '';
     String connectSid = prefs.getString('connectSid') ?? '';
 
-    debugPrint("🟡 authToken from prefs: ${authToken.substring(0, 20)}...");
-    debugPrint("🟡 connectSid from prefs: $connectSid");
-
     if (connectSid.isEmpty) {
-      debugPrint(
-        "🧨 WARNING: connectSid is empty, setting fallback value for debug!",
-      );
       connectSid =
-          's%3A90I8VK0ssLCW9DjFq4xSLrkDEI7xUgCG.JFNw9cZG8Txw07rqZ6gs7K8bGpm4pMApT7Yu9FqqjbY';
-    }
-
-    if (cachedLanguages != null && cachedLanguages.isNotEmpty) {
-      debugPrint(
-        "✅ Using cached languages (${cachedLanguages.length}) - $cachedLanguages",
-      );
-      setState(() {
-        languages = cachedLanguages;
-        if (!languages.contains(selectedLanguage) && languages.isNotEmpty) {
-          selectedLanguage = languages[0];
-        }
-        isLoadingLanguages = false;
-      });
-      _animationController.forward();
-      return;
+      's%3A90I8VK0ssLCW9DjFq4xSLrkDEI7xUgCG.JFNw9cZG8Txw07rqZ6gs7K8bGpm4pMApT7Yu9FqqjbY';
     }
 
     try {
-      final fetchedLanguages = await LanguageListApi.fetchLanguages(
+      final fetched = await LanguageDetailApi.fetchLanguages(
         authToken: authToken,
         connectSid: connectSid,
       );
 
-      debugPrint("✅ API returned ${fetchedLanguages.length} languages");
-
-      if (!mounted) return;
-
       setState(() {
-        languages = fetchedLanguages.isNotEmpty
-            ? fetchedLanguages
-            : ['No languages available'];
-        if (!languages.contains(selectedLanguage) && languages.isNotEmpty) {
-          selectedLanguage = languages[0];
+        allLanguages = fetched;
+        if (allLanguages.isNotEmpty && !allLanguages.any((e) => e.languageName == selectedLanguage)) {
+          selectedLanguage = allLanguages[0].languageName;
         }
-        isLoadingLanguages = false;
+        isLoading = false;
       });
 
-      await prefs.setStringList('cached_languages', languages);
       _animationController.forward();
     } catch (e) {
-      debugPrint("❌ Error fetching languages: $e");
+      setState(() {
+        isLoading = false;
+        allLanguages = [];
+      });
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error loading languages: $e')));
-        setState(() {
-          languages = ['No languages available'];
-          if (!languages.contains(selectedLanguage)) {
-            selectedLanguage = languages[0];
-          }
-          isLoadingLanguages = false;
-        });
-        _animationController.forward();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading languages: $e')),
+        );
       }
     }
   }
@@ -155,71 +112,60 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
           ),
           child: FadeTransition(
             opacity: _fadeAnimation,
-            child: isLoadingLanguages
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Color(0xFF005E6A),
-                          ),
-                        ),
-                        SizedBox(height: 16 * sizeScale),
-                        Text(
-                          'Loading Languages...',
-                          style: TextStyle(
-                            fontSize: 16 * sizeScale,
-                            color: const Color(0xFF003840),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
+            child: isLoading
+                ? _buildLoader(sizeScale)
                 : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(),
+                const Divider(thickness: 1.2),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: ListView(
+                    controller: scrollController,
+                    padding: EdgeInsets.only(
+                      bottom:
+                      MediaQuery.of(context).viewInsets.bottom +
+                          10 * sizeScale,
+                    ),
                     children: [
-                      _buildHeader(),
-                      const Divider(thickness: 1.2),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child: ListView(
-                          controller: scrollController,
-                          padding: EdgeInsets.only(
-                            bottom:
-                                MediaQuery.of(context).viewInsets.bottom +
-                                10 * sizeScale,
-                          ),
-                          children: [
-                            _buildLabel("Select language*", required: true),
-                            _buildDropdownField(
-                              value: selectedLanguage,
-                              items: languages,
-                              onChanged: (val) => setState(
-                                () => selectedLanguage = val ?? languages[0],
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            _buildLabel("Select proficiency*", required: true),
-                            _buildDropdownField(
-                              value: selectedProficiency,
-                              items: _proficiencyLevels,
-                              onChanged: (val) => setState(
-                                () => selectedProficiency =
-                                    val ?? _proficiencyLevels[0],
-                              ),
-                            ),
-                            const SizedBox(height: 30),
-                            _buildSubmitButton(),
-                          ],
-                        ),
-                      ),
+                      _buildLabel("Select language*", required: true),
+                      _buildLanguageDropdown(),
+                      const SizedBox(height: 16),
+                      _buildLabel("Select proficiency*", required: true),
+                      _buildProficiencyDropdown(),
+                      const SizedBox(height: 30),
+                      _buildSubmitButton(),
                     ],
                   ),
+                ),
+              ],
+            ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildLoader(double sizeScale) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF005E6A)),
+          ),
+          SizedBox(height: 16 * sizeScale),
+          Text(
+            'Loading Languages...',
+            style: TextStyle(
+              fontSize: 16 * sizeScale,
+              color: const Color(0xFF003840),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -263,29 +209,39 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
     );
   }
 
+  Widget _buildLanguageDropdown() {
+    final languageNames = allLanguages.map((e) => e.languageName).toList();
+    return _buildDropdownField(
+      value: selectedLanguage,
+      items: languageNames,
+      onChanged: (val) => setState(() => selectedLanguage = val ?? ''),
+    );
+  }
+
+  Widget _buildProficiencyDropdown() {
+    return _buildDropdownField(
+      value: selectedProficiency,
+      items: _proficiencyLevels,
+      onChanged: (val) => setState(() => selectedProficiency = val ?? ''),
+    );
+  }
+
   Widget _buildDropdownField({
     required String value,
     required List<String> items,
     required void Function(String?) onChanged,
   }) {
-    final displayValue = items.contains(value)
-        ? value
-        : (items.isNotEmpty ? items[0] : null);
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: DropdownButtonFormField<String>(
-        value: displayValue,
+        value: items.contains(value) ? value : null,
         items: items
             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
             .toList(),
-        onChanged: isLoadingLanguages ? null : onChanged,
+        onChanged: isLoading ? null : onChanged,
         decoration: InputDecoration(
           hintText: 'Please select',
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           filled: true,
           fillColor: Colors.white,
@@ -309,24 +265,19 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
           ),
         ),
         onPressed: () {
-          if (selectedLanguage.isEmpty ||
-              selectedProficiency.isEmpty ||
-              selectedLanguage == 'No languages available') {
+          if (selectedLanguage.isEmpty || selectedProficiency.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Please fill all required fields or check language data',
-                ),
-              ),
+              const SnackBar(content: Text('Please fill all required fields')),
             );
             return;
           }
-          final data = {
-            'Language': widget.initialData,
-            'language': selectedLanguage,
-            'proficiency': selectedProficiency,
-          };
-          widget.onSave(data);
+
+          final result = LanguagesModel(
+            languageName: selectedLanguage,
+            proficiency: selectedProficiency,
+          );
+
+          widget.onSave(result);
           Navigator.pop(context);
         },
         child: const Text("Submit", style: TextStyle(color: Colors.white)),

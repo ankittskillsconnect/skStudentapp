@@ -6,12 +6,16 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditWo
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/Myaccount/MyAccountAppbar.dart';
 import 'package:sk_loginscreen1/Model/CertificateDetails_Model.dart';
 import 'package:sk_loginscreen1/Model/Internship_Projects_Model.dart';
+import 'package:sk_loginscreen1/Model/Skiils_Model.dart';
 import 'package:sk_loginscreen1/Model/WorkExperience_Model.dart';
 import 'package:sk_loginscreen1/Utilities/MyAccount_Get_Post/Get/InternshipProject_Api.dart';
 import 'package:sk_loginscreen1/Utilities/MyAccount_Get_Post/Get/WorkExperience_Api.dart';
 import '../../../Model/EducationDetail_Model.dart';
+import '../../../Model/Languages_Model.dart';
 import '../../../Utilities/MyAccount_Get_Post/Get/CertificateDetails_APi.dart';
 import '../../../Utilities/MyAccount_Get_Post/Get/EducationDetail_Api.dart';
+import '../../../Utilities/MyAccount_Get_Post/Get/LanguagesGet_Api.dart';
+import '../../../Utilities/MyAccount_Get_Post/Get/Skills_Api.dart';
 import '../BottomSheets/EditEducationBottomSheet.dart';
 import '../BottomSheets/EditLanguageBottomSheet.dart';
 import '../BottomSheets/EditPersonalDetailSheet.dart';
@@ -48,16 +52,18 @@ class _MyAccountState extends State<MyAccount> {
   // String percentage = "86.5";
   // String passingYear = "2025";
 
-  List<String> skills = [];
+  List<SkillsModel> skillList = [];
   List<InternshipProjectModel> projects = [];
   List<CertificateModel> certificatesList = [];
   List<WorkExperienceModel> workExperiences = [];
-  List<Map<String, dynamic>> languages = [];
+  List<LanguagesModel> languageList = [];
   List<EducationDetailModel> educationDetails = [];
   bool isLoadingEducation = true;
   bool isLoadingProject = true;
   bool isLoadingWorkExperience = true;
   bool isLoadingCertificate = true;
+  bool isLoadingSkills = true;
+  bool isLoadingLanguages = true;
   File? _profileImage;
 
   @override
@@ -67,6 +73,8 @@ class _MyAccountState extends State<MyAccount> {
     fetchInternShipProjectDetails();
     fetchWorkExperienceDetails();
     fetchCertificateDetails();
+    fetchSkills();
+    fetchLanguageData();
     // projects.add({
     //   'projectDetail': null,
     //   'projectName': 'Project A',
@@ -275,6 +283,50 @@ class _MyAccountState extends State<MyAccount> {
     }
   }
 
+  Future<void> fetchSkills() async {
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('authToken') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
+
+    setState(() {
+      isLoadingSkills = true;
+    });
+
+
+    try {
+      final result = await SkillsApi.fetchSkills(
+        authToken: authToken,
+        connectSid: connectSid,
+      );
+
+      setState(() {
+        skillList = result;
+        setState(() {
+          isLoadingSkills = false;
+        });
+
+      });
+    } catch (e) {
+      print(' Error fetching skills: $e');
+    }
+  }
+
+  void fetchLanguageData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('authToken') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
+
+    final fetchedLanguages = await LanguageDetailApi.fetchLanguages(
+      authToken: authToken,
+      connectSid: connectSid,
+    );
+
+    setState(() {
+      languageList = fetchedLanguages;
+      isLoadingLanguages = false;
+    });
+  }
+
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: source, imageQuality: 85);
@@ -427,28 +479,7 @@ class _MyAccountState extends State<MyAccount> {
                 const SizedBox(height: 20),
                 _buildSectionHeader(
                   "Education Details",
-                  showEdit: educationDetail != null,
-                  onEdit: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => EditEducationBottomSheet(
-                        initialData: educationDetails.isNotEmpty
-                            ? educationDetails.first
-                            : null,
-                        onSave: (data) {
-                          setState(() {
-                            educationDetail = data['educationDetail'];
-                            educationDetails = [data['educationDetail']];
-                          });
-
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                  showAdd: educationDetail == null,
+                  showAdd: true,
                   onAdd: () {
                     showModalBottomSheet(
                       context: innerContext,
@@ -457,8 +488,7 @@ class _MyAccountState extends State<MyAccount> {
                       builder: (_) => EditEducationBottomSheet(
                         onSave: (data) {
                           setState(() {
-                            educationDetail = data['educationDetail'];
-                            educationDetails = [data['educationDetail']];
+                            educationDetails.add(data['educationDetail']);
                           });
                           Navigator.pop(innerContext);
                         },
@@ -511,7 +541,7 @@ class _MyAccountState extends State<MyAccount> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${edu.courseName} | ${edu.specializationName} | ${edu.marks}',
+                                  '${edu.courseName} | ${edu.specializationName} \nCGPA - ${edu.marks}',
                                   style: TextStyle(
                                     fontSize: 14 * fontScale,
                                     color: const Color(0xFF003840),
@@ -521,29 +551,47 @@ class _MyAccountState extends State<MyAccount> {
                                 Text(
                                   '${edu.collegeMasterName}\n${edu.passingYear}',
                                   style: TextStyle(
-                                    fontSize: 13 * fontScale,
-                                    color: Colors.grey[600],
+                                    fontSize: 14 * fontScale,
+                                    color: const Color(0xFF003840),
                                     height: 1.4,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.delete_outline,
-                              color: Colors.red,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                educationDetails.remove(edu);
-                              });
-                            },
-                          ),
+
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    context: innerContext,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.white,
+                                    builder: (_) => EditEducationBottomSheet(
+                                      initialData: edu,
+                                      onSave: (data) {
+                                        setState(() {
+                                          final index = educationDetails.indexOf(edu);
+                                          educationDetails[index] = data['educationDetail'];
+                                        });
+                                        Navigator.pop(innerContext);
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                onPressed: () {
+                                  setState(() {
+                                    educationDetails.remove(edu);
+                                  });
+                                },
+                              ),
                         ],
                       ),
                     );
-                  })
+                  }).toList()
                 else
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
@@ -551,10 +599,11 @@ class _MyAccountState extends State<MyAccount> {
                       "No education details found.",
                       style: TextStyle(
                         fontSize: 14 * fontScale,
-                        color: Colors.grey[600],
+                        color: const Color(0xFF003840),
                       ),
                     ),
                   ),
+
 
                 //education end
                 //resume
@@ -622,38 +671,37 @@ class _MyAccountState extends State<MyAccount> {
                 // skills
                 _buildSectionHeader(
                   "Skills",
-                  showEdit: skills.isNotEmpty,
+                  showEdit: skillList.isNotEmpty,
                   onEdit: () {
                     showModalBottomSheet(
                       context: innerContext,
                       isScrollControlled: true,
                       builder: (_) => EditSkillsBottomSheet(
-                        initialSkills: skills,
+                        initialSkills: skillList,
                         onSave: (updatedSkills) {
-                          setState(() => skills = updatedSkills);
-                          // _saveData();
+                          setState(() => skillList = updatedSkills);
                           Navigator.pop(innerContext);
                         },
                       ),
                     );
                   },
-                  showAdd: skills.isEmpty,
+                  showAdd: skillList.isEmpty,
                   onAdd: () {
                     showModalBottomSheet(
                       context: innerContext,
                       isScrollControlled: true,
                       builder: (_) => EditSkillsBottomSheet(
-                        initialSkills: skills,
+                        initialSkills: skillList,
                         onSave: (updatedSkills) {
-                          setState(() => skills = updatedSkills);
-                          // _saveData();
+                          setState(() => skillList = updatedSkills);
                           Navigator.pop(innerContext);
                         },
                       ),
                     );
                   },
                 ),
-                if (skills.isNotEmpty)
+
+                if (skillList.isNotEmpty)
                   Container(
                     padding: EdgeInsets.all(12 * sizeScale),
                     margin: const EdgeInsets.only(top: 8),
@@ -664,23 +712,39 @@ class _MyAccountState extends State<MyAccount> {
                     child: Wrap(
                       spacing: 8 * sizeScale,
                       runSpacing: 8 * sizeScale,
-                      children: skills.map((skill) {
-                        return Chip(
+                      children: skillList.expand((skill) {
+                        return skill.skills
+                            .split(',')
+                            .map((s) => s.trim())
+                            .where((s) => s.isNotEmpty)
+                            .map((singleSkill) => Chip(
                           label: Text(
-                            skill,
+                            singleSkill,
                             style: TextStyle(fontSize: 14 * fontScale),
                           ),
                           onDeleted: () {
-                            setState(() => skills.remove(skill));
-                            // _saveData();
+                            setState(() {
+                              final updatedSkills = skill.skills
+                                  .split(',')
+                                  .map((s) => s.trim())
+                                  .where((s) => s != singleSkill)
+                                  .toList();
+                              if (updatedSkills.isEmpty) {
+                                skillList.remove(skill);
+                              } else {
+                                skill.skills = updatedSkills.join(',');
+                              }
+                            });
                           },
                           deleteIconColor: const Color(0xFF005E6A),
                           backgroundColor: const Color(0xFFEBF6F7),
                           labelStyle: const TextStyle(color: Color(0xFF003840)),
-                        );
+                        ));
                       }).toList(),
                     ),
                   ),
+
+
                 const SizedBox(height: 20),
 
                 //skills end
@@ -1128,6 +1192,7 @@ class _MyAccountState extends State<MyAccount> {
 
                 //work experience ended
                 //languages begin
+
                 const SizedBox(height: 20),
                 _buildSectionHeader(
                   "Languages",
@@ -1139,22 +1204,17 @@ class _MyAccountState extends State<MyAccount> {
                       backgroundColor: Colors.white,
                       builder: (_) => LanguageBottomSheet(
                         initialData: null,
-                        language: '',
-                        onSave: (data) {
+                        onSave: (LanguagesModel data) {
                           setState(() {
-                            languages.add({
-                              'Language': data['Language'],
-                              'language': data['language'],
-                              'proficiency': data['proficiency'],
-                            });
+                            languageList.add(data);
                           });
-                          // _saveData();
                         },
                       ),
                     );
                   },
+
                 ),
-                for (var i = 0; i < languages.length; i++)
+                for (var i = 0; i < languageList.length; i++)
                   Container(
                     width: double.infinity,
                     padding: EdgeInsets.all(14 * sizeScale),
@@ -1184,7 +1244,7 @@ class _MyAccountState extends State<MyAccount> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                languages[i]['language'] ?? 'Language',
+                                languageList[i].languageName,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14 * fontScale,
@@ -1193,7 +1253,7 @@ class _MyAccountState extends State<MyAccount> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                languages[i]['proficiency'] ?? 'Proficiency',
+                                languageList[i].proficiency,
                                 style: TextStyle(
                                   fontSize: 12 * fontScale,
                                   color: Colors.black54,
@@ -1213,21 +1273,16 @@ class _MyAccountState extends State<MyAccount> {
                               isScrollControlled: true,
                               backgroundColor: Colors.white,
                               builder: (_) => LanguageBottomSheet(
-                                initialData: languages[i]['Language'],
-                                language: languages[i]['language'] ?? '',
-                                onSave: (data) {
+                                initialData: languageList[i],
+                                onSave: (LanguagesModel data) {
                                   setState(() {
-                                    languages[i] = {
-                                      'Language': data['Language'],
-                                      'language': data['language'],
-                                      'proficiency': data['proficiency'],
-                                    };
+                                    languageList[i] = data;
                                   });
-                                  // _saveData();
                                 },
                               ),
                             );
                           },
+
                         ),
                         IconButton(
                           icon: const Icon(
@@ -1236,15 +1291,17 @@ class _MyAccountState extends State<MyAccount> {
                           ),
                           onPressed: () {
                             setState(() {
-                              languages.removeAt(i);
+                              languageList.removeAt(i);
                             });
-                            // _saveData();
                           },
                         ),
                       ],
                     ),
                   ),
+
                 const SizedBox(height: 20),
+
+
                 //Languages end here
               ],
             ),

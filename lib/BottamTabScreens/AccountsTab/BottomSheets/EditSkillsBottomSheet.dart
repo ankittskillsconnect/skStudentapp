@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../Model/Skiils_Model.dart';
 
 class EditSkillsBottomSheet extends StatefulWidget {
-  final List<String> initialSkills;
-  final Function(List<String>) onSave;
+  final List<SkillsModel> initialSkills;
+  final Function(List<SkillsModel>) onSave;
 
   const EditSkillsBottomSheet({
     super.key,
@@ -15,7 +16,7 @@ class EditSkillsBottomSheet extends StatefulWidget {
 }
 
 class _EditSkillsBottomSheetState extends State<EditSkillsBottomSheet> {
-  late List<String> skills;
+  late List<SkillsModel> skills;
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
@@ -27,9 +28,10 @@ class _EditSkillsBottomSheetState extends State<EditSkillsBottomSheet> {
 
   void _addSkill() {
     final text = _controller.text.trim();
-    if (text.isNotEmpty && !skills.contains(text)) {
+    if (text.isNotEmpty &&
+        !skills.any((skill) => skill.skills.toLowerCase() == text.toLowerCase())) {
       setState(() {
-        skills.add(text);
+        skills.add(SkillsModel(skills: text));
         _controller.clear();
       });
     }
@@ -90,7 +92,7 @@ class _EditSkillsBottomSheetState extends State<EditSkillsBottomSheet> {
                           runSpacing: 8,
                           children: skills.map((skill) {
                             return Chip(
-                              label: Text(skill),
+                              label: Text(skill.skills),
                               deleteIcon: const Icon(Icons.close, size: 18),
                               onDeleted: () => setState(() => skills.remove(skill)),
                             );
@@ -130,7 +132,6 @@ class _EditSkillsBottomSheetState extends State<EditSkillsBottomSheet> {
                 ElevatedButton(
                   onPressed: () {
                     widget.onSave(skills);
-                    // Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF005E6A),
@@ -141,7 +142,7 @@ class _EditSkillsBottomSheetState extends State<EditSkillsBottomSheet> {
                   ),
                   child: const Text("Save", style: TextStyle(color: Colors.white)),
                 ),
-                SizedBox(height: 20,)
+                const SizedBox(height: 20),
               ],
             ),
           );
