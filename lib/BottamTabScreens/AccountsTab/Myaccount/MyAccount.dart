@@ -6,9 +6,11 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditWo
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/Myaccount/MyAccountAppbar.dart';
 import 'package:sk_loginscreen1/Model/CertificateDetails_Model.dart';
 import 'package:sk_loginscreen1/Model/Internship_Projects_Model.dart';
+import 'package:sk_loginscreen1/Model/PersonalDetail_Model.dart';
 import 'package:sk_loginscreen1/Model/Skiils_Model.dart';
 import 'package:sk_loginscreen1/Model/WorkExperience_Model.dart';
 import 'package:sk_loginscreen1/Utilities/MyAccount_Get_Post/Get/InternshipProject_Api.dart';
+import 'package:sk_loginscreen1/Utilities/MyAccount_Get_Post/Get/PersonalDetail_Api.dart';
 import 'package:sk_loginscreen1/Utilities/MyAccount_Get_Post/Get/WorkExperience_Api.dart';
 import '../../../Model/EducationDetail_Model.dart';
 import '../../../Model/Languages_Model.dart';
@@ -33,15 +35,15 @@ class MyAccount extends StatefulWidget {
 
 class _MyAccountState extends State<MyAccount> {
   String fullname = "John";
-  String dob = "16, May 2004";
-  String phone = "9892552373";
-  String whatsapp = "9892552373";
-  String email = "akhilesh.skillsconnect@gmail.com";
-  String state = "Maharashtra";
-  String city = "Mumbai";
-  String country = "India";
-
+  // String dob = "16, May 2004";
+  // String phone = "9892552373";
+  // String whatsapp = "9892552373";
+  // String email = "akhilesh.skillsconnect@gmail.com";
+  // String state = "Maharashtra";
+  // String city = "Mumbai";
+  // String country = "India";
   EducationDetailModel? educationDetail;
+  PersonalDetailModel? personalDetail;
 
   // String degreeType = "Undergrad";
   // String courseName = "Bsc IT";
@@ -58,12 +60,14 @@ class _MyAccountState extends State<MyAccount> {
   List<WorkExperienceModel> workExperiences = [];
   List<LanguagesModel> languageList = [];
   List<EducationDetailModel> educationDetails = [];
+  List<PersonalDetailModel> personalDetails = [];
   bool isLoadingEducation = true;
   bool isLoadingProject = true;
   bool isLoadingWorkExperience = true;
   bool isLoadingCertificate = true;
   bool isLoadingSkills = true;
   bool isLoadingLanguages = true;
+  bool isLoadingPersonalDetail = true;
   File? _profileImage;
 
   @override
@@ -75,6 +79,7 @@ class _MyAccountState extends State<MyAccount> {
     fetchCertificateDetails();
     fetchSkills();
     fetchLanguageData();
+    _fetchPersonalDetails();
     // projects.add({
     //   'projectDetail': null,
     //   'projectName': 'Project A',
@@ -213,10 +218,10 @@ class _MyAccountState extends State<MyAccount> {
     final connectSid = prefs.getString('connectSid') ?? '';
     try {
       final internshipProjectApi =
-          await InternshipProjectApi.fetchInternshipProjects(
-            authToken: authToken,
-            connectSid: connectSid,
-          );
+      await InternshipProjectApi.fetchInternshipProjects(
+        authToken: authToken,
+        connectSid: connectSid,
+      );
       setState(() {
         projects = internshipProjectApi;
         isLoadingProject = false;
@@ -229,6 +234,36 @@ class _MyAccountState extends State<MyAccount> {
       });
     }
   }
+
+
+  Future<void> _fetchPersonalDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('authToken') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
+
+    try {
+      final results = await PersonalDetailApi.fetchPersonalDetails(
+        authToken: authToken,
+        connectSid: connectSid,
+      );
+
+      setState(() {
+        if (results.isNotEmpty) {
+          personalDetail = results.first as PersonalDetailModel?;
+        } else {
+          personalDetail = null;
+        }
+        isLoadingPersonalDetail = false;
+        print('✅ Fetched personal detail');
+      });
+    } catch (e) {
+      print('❌ Personal details fetch error: $e');
+      setState(() {
+        isLoadingPersonalDetail = false;
+      });
+    }
+  }
+
 
   Future<void> fetchWorkExperienceDetails() async {
     final prefs = await SharedPreferences.getInstance();
@@ -311,7 +346,7 @@ class _MyAccountState extends State<MyAccount> {
     }
   }
 
-  void fetchLanguageData() async {
+  Future <void> fetchLanguageData() async {
     final prefs = await SharedPreferences.getInstance();
     final authToken = prefs.getString('authToken') ?? '';
     final connectSid = prefs.getString('connectSid') ?? '';
@@ -418,62 +453,51 @@ class _MyAccountState extends State<MyAccount> {
                 const SizedBox(height: 25),
                 _buildSectionHeader(
                   "Personal Details",
-                  showEdit: true,
+                  showEdit: personalDetail != null,
                   onEdit: () {
                     showModalBottomSheet(
                       context: innerContext,
                       isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: Colors.white,
                       builder: (_) => EditPersonalDetailsSheet(
-                        fullname: fullname,
-                        dob: dob,
-                        phone: phone,
-                        whatsapp: whatsapp,
-                        email: email,
-                        state: state,
-                        city: city,
-                        country: country,
+                        initialData: personalDetail,
                         onSave: (updatedData) {
                           setState(() {
-                            fullname = updatedData['fullname'] ?? fullname;
-                            dob = updatedData['dob'] ?? dob;
-                            phone = updatedData['phone'] ?? phone;
-                            whatsapp = updatedData['whatsapp'] ?? whatsapp;
-                            email = updatedData['email'] ?? email;
-                            state = updatedData['state'] ?? state;
-                            city = updatedData['city'] ?? city;
-                            country = updatedData['country'] ?? country;
+                            personalDetail = updatedData;
                           });
-                          // _saveData();
                           Navigator.pop(innerContext);
                         },
                       ),
                     );
                   },
                 ),
-                _buildCardBody(
+                isLoadingPersonalDetail
+                    ? const Center(child: CircularProgressIndicator())
+                    : personalDetail == null
+                    ? const Text('No personal details available.')
+                    : _buildCardBody(
                   children: [
                     _DetailRow(
                       icon: Icons.perm_identity_outlined,
-                      text: fullname,
+                      text: '${personalDetail!.firstName} ${personalDetail!.lastName}',
                     ),
-                    _DetailRow(icon: Icons.cake_outlined, text: dob),
-                    _DetailRow(icon: Icons.phone_outlined, text: phone),
-                    _DetailRow(icon: Icons.message_outlined, text: whatsapp),
+                    _DetailRow(icon: Icons.cake_outlined, text: personalDetail!.dateOfBirth),
+                    _DetailRow(icon: Icons.phone_outlined, text: personalDetail!.mobile),
+                    _DetailRow(icon: Icons.message_outlined, text: personalDetail!.whatsAppNumber),
                     _DetailRow(
                       icon: Icons.location_on_outlined,
-                      text: state.isEmpty ? 'Not provided' : '$state , $city',
+                      text: personalDetail!.state.isEmpty
+                          ? 'Not provided'
+                          : '${personalDetail!.state}, ${personalDetail!.city}',
                     ),
-                    // _DetailRow(
-                    //   icon: Icons.location_on_outlined,
-                    //   text: city.isEmpty ? 'Not provided' : city,
-                    // ),
                     _DetailRow(
                       icon: Icons.mark_email_read_outlined,
-                      text: email,
+                      text: personalDetail!.email,
                     ),
                   ],
                 ),
+
+
 
                 //education from here
                 const SizedBox(height: 20),
@@ -541,13 +565,13 @@ class _MyAccountState extends State<MyAccount> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${edu.courseName} | ${edu.specializationName} \nCGPA - ${edu.marks}',
+                                  '${edu.courseName} \n${edu.specializationName} \nCGPA - ${edu.marks}',
                                   style: TextStyle(
                                     fontSize: 14 * fontScale,
                                     color: const Color(0xFF003840),
                                   ),
                                 ),
-                                const SizedBox(height: 2),
+
                                 Text(
                                   '${edu.collegeMasterName}\n${edu.passingYear}',
                                   style: TextStyle(
@@ -604,7 +628,6 @@ class _MyAccountState extends State<MyAccount> {
                     ),
                   ),
 
-
                 //education end
                 //resume
                 const SizedBox(height: 20),
@@ -639,6 +662,7 @@ class _MyAccountState extends State<MyAccount> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
@@ -1212,7 +1236,6 @@ class _MyAccountState extends State<MyAccount> {
                       ),
                     );
                   },
-
                 ),
                 for (var i = 0; i < languageList.length; i++)
                   Container(

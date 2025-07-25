@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Model/Languages_Model.dart';
-import '../../../Utilities/MyAccount_Get_Post/Get/LanguagesGet_Api.dart';
+import '../../../Utilities/Language_Api.dart';
 
 class LanguageBottomSheet extends StatefulWidget {
   final LanguagesModel? initialData;
@@ -22,9 +22,13 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
   late String selectedLanguage;
   late String selectedProficiency;
   bool isLoading = true;
-  List<LanguagesModel> allLanguages = [];
+  List<String> allLanguages = [];
 
-  final List<String> _proficiencyLevels = ['Basic', 'Intermediate', 'Advanced'];
+  final List<String> _proficiencyLevels = [
+    'Basic',
+    'Native/Bilingual',
+    'Conversational'
+  ];
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -32,8 +36,10 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
   @override
   void initState() {
     super.initState();
+
     selectedLanguage = widget.initialData?.languageName ?? '';
-    selectedProficiency = widget.initialData?.proficiency ?? _proficiencyLevels[0];
+    selectedProficiency =
+        widget.initialData?.proficiency ?? _proficiencyLevels[0];
 
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
@@ -43,45 +49,31 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
       CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
 
-    _fetchLanguages();
+    _loadLanguagesFromApi();
   }
 
-  Future<void> _fetchLanguages() async {
+  void _loadLanguagesFromApi() async {
     final prefs = await SharedPreferences.getInstance();
     final authToken = prefs.getString('authToken') ?? '';
-    String connectSid = prefs.getString('connectSid') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
 
-    if (connectSid.isEmpty) {
-      connectSid =
-      's%3A90I8VK0ssLCW9DjFq4xSLrkDEI7xUgCG.JFNw9cZG8Txw07rqZ6gs7K8bGpm4pMApT7Yu9FqqjbY';
-    }
+    final languages = await LanguageListApi.fetchLanguages(
+      authToken: authToken,
+      connectSid: connectSid,
+    );
 
-    try {
-      final fetched = await LanguageDetailApi.fetchLanguages(
-        authToken: authToken,
-        connectSid: connectSid,
-      );
-
-      setState(() {
-        allLanguages = fetched;
-        if (allLanguages.isNotEmpty && !allLanguages.any((e) => e.languageName == selectedLanguage)) {
-          selectedLanguage = allLanguages[0].languageName;
+    setState(() {
+      allLanguages = languages;
+      if (allLanguages.isNotEmpty) {
+        final isInitialValid = allLanguages.contains(selectedLanguage);
+        if (!isInitialValid) {
+          selectedLanguage = allLanguages[0];
         }
-        isLoading = false;
-      });
-
-      _animationController.forward();
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-        allLanguages = [];
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading languages: $e')),
-        );
       }
-    }
+      isLoading = false;
+    });
+
+    _animationController.forward();
   }
 
   @override
@@ -210,10 +202,9 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
   }
 
   Widget _buildLanguageDropdown() {
-    final languageNames = allLanguages.map((e) => e.languageName).toList();
     return _buildDropdownField(
       value: selectedLanguage,
-      items: languageNames,
+      items: allLanguages,
       onChanged: (val) => setState(() => selectedLanguage = val ?? ''),
     );
   }
@@ -235,20 +226,16 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: DropdownButtonFormField<String>(
         value: items.contains(value) ? value : null,
-        items: items
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-            .toList(),
-        onChanged: isLoading ? null : onChanged,
-        decoration: InputDecoration(
-          hintText: 'Please select',
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          filled: true,
-          fillColor: Colors.white,
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
         ),
-        dropdownColor: Colors.white,
-        menuMaxHeight: 250,
-        borderRadius: BorderRadius.circular(20),
+        items: items.toSet().map((item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(item),
+          );
+        }).toList(),
+        onChanged: onChanged,
       ),
     );
   }

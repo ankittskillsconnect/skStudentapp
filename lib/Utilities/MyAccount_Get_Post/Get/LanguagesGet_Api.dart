@@ -21,37 +21,30 @@ class LanguageDetailApi {
 
       if (streamedResponse.statusCode == 200) {
         final responseBody = await streamedResponse.stream.bytesToString();
-        print("🔵 Raw Language API response: $responseBody");
-
         final jsonData = json.decode(responseBody);
-        print("🟢 Decoded JSON: $jsonData");
-        print("🔍 Type of decoded JSON: ${jsonData.runtimeType}");
 
         if (jsonData is Map) {
-          print("🧩 Available keys in JSON: ${jsonData.keys}");
-
-          // Check for correct list key: 'data' or 'languages'
           if (jsonData.containsKey('languages') && jsonData['languages'] is List) {
             final langList = jsonData['languages'] as List;
-            print("✅ Languages list found with ${langList.length} items");
-            print("▶️ First language item: ${langList.isNotEmpty ? langList[0] : 'Empty'}");
+            print(" Languages list found with ${langList.length} items");
+            print(" First language item: ${langList.isNotEmpty ? langList[0] : 'Empty'}");
 
             return langList
                 .map((jsonItem) => LanguagesModel.fromJson(jsonItem))
                 .toList();
           } else if (jsonData.containsKey('data') && jsonData['data'] is List) {
             final langList = jsonData['data'] as List;
-            print("✅ 'data' list found with ${langList.length} items");
-            print("▶️ First item: ${langList.isNotEmpty ? langList[0] : 'Empty'}");
+            print(" 'data' list found with ${langList.length} items");
+            print(" First item: ${langList.isNotEmpty ? langList[0] : 'Empty'}");
 
             return langList
                 .map((jsonItem) => LanguagesModel.fromJson(jsonItem))
                 .toList();
           } else {
-            throw Exception("❌ Neither 'languages' nor 'data' key present or not a list");
+            throw Exception(" Neither 'languages' nor 'data' key present or not a list");
           }
         } else {
-          throw Exception("❌ JSON is not a Map");
+          throw Exception(" JSON is not a Map");
         }
       } else {
         throw Exception(
@@ -59,7 +52,7 @@ class LanguageDetailApi {
         );
       }
     } catch (e) {
-      print('🚨 Language fetch error: $e');
+      print(' Language fetch error: $e');
       return [];
     }
   }
