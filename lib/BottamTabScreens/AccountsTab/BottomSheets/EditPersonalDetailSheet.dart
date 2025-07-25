@@ -247,7 +247,8 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
                 _buildLabel("Email"),
                 _buildTextField("Enter Email", emailController),
                 _buildLabel("State"),
-                _buildDropdown(states, selectedState, (val) async {
+                _buildDropdown(
+                    states, selectedState, (val) async {
                   setState(() {
                     selectedState = val!;
                     selectedCity = '';
@@ -276,7 +277,6 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
                       );
                       return;
                     }
-
                     final updatedData = PersonalDetailModel(
                       firstName: firstNameController.text,
                       lastName: lastNameController.text,
@@ -288,7 +288,6 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
                       city: selectedCity,
                     );
                     widget.onSave(updatedData);
-
                     if (context.mounted) {
                       context.read<ProfileBloc>().add(LoadProfileData());
                     }

@@ -31,7 +31,7 @@ class _PasswordFieldState extends State<PasswordField> {
           },
         ),
         filled: true,
-        fillColor: Colors.grey[200],
+        fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: const BorderSide(color: Color(0xFF003840)),

@@ -154,16 +154,16 @@ class _LoginpageState extends State<Loginpage> {
               child: SafeArea(
                 child: Stack(
                   children: [
-                    Positioned(
-                      top: 0,
-                      left: screenWidth * 0.5,
-                      child: SvgPicture.asset(
-                        'assets/design.svg',
-                        height: screenHeight * 0.25,
-                        width: screenWidth * 0.5,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                    // Positioned(
+                    //   top: 0,
+                    //   left: screenWidth * 0.5,
+                    //   child: SvgPicture.asset(
+                    //     'assets/design.svg',
+                    //     height: screenHeight * 0.25,
+                    //     width: screenWidth * 0.5,
+                    //     fit: BoxFit.cover,
+                    //   ),
+                    // ),
                     Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -171,8 +171,8 @@ class _LoginpageState extends State<Loginpage> {
                           SizedBox(height: screenHeight * 0.025),
                           SvgPicture.asset(
                             "assets/Logo.svg",
-                            width: screenWidth * 0.5,
-                            height: screenHeight * 0.08,
+                            width: screenWidth * 0.8,
+                            height: screenHeight * 0.09,
                           ),
                         ],
                       ),
@@ -211,7 +211,7 @@ class _LoginpageState extends State<Loginpage> {
                           hintText: "example@gmail.com",
                           prefixIcon: const Icon(Icons.email_outlined),
                           filled: true,
-                          fillColor: Colors.grey[200],
+                          fillColor: Colors.white,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
                             borderSide: const BorderSide(color: Color(0xFF003840)),
@@ -234,7 +234,7 @@ class _LoginpageState extends State<Loginpage> {
                           ),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.02),
+                      SizedBox(height: screenHeight * 0.01),
                       SizedBox(
                         width: double.infinity,
                         height: screenHeight * 0.06,
