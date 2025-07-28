@@ -134,15 +134,14 @@ class _LoginpageState extends State<Loginpage> {
     final mq = MediaQuery.of(context);
     final screenWidth = mq.size.width;
     final screenHeight = mq.size.height;
-
     return BlocListener<NavigationBloc, NavigationState>(
       listener: (context, state) {
-        if (state is NavigatetoForgotPassword) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const ForgotpasswordPage()),
-          );
-        }
+        // if (state is NavigatetoForgotPassword) {
+        //   Navigator.push(
+        //     context,
+        //     MaterialPageRoute(builder: (_) => const ForgotpasswordPage()),
+        //   );
+        // }
       },
       child: Scaffold(
         backgroundColor: const Color(0xFF003840),
@@ -227,6 +226,10 @@ class _LoginpageState extends State<Loginpage> {
                         child: TextButton(
                           onPressed: () {
                             context.read<NavigationBloc>().add(GoToForgotPassword());
+                            // Navigator.push(
+                            //             context,
+                            //             MaterialPageRoute(builder: (_) => const ForgotpasswordPage()),
+                            //           );
                           },
                           child: const Text(
                             "Forgot password?",
@@ -234,31 +237,44 @@ class _LoginpageState extends State<Loginpage> {
                           ),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.01),
-                      SizedBox(
-                        width: double.infinity,
-                        height: screenHeight * 0.06,
-                        child: ElevatedButton.icon(
-                          onPressed: _isLoading ? null : _login,
-                          icon: _isLoading
-                              ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
+                      // SizedBox(height: screenHeight * 0.01),
+                      Center(
+                        child: SizedBox(
+                          width: screenWidth * 0.4,
+                          height: screenHeight * 0.05,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _login,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.teal,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
                             ),
-                          )
-                              : const Icon(Icons.arrow_forward, color: Colors.white),
-                          label: const Text("Log In", style: TextStyle(color: Colors.white)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.teal,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  "Login",
+                                  style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.05 ),
+                                ),
+                                const SizedBox(width: 8),
+                                _isLoading
+                                    ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                                    :  Icon(Icons.arrow_forward, color: Colors.white , size: screenWidth * 0.05),
+                              ],
                             ),
                           ),
                         ),
                       ),
+
                       SizedBox(height: screenHeight * 0.02),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

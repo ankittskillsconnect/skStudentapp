@@ -38,34 +38,38 @@ class CustomBottomNavBar extends StatelessWidget {
           currentIndex = 0;
         }
 
-        return Container(
-          height: navBarHeight,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            border: Border(
-              top: BorderSide(color: Color(0xFFE0E0E0), width: 0.5),
+        return SafeArea(
+          top: false,
+          child: Container(
+            height: navBarHeight,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                top: BorderSide(color: Color(0xFFE0E0E0), width: 0.5),
+              ),
+            ),
+            child: Row(
+              children: [
+                _buildNavItem(context, currentIndex, 0, Icons.home_outlined, 'Home', () {
+                  context.read<NavigationBloc>().add(GotoHomeScreen2());
+                }, iconSize, textSize, isFirst: true),
+                _buildNavItem(context, currentIndex, 1, Icons.work_outline_rounded, 'Jobs', () {
+                  context.read<NavigationBloc>().add(GotoJobScreen2());
+                }, iconSize, textSize),
+                _buildNavItem(context, currentIndex, 2, Icons.airplay_outlined, 'Interview', () {
+                  context.read<NavigationBloc>().add(GoToInterviewScreen2());
+                }, iconSize, textSize),
+                _buildNavItem(context, currentIndex, 3, Icons.contacts_outlined, 'Contacts', () {
+                  context.read<NavigationBloc>().add(GoToContactsScreen2());
+                }, iconSize, textSize),
+                _buildNavItem(context, currentIndex, 4, Icons.account_circle_outlined, 'Account', () {
+                  context.read<NavigationBloc>().add(GoToAccountScreen2());
+                }, iconSize, textSize, isLast: true),
+              ],
             ),
           ),
-          child: Row(
-            children: [
-              _buildNavItem(context, currentIndex, 0, Icons.home_outlined, 'Home', () {
-                context.read<NavigationBloc>().add(GotoHomeScreen2());
-              }, iconSize, textSize, isFirst: true),
-              _buildNavItem(context, currentIndex, 1, Icons.work_outline_rounded, 'Jobs', () {
-                context.read<NavigationBloc>().add(GotoJobScreen2());
-              }, iconSize, textSize),
-              _buildNavItem(context, currentIndex, 2, Icons.airplay_outlined, 'Interview', () {
-                context.read<NavigationBloc>().add(GoToInterviewScreen2());
-              }, iconSize, textSize),
-              _buildNavItem(context, currentIndex, 3, Icons.contacts_outlined, 'Contacts', () {
-                context.read<NavigationBloc>().add(GoToContactsScreen2());
-              }, iconSize, textSize),
-              _buildNavItem(context, currentIndex, 4, Icons.account_circle_outlined, 'Account', () {
-                context.read<NavigationBloc>().add(GoToAccountScreen2());
-              }, iconSize, textSize, isLast: true),
-            ],
-          ),
         );
+
       },
     );
   }
@@ -83,7 +87,6 @@ class CustomBottomNavBar extends StatelessWidget {
         bool isLast = false,
       }) {
     final isSelected = currentIndex == itemIndex;
-
     return Expanded(
       child: GestureDetector(
         onTap: onTap,

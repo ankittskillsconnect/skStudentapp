@@ -80,7 +80,7 @@ class _MainAppState extends State<MainApp> {
     if (_isLoggedIn) {
       context.read<NavigationBloc>().add(GotoHomeScreen2());
     } else {
-      context.read<NavigationBloc>().add(GobackToLoginPage());
+      context.read<NavigationBloc>().add(SplashToLogin());
     }
   }
 
@@ -88,14 +88,15 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return BlocListener<NavigationBloc, NavigationState>(
       listener: (context, state) {
-        if (state is NavigatetoForgotPassword) {
+        if (state is NavigateToLoginPage || state is NavigateBacktoLoginin) {
+          Navigator.popUntil(context, (route) => route.isFirst);
+        } else if (state is NavigatetoForgotPassword) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const ForgotpasswordPage()),
-          );
-        } else if (state is NavigateToLoginPage ||
-            state is NavigateBacktoLoginin) {
-          Navigator.popUntil(context, (route) => route.isFirst);
+          ).then((_) {
+            context.read<NavigationBloc>().add(GobackToLoginPage());
+          });
         } else if (state is NavigateToMyAccount) {
           Navigator.push(
             context,
@@ -105,6 +106,7 @@ class _MainAppState extends State<MainApp> {
           });
         }
       },
+
       child: BlocBuilder<NavigationBloc, NavigationState>(
         builder: (context, state) {
           if (_showSplashScreen) return const SplashScreen();

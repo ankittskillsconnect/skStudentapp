@@ -28,7 +28,8 @@ class _SplashPageFileState extends State<SplashPageFile> {
     if (!mounted) return;
     if (token != null && token.isNotEmpty) {
       context.read<NavigationBloc>().add(GotoHomeScreen2());
-    } else {
+    }
+    else {
       context.read<NavigationBloc>().add(SplashToLogin());
     }
   }

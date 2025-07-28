@@ -43,6 +43,7 @@ class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
     on<GoToForgotPassword>((event, emit) {
       print('Handling GoToForgotPassword');
       emit(const NavigatetoForgotPassword());
+      // emit(NavigationIdle());
     });
     on<SplashToLogin>((event, emit) {
       print('Handling SplashToLogin');

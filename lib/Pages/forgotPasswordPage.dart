@@ -29,10 +29,11 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
 
   Future<void> _handleSendOtp() async {
     final email = emailController.text.trim();
-
     if (email.isEmpty || !email.contains('@')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Enter a valid email address")),
+        const SnackBar(content: Text("Enter a valid email address"),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
@@ -46,7 +47,7 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(result['message'])));
+      ).showSnackBar(SnackBar(content: Text(result['message']), backgroundColor: Colors.red,));
 
       if (result['success']) {
         _showOtpBottomSheet();
@@ -55,7 +56,7 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      ).showSnackBar(SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red,));
     }
   }
 
@@ -66,7 +67,7 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
     if (otp.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Enter the OTP")));
+      ).showSnackBar(const SnackBar(content: Text("Enter the OTP"), backgroundColor: Colors.red,));
       return;
     }
 
@@ -75,7 +76,7 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
     if (result["success"]) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(result["message"])));
+      ).showSnackBar(SnackBar(content: Text(result["message"]),backgroundColor: Colors.red,));
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -85,7 +86,7 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
     } else {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(result["message"])));
+      ).showSnackBar(SnackBar(content: Text(result["message"]),backgroundColor: Colors.red,));
     }
   }
 
@@ -192,7 +193,10 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return WillPopScope(
       onWillPop: () async {
         _goBack();
@@ -202,32 +206,21 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
         resizeToAvoidBottomInset: true,
         backgroundColor: const Color(0xFF003840),
         body: Column(
-          children:[
+          children: [
             Expanded(
               flex: 2,
               child: SafeArea(
                 child: Stack(
                   children: [
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      left: 200,
-                      child: SvgPicture.asset(
-                        'assets/design.svg',
-                        height: 200,
-                        width: 250,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
                     Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const SizedBox(height: 20),
+                          SizedBox(height: screenHeight * 0.02),
                           SvgPicture.asset(
                             "assets/Logo.svg",
-                            width: 193,
-                            height: 64,
+                            width: screenWidth * 0.8,
+                            height: screenHeight * 0.09,
                           ),
                         ],
                       ),
@@ -261,35 +254,42 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Center(
+                              Center(
                                 child: Text(
                                   "Reset Password?",
                                   style: TextStyle(
-                                    fontSize: 25,
+                                    fontSize: screenWidth * 0.06,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 10),
-                              const Center(
+                              SizedBox(height: screenHeight * 0.01),
+                              Center(
                                 child: Text(
                                   "Please provide an email to receive password reset instructions.",
                                   textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.035,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 60),
-                              const Text("Enter your email address"),
-                              const SizedBox(height: 8),
+                              SizedBox(height: screenHeight * 0.03),
+                              Text(
+                                "Enter your email address",
+                                style: TextStyle(
+                                  fontSize: screenWidth * 0.04,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              SizedBox(height: screenHeight * 0.01),
                               TextField(
                                 controller: emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
                                   hintText: "example@gmail.com",
-                                  prefixIcon: const Icon(
-                                    Icons.mail_outline_outlined,
-                                  ),
+                                  prefixIcon: const Icon(Icons.mail_outline_outlined),
                                   filled: true,
-                                  fillColor: Colors.grey[200],
+                                  fillColor: Colors.white,
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(30),
                                     borderSide: const BorderSide(
@@ -298,46 +298,60 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 25),
-                              SizedBox(
-                                width: double.infinity,
-                                height: 50,
-                                child: ElevatedButton.icon(
-                                  onPressed: _isLoading ? null : _handleSendOtp,
-                                  icon: _isLoading
-                                      ? const SizedBox(
-                                          width: 18,
-                                          height: 18,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
+                              SizedBox(height: screenHeight * 0.03),
+                              Center(
+                                child: SizedBox(
+                                  width: screenWidth * 0.4,
+                                  height: screenHeight * 0.05,
+                                  child: ElevatedButton(
+                                    onPressed: _isLoading ? null : _handleSendOtp,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.teal,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          "Get OTP",
+                                          style: TextStyle(
                                             color: Colors.white,
+                                            fontSize: screenWidth * 0.045,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        _isLoading
+                                            ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
                                           ),
                                         )
-                                      : const Icon(
+                                            : Icon(
                                           Icons.arrow_forward,
                                           color: Colors.white,
+                                          size: screenWidth * 0.05,
                                         ),
-                                  label: const Text(
-                                    "Get OTP",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.teal,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
+                                      ],
                                     ),
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: screenHeight * 0.015),
                               GestureDetector(
                                 onTap: _goBack,
-                                child: const Center(
+                                child: Center(
                                   child: Text(
                                     "Go Back",
                                     style: TextStyle(
                                       color: Colors.teal,
                                       fontWeight: FontWeight.bold,
+                                      fontSize: screenWidth * 0.04,
                                     ),
                                   ),
                                 ),
@@ -356,4 +370,5 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
       ),
     );
   }
+
 }

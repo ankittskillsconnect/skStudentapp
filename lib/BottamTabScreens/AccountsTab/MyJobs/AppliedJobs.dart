@@ -30,6 +30,7 @@ class _AppliedJobsPageState extends State<AppliedJobsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           "Applied Jobs",
@@ -50,7 +51,6 @@ class _AppliedJobsPageState extends State<AppliedJobsPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return  Center(child: _buildShimmerCard());
           }
-
           if (snapshot.hasError) {
             return Center(
               child: Text(
@@ -59,7 +59,6 @@ class _AppliedJobsPageState extends State<AppliedJobsPage> {
               ),
             );
           }
-
           final jobs = snapshot.data ?? [];
           if (jobs.isEmpty) {
             return const Center(

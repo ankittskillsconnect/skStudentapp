@@ -194,40 +194,45 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
                   ),
                 ),
               ),
-        bottomNavigationBar: Container(
-          padding: EdgeInsets.symmetric(
-            vertical: 12 * sizeScale,
-            horizontal: 140 * sizeScale,
+        bottomNavigationBar: SafeArea(
+          minimum: EdgeInsets.only(
+            bottom: 8 * sizeScale,
           ),
-          color: const Color(0xFFEFF8F9),
-          child: Row(
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    print(
-                      "Apply button pressed with jobToken: ${widget.jobToken}",
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF005E6A),
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 16 * sizeScale),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30 * sizeScale),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              vertical: 12 * sizeScale,
+              horizontal: 140 * sizeScale,
+            ),
+            color: const Color(0xFFEFF8F9),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      print(
+                        "Apply button pressed with jobToken: ${widget.jobToken}",
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF005E6A),
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 16 * sizeScale),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30 * sizeScale),
+                      ),
+                      elevation: 0,
                     ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    "Apply Now",
-                    style: TextStyle(
-                      fontSize: 16 * fontScale,
-                      fontWeight: FontWeight.w600,
+                    child: Text(
+                      "Apply Now",
+                      style: TextStyle(
+                        fontSize: 16 * fontScale,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

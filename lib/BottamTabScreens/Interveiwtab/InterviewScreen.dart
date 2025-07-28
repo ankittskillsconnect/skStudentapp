@@ -81,7 +81,6 @@ class _InterviewScreenState extends State<InterviewScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final scaleFactor = MediaQuery.of(context).size.width / 375;
@@ -134,7 +133,7 @@ class _InterviewScreenState extends State<InterviewScreen> {
                               onTap: _pickDateRange,
                               child: Padding(
                                 padding: EdgeInsets.symmetric(
-                                  horizontal: 11 * scaleFactor,
+                                  horizontal: 15 * scaleFactor,
                                 ),
                                 child: Row(
                                   children: [
@@ -148,9 +147,9 @@ class _InterviewScreenState extends State<InterviewScreen> {
                                       child: Text(
                                         _startDate != null && _endDate != null
                                             ? "${_startDate!.toLocal().toString().split(' ')[0]} → ${_endDate!.toLocal().toString().split(' ')[0]}"
-                                            : "Select date range",
+                                            : "Select date range" ,
                                         style: TextStyle(
-                                          fontSize: 10 * scaleFactor,
+                                          fontSize: 12 * scaleFactor,
                                           color: Colors.black,
                                         ),
                                       ),

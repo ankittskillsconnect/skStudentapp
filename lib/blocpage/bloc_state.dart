@@ -24,6 +24,7 @@ abstract class NavigationState extends Equatable {
   @override
   List<Object> get props => [];
 }
+class NavigationIdle extends NavigationState {}
 
 class initalState extends NavigationState {
   const initalState();
@@ -32,9 +33,10 @@ class initalState extends NavigationState {
 }
 
 class NavigatetoForgotPassword extends NavigationState {
+
   const NavigatetoForgotPassword();
   @override
-  List<Object> get props => ['NavigatetoForgotPassword'];
+  List<Object> get props => ['NavigatetoForgotPassword' ];
 }
 
 class NavigateBacktoLoginin extends NavigationState {

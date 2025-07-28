@@ -45,7 +45,9 @@ class _AccountScreenState extends State<AccountScreen> {
   Future<void> _logout() async {
     final loginService = loginUser();
     await loginService.clearToken();
-    context.read<NavigationBloc>().add(GobackToLoginPage());
+    if (context.mounted) {
+      context.read<NavigationBloc>().add(GobackToLoginPage());
+    }
   }
 
   @override
@@ -60,10 +62,7 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   String _calculateAge(String? dob) {
-    if (dob == null || dob.isEmpty) {
-      debugPrint('DOB is null or empty');
-      return 'N/A';
-    }
+    if (dob == null || dob.isEmpty) return 'N/A';
     try {
       final date = DateFormat('dd, MMM yyyy').parse(dob);
       final today = DateTime.now();
@@ -72,13 +71,9 @@ class _AccountScreenState extends State<AccountScreen> {
           (today.month == date.month && today.day < date.day)) {
         age--;
       }
-      if (age < 0 || age > 120) {
-        debugPrint('Invalid age calculated: $age for DOB: $dob');
-        return 'N/A';
-      }
+      if (age < 0 || age > 120) return 'N/A';
       return '$age years old';
-    } catch (e) {
-      debugPrint('Error parsing DOB: $dob, Error: $e');
+    } catch (_) {
       return 'N/A';
     }
   }
@@ -91,7 +86,7 @@ class _AccountScreenState extends State<AccountScreen> {
     final double spacing = media.height * 0.015;
 
     return BlocListener<NavigationBloc, NavigationState>(
-      listener: (context, state) {},
+      listener: (_, __) {},
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
@@ -120,9 +115,9 @@ class _AccountScreenState extends State<AccountScreen> {
                 SizedBox(height: media.height * 0.05),
                 BlocBuilder<ProfileBloc, ProfileState>(
                   builder: (context, state) {
-                    if (state is ProfileLoading) {
+                    if (state is ProfileLoading)
                       return const CircularProgressIndicator();
-                    } else if (state is ProfileDataLoaded) {
+                    if (state is ProfileDataLoaded) {
                       return Column(
                         children: [
                           Container(
@@ -168,16 +163,8 @@ class _AccountScreenState extends State<AccountScreen> {
                           ),
                         ],
                       );
-                    } else {
-                      return CircularProgressIndicator(color: Colors.teal);
-                      //   Text(
-                      //   'Unable to load profile data',
-                      //   style: TextStyle(
-                      //     fontSize: 16,
-                      //     color: Colors.red,
-                      //   ),
-                      // );
                     }
+                    return const CircularProgressIndicator(color: Colors.teal);
                   },
                 ),
                 SizedBox(height: spacing * 1.3),
@@ -190,71 +177,64 @@ class _AccountScreenState extends State<AccountScreen> {
                       itemCount: options.length,
                       itemBuilder: (context, index) {
                         final option = options[index];
-                        final isMyAccount = option["label"] == 'My Account';
-                        final interviewVideos =
-                            option["label"] == "My interview videos";
-                        final watchList = option['label'] == "Watchlist";
-                        final myJobs = option['label'] == "My Jobs";
                         return _AccountOption(
                           icon: option['icon'] as IconData,
                           label: option['label'] as String,
                           isSelected: selectedOptionIndex == index,
                           onTap: () {
-                            setState(() {
-                              selectedOptionIndex = index;
-                            });
-                            if (index == 6) {
-                              _logout();
-                            } else if (isMyAccount) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const MyAccount(),
-                                ),
-                              ).then((_) {
-                                Future.delayed(
-                                  const Duration(milliseconds: 200),
-                                  () {
-                                    if (mounted) {
-                                      context.read<ProfileBloc>().add(
-                                        LoadProfileData(),
-                                      );
-                                    }
-                                  },
-                                );
-                              });
-                            } else if (interviewVideos) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => MyInterviewVideos(),
-                                ),
-                              );
-                            } else if (watchList) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => WatchListPage(),
-                                ),
-                              );
-                            }else if (myJobs) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => AppliedJobsPage(),
-                                ),
-                              );
-                            }
+                            setState(() => selectedOptionIndex = index);
                             Future.delayed(
-                              const Duration(milliseconds: 50),
+                              const Duration(milliseconds: 100),
                               () {
-                                if (mounted) {
-                                  setState(() {
-                                    selectedOptionIndex = -1;
-                                  });
-                                }
+                                if (!mounted) return;
+                                setState(() => selectedOptionIndex = -1);
                               },
                             );
+                            switch (option['label']) {
+                              case 'Logout':
+                                _logout();
+                                break;
+                              case 'My Account':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const MyAccount(),
+                                  ),
+                                ).then((_) {
+                                  if (mounted) {
+                                    context.read<ProfileBloc>().add(
+                                      LoadProfileData(),
+                                    );
+                                  }
+                                });
+                                break;
+                              case 'My interview videos':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MyInterviewVideos(),
+                                  ),
+                                );
+                                break;
+                              case 'Watchlist':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => WatchListPage(),
+                                  ),
+                                );
+                                break;
+                              case 'My Jobs':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => AppliedJobsPage(),
+                                  ),
+                                );
+                                break;
+                              default:
+                                break;
+                            }
                           },
                         );
                       },
@@ -302,25 +282,21 @@ class _AccountOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final selectedColor = const Color(0xFF007B84);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: size.height * 0.02),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: isSelected ? selectedColor : const Color(0xFF003840),
-              size: size.width * 0.06,
-            ),
+            Icon(icon, size: size.width * 0.06),
             SizedBox(width: size.width * 0.04),
             Text(
               label,
               style: TextStyle(
                 fontSize: size.width * 0.045,
-                color: isSelected ? selectedColor : const Color(0xFF003840),
                 fontWeight: FontWeight.w500,
               ),
             ),
