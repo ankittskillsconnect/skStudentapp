@@ -5,10 +5,13 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyJobs/AppliedJobs.
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/Myaccount/MyAccount.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyInterviewVid/MyInterviewVideos.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/WatchListScreen/WatchList.dart';
+import 'package:sk_loginscreen1/Model/Image_update_Model.dart';
 import 'package:sk_loginscreen1/Pages/bottombar.dart';
+import 'package:sk_loginscreen1/Utilities/MyAccount_Get_Post/Get/AccountImageApi.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_state.dart';
+import '../../Model/AccountScrren_Image_Name_Model.dart';
 import '../../ProfileLogic/ProfileEvent.dart';
 import '../../ProfileLogic/ProfileLogic.dart';
 import '../../ProfileLogic/ProfileState.dart';
@@ -22,7 +25,9 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
+  AcountScreenImageModel? _profileData;
   int _selectedIndex = 0;
+
 
   void _onItemTapped(int index) {
     setState(() {
@@ -53,7 +58,16 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<ProfileBloc>().add(LoadProfileData());
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    final data = await AccountImageApi.fetchAccountScreenData();
+    if (mounted) {
+      setState(() {
+        _profileData = data;
+      });
+    }
   }
 
   Future<void> _onRefresh() async {
@@ -64,7 +78,7 @@ class _AccountScreenState extends State<AccountScreen> {
   String _calculateAge(String? dob) {
     if (dob == null || dob.isEmpty) return 'N/A';
     try {
-      final date = DateFormat('dd, MMM yyyy').parse(dob);
+      final date = DateFormat('yyyy-MM-dd').parse(dob);
       final today = DateTime.now();
       int age = today.year - date.year;
       if (today.month < date.month ||
@@ -77,6 +91,7 @@ class _AccountScreenState extends State<AccountScreen> {
       return 'N/A';
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -113,60 +128,54 @@ class _AccountScreenState extends State<AccountScreen> {
                   ],
                 ),
                 SizedBox(height: media.height * 0.05),
-                BlocBuilder<ProfileBloc, ProfileState>(
-                  builder: (context, state) {
-                    if (state is ProfileLoading)
-                      return const CircularProgressIndicator();
-                    if (state is ProfileDataLoaded) {
-                      return Column(
-                        children: [
-                          Container(
-                            width: profileSize,
-                            height: profileSize,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: const Color(0xFF005E6A),
-                                width: 2,
-                              ),
-                            ),
-                            child: ClipOval(
-                              child: state.profileImage != null
-                                  ? Image.file(
-                                      state.profileImage!,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : const Image(
-                                      image: AssetImage(
-                                        'assets/placeholder.jpg',
-                                      ),
-                                      fit: BoxFit.cover,
-                                    ),
-                            ),
-                          ),
-                          SizedBox(height: spacing * 1.7),
-                          Text(
-                            state.fullname,
-                            style: TextStyle(
-                              fontSize: media.width * 0.05,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF005E6A),
-                            ),
-                          ),
-                          SizedBox(height: spacing * 0.3),
-                          Text(
-                            _calculateAge(state.dob),
-                            style: TextStyle(
-                              fontSize: media.width * 0.04,
-                              color: const Color(0xFF6A8E92),
-                            ),
-                          ),
-                        ],
-                      );
-                    }
-                    return const CircularProgressIndicator(color: Colors.teal);
-                  },
+                Column(
+                  children: [
+                    Container(
+                      width: profileSize,
+                      height: profileSize,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0xFF005E6A), width: 2),
+                      ),
+                      child: ClipOval(
+                        child: _profileData?.userImage != null
+                            ? Image.network(
+                          _profileData!.userImage!,
+                          fit: BoxFit.cover,
+                        )
+                            : const Image(
+                          image: AssetImage('assets/placeholder.jpg'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // First Name + Last Name
+                    Text(
+                      '${_profileData?.firstName ?? ''} ${_profileData?.lastName ?? ''}',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF005E6A),
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // Age (DOB string as-is or calculate age)
+                    if (_profileData?.age != null)
+                      Text(
+                        _calculateAge(_profileData!.age!), // you can implement _calculateAge
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF6A8E92),
+                        ),
+                      ),
+                  ],
                 ),
+
                 SizedBox(height: spacing * 1.3),
                 Expanded(
                   child: RefreshIndicator(

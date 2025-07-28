@@ -26,6 +26,8 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditPe
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditSkillsBottomSheet.dart';
 import 'package:icons_plus/icons_plus.dart';
 
+import '../../../Model/Image_update_Model.dart';
+import '../../../Utilities/MyAccount_Get_Post/Get/Image_Api.dart';
 import 'MyaccountElements/CertificateDetails.dart';
 import 'MyaccountElements/EducationDetails.dart';
 import 'MyaccountElements/LanguageDetails.dart';
@@ -53,6 +55,8 @@ class _MyAccountState extends State<MyAccount> {
   List<LanguagesModel> languageList = [];
   List<EducationDetailModel> educationDetails = [];
   List<PersonalDetailModel> personalDetails = [];
+  ImageUpdateModel? _imageUpdateData;
+  bool isLoadingImage = true;
   bool isLoadingEducation = true;
   bool isLoadingProject = true;
   bool isLoadingWorkExperience = true;
@@ -72,7 +76,27 @@ class _MyAccountState extends State<MyAccount> {
     fetchSkills();
     fetchLanguageData();
     _fetchPersonalDetails();
+    _loadProfileImageFromApi();
   }
+
+  Future<void> _loadProfileImageFromApi() async {
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('authToken') ?? '';
+    final connectSid = prefs.getString('connectSid') ?? '';
+
+    final data = await LoadImageApi.fetchUserImage(
+      authToken: authToken,
+      connectSid: connectSid,
+    );
+
+    if (mounted && data != null) {
+      setState(() {
+        _imageUpdateData = data;
+      });
+    }
+  }
+
+
 
   Future<void> fetchEducationDetails() async {
     final prefs = await SharedPreferences.getInstance();
@@ -608,6 +632,23 @@ class _MyAccountState extends State<MyAccount> {
     final double widthScale = size.width / 360;
     final double sizeScale = widthScale.clamp(0.98, 1.02);
 
+    Widget displayedImage;
+
+    if (_profileImage != null) {
+      displayedImage = Image.file(_profileImage!, fit: BoxFit.cover);
+    } else if (_imageUpdateData?.userImage != null &&
+        _imageUpdateData!.userImage!.isNotEmpty) {
+      displayedImage = Image.network(
+        _imageUpdateData!.userImage!,
+        fit: BoxFit.cover,
+      );
+    } else {
+      displayedImage = const Image(
+        image: AssetImage('assets/placeholder.jpg'),
+        fit: BoxFit.cover,
+      );
+    }
+
     return Column(
       children: [
         Stack(
@@ -623,14 +664,7 @@ class _MyAccountState extends State<MyAccount> {
                   width: 2.3 * sizeScale,
                 ),
               ),
-              child: ClipOval(
-                child: _profileImage != null
-                    ? Image.file(_profileImage!, fit: BoxFit.cover)
-                    : const Image(
-                        image: AssetImage('assets/placeholder.jpg'),
-                        fit: BoxFit.cover,
-                      ),
-              ),
+              child: ClipOval(child: displayedImage),
             ),
             Positioned(
               bottom: 8 * sizeScale,
@@ -652,14 +686,18 @@ class _MyAccountState extends State<MyAccount> {
         ),
         const SizedBox(height: 12),
         Text(
-          fullname,
+          '${_imageUpdateData?.firstName ?? ''} ${_imageUpdateData?.lastName ?? ''}'.trim().isNotEmpty
+              ? '${_imageUpdateData?.firstName ?? ''} ${_imageUpdateData?.lastName ?? ''}'.trim()
+              : '',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
             color: const Color(0xFF005E6A),
           ),
         ),
+
       ],
     );
   }
+
 }
