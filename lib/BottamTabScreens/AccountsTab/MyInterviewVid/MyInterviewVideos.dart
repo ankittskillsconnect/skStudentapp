@@ -7,6 +7,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
+import '../../../Model/My_Interview_Videos_Model.dart';
+import '../../../Utilities/MyAccount_Get_Post/Get/My_Interview_Videos_Api.dart';
 import 'VideopreviewScreen.dart';
 
 class MyInterviewVideos extends StatefulWidget {
@@ -17,10 +19,11 @@ class MyInterviewVideos extends StatefulWidget {
 }
 
 class _MyInterviewVideosState extends State<MyInterviewVideos> {
+  VideoIntroModel? _videoIntroModel;
   final Map<String, String> _questionVideoPaths = {};
   bool _isFullScreen = false;
 
-  // ✅ YouTube video section
+
   final String youtubeUrl = 'https://www.youtube.com/embed/yeTExU0nuho?si=7GeceW6FeSmT5bAi';
   late YoutubePlayerController _controller;
   late String _videoId;
@@ -39,6 +42,34 @@ class _MyInterviewVideosState extends State<MyInterviewVideos> {
         enableCaption: true,
       ),
     );
+    _fetchVideoIntro();
+  }
+
+  Future<void> _fetchVideoIntro() async {
+    final api = VideoIntroApi();
+    final data = await api.fetchVideoIntroQuestions();
+
+    if (data != null) {
+      setState(() {
+        _videoIntroModel = data;
+
+        if (data.aboutYourself.trim().isNotEmpty) {
+          _questionVideoPaths["tell me about yourself".toLowerCase()] = data.aboutYourself;
+        }
+
+        if (data.organizeYourDay.trim().isNotEmpty) {
+          _questionVideoPaths["how do you organize your day?".toLowerCase()] = data.organizeYourDay;
+        }
+
+        if (data.yourStrength.trim().isNotEmpty) {
+          _questionVideoPaths["what are your strengths?".toLowerCase()] = data.yourStrength;
+        }
+
+        if (data.taughtYourselfLately.trim().isNotEmpty) {
+          _questionVideoPaths["what is something you have taught yourself lately?".toLowerCase()] = data.taughtYourselfLately;
+        }
+      });
+    }
   }
 
   String? _extractVideoId(String url) {
@@ -55,7 +86,7 @@ class _MyInterviewVideosState extends State<MyInterviewVideos> {
     ].request();
 
     final picker = ImagePicker();
-    final XFile? recorded = await picker.pickVideo(source: ImageSource.camera);
+    final XFile? recorded = await picker.pickVideo(source: ImageSource.camera , maxDuration: const Duration(seconds: 60));
 
     if (recorded != null) {
       final appDir = await getApplicationDocumentsDirectory();
@@ -129,7 +160,6 @@ class _MyInterviewVideosState extends State<MyInterviewVideos> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // ✅ YouTube Player
                   SizedBox(
                     height: _isFullScreen
                         ? MediaQuery.of(context).size.height
@@ -147,8 +177,8 @@ class _MyInterviewVideosState extends State<MyInterviewVideos> {
                   _buildGuidelinesCard(),
                   const SizedBox(height: 20),
                   _buildQuestionTile("Tell me about Yourself"),
-                  _buildQuestionTile("What are your strengths?"),
                   _buildQuestionTile("How do you organize your day?"),
+                  _buildQuestionTile("What are your strengths?"),
                   _buildQuestionTile("What is something you have taught yourself lately?"),
                 ],
               ),
@@ -188,10 +218,14 @@ class _MyInterviewVideosState extends State<MyInterviewVideos> {
 
   Widget _buildQuestionTile(String question) {
     final normalized = question.trim().toLowerCase();
-    final hasVideo = _questionVideoPaths.containsKey(normalized);
+    final videoPath = _questionVideoPaths[normalized];
+    final hasPath = videoPath != null && videoPath.isNotEmpty;
+    final isRemote = hasPath && (videoPath!.startsWith('http') || videoPath.startsWith('https'));
+    final existsLocally = hasPath && !isRemote ? File(videoPath!).existsSync() : false;
+    final canPreview = isRemote || existsLocally;
 
     return Container(
-      key: ValueKey('$normalized-$hasVideo'),
+      key: ValueKey('$normalized-$canPreview'),
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
@@ -221,21 +255,21 @@ class _MyInterviewVideosState extends State<MyInterviewVideos> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
             icon: Icon(
-              hasVideo ? Icons.play_circle_fill_outlined : Icons.play_arrow,
+              canPreview ? Icons.play_circle_fill_outlined : Icons.play_arrow,
               size: 20,
               color: Colors.white,
             ),
             label: Text(
-              hasVideo ? "Preview" : "Start",
+              canPreview ? "Preview" : "Start",
               style: const TextStyle(color: Colors.white, fontSize: 15),
             ),
             onPressed: () {
-              if (hasVideo) {
+              if (canPreview) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => VideoPreviewScreen(
-                      videoPath: _questionVideoPaths[normalized]!,
+                      videoUrl: videoPath!,
                       question: question,
                     ),
                   ),
@@ -249,6 +283,7 @@ class _MyInterviewVideosState extends State<MyInterviewVideos> {
       ),
     );
   }
+
 
   @override
   void dispose() {

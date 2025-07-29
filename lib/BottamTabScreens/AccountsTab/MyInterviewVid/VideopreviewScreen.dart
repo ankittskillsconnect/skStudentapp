@@ -7,11 +7,11 @@ import '../../../blocpage/bloc_state.dart';
 import 'package:chewie/chewie.dart';
 
 class VideoPreviewScreen extends StatefulWidget {
-  final String videoPath;
+  final String videoUrl;
   final String question;
 
   const VideoPreviewScreen({
-    required this.videoPath,
+    required this.videoUrl,
     required this.question,
     super.key,
   });
@@ -27,17 +27,23 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
   @override
   void initState() {
     super.initState();
-    _videoController = VideoPlayerController.file(File(widget.videoPath))
-      ..initialize().then((_) {
-        _chewieController = ChewieController(
-          videoPlayerController: _videoController,
-          autoPlay: true,
-          looping: false,
-          allowFullScreen: true,
-          allowPlaybackSpeedChanging: false,
-        );
-        setState(() {});
-      });
+
+    if (widget.videoUrl.startsWith("http")) {
+      _videoController = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
+    } else {
+      _videoController = VideoPlayerController.file(File(widget.videoUrl));
+    }
+
+    _videoController.initialize().then((_) {
+      _chewieController = ChewieController(
+        videoPlayerController: _videoController,
+        autoPlay: true,
+        looping: false,
+        allowFullScreen: true,
+        allowPlaybackSpeedChanging: false,
+      );
+      setState(() {});
+    });
   }
 
   @override
