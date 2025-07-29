@@ -11,11 +11,12 @@ import 'package:sk_loginscreen1/Utilities/MyAccount_Get_Post/Get/AccountImageApi
 import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_state.dart';
-import '../../Model/AccountScrren_Image_Name_Model.dart';
+import '../../Model/AccountScreen_Image_Name_Model.dart';
 import '../../ProfileLogic/ProfileEvent.dart';
 import '../../ProfileLogic/ProfileLogic.dart';
 import '../../ProfileLogic/ProfileState.dart';
 import '../../Utilities/auth/LoginUserApi.dart';
+import 'package:shimmer/shimmer.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -27,7 +28,6 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
   AcountScreenImageModel? _profileData;
   int _selectedIndex = 0;
-
 
   void _onItemTapped(int index) {
     setState(() {
@@ -92,7 +92,6 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context).size;
@@ -127,18 +126,23 @@ class _AccountScreenState extends State<AccountScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: media.height * 0.05),
-                Column(
+                SizedBox(height: media.height * 0.03),
+                _profileData == null
+                    ? ProfileHeaderShimmer(profileSize: profileSize)
+                    : Column(
                   children: [
                     Container(
                       width: profileSize,
                       height: profileSize,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFF005E6A), width: 2),
+                        border: Border.all(
+                          color: const Color(0xFF005E6A),
+                          width: 2,
+                        ),
                       ),
                       child: ClipOval(
-                        child: _profileData?.userImage != null
+                        child: _profileData!.userImage != null
                             ? Image.network(
                           _profileData!.userImage!,
                           fit: BoxFit.cover,
@@ -149,25 +153,19 @@ class _AccountScreenState extends State<AccountScreen> {
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 16),
-
-                    // First Name + Last Name
+                    const SizedBox(height: 12),
                     Text(
-                      '${_profileData?.firstName ?? ''} ${_profileData?.lastName ?? ''}',
+                      '${_profileData!.firstName ?? ''} ${_profileData!.lastName ?? ''}',
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF005E6A),
                       ),
                     ),
-
-                    const SizedBox(height: 8),
-
-                    // Age (DOB string as-is or calculate age)
-                    if (_profileData?.age != null)
+                    const SizedBox(height: 2),
+                    if (_profileData!.age != null)
                       Text(
-                        _calculateAge(_profileData!.age!), // you can implement _calculateAge
+                        _calculateAge(_profileData!.age!),
                         style: const TextStyle(
                           fontSize: 16,
                           color: Color(0xFF6A8E92),
@@ -175,8 +173,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       ),
                   ],
                 ),
-
-                SizedBox(height: spacing * 1.3),
+                SizedBox(height: spacing * 1.0),
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: _onRefresh,
@@ -315,3 +312,58 @@ class _AccountOption extends StatelessWidget {
     );
   }
 }
+
+
+class ProfileHeaderShimmer extends StatelessWidget {
+  final double profileSize;
+
+  const ProfileHeaderShimmer({super.key, required this.profileSize});
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Column(
+        children: [
+          // Profile circle placeholder
+          Container(
+            width: profileSize,
+            height: profileSize,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+            ),
+          ),
+
+          // Matches: SizedBox(height: 12)
+          const SizedBox(height: 12),
+
+          // Matches: Text first name + last name, fontSize 20
+          Container(
+            width: 160, // Adjusted for realistic name width
+            height: 24, // Font size 20 + padding
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+
+          // Matches: SizedBox(height: 2)
+          const SizedBox(height: 2),
+
+          // Matches: Age text, fontSize 16
+          Container(
+            width: 100,
+            height: 18, // Font size 16 + padding
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

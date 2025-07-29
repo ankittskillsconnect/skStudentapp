@@ -27,11 +27,13 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditSk
 import 'package:icons_plus/icons_plus.dart';
 
 import '../../../Model/Image_update_Model.dart';
+import '../../../Model/Percentage_bar_Model.dart';
 import '../../../Utilities/MyAccount_Get_Post/Get/Image_Api.dart';
 import 'MyaccountElements/CertificateDetails.dart';
 import 'MyaccountElements/EducationDetails.dart';
 import 'MyaccountElements/LanguageDetails.dart';
 import 'MyaccountElements/Personaldetails.dart';
+import 'MyaccountElements/Profile_Completition_Bar.dart';
 import 'MyaccountElements/ProjectDetails.dart';
 import 'MyaccountElements/SkillsDetails.dart';
 import 'MyaccountElements/WorkExperienceDetails.dart';
@@ -45,6 +47,7 @@ class MyAccount extends StatefulWidget {
 }
 
 class _MyAccountState extends State<MyAccount> {
+
   String fullname = "John";
   EducationDetailModel? educationDetail;
   PersonalDetailModel? personalDetail;
@@ -65,6 +68,8 @@ class _MyAccountState extends State<MyAccount> {
   bool isLoadingLanguages = true;
   bool isLoadingPersonalDetail = true;
   File? _profileImage;
+  ProfileCompletionModel? profileCompletion;
+  bool isLoadingProfilePercentage = true;
 
   @override
   void initState() {
@@ -95,7 +100,6 @@ class _MyAccountState extends State<MyAccount> {
       });
     }
   }
-
 
 
   Future<void> fetchEducationDetails() async {
@@ -323,6 +327,8 @@ class _MyAccountState extends State<MyAccount> {
     );
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -343,6 +349,8 @@ class _MyAccountState extends State<MyAccount> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildProfileHeader(),
+                const SizedBox(height: 25),
+                ProfileCompletionBar(),
                 const SizedBox(height: 25),
                 PersonalDetailsSection(
                   personalDetail: personalDetail,
@@ -701,3 +709,8 @@ class _MyAccountState extends State<MyAccount> {
   }
 
 }
+
+
+
+
+

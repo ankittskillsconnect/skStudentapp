@@ -3,6 +3,7 @@ import 'package:sk_loginscreen1/Model/PersonalDetail_Model.dart';
 import 'DetailRow.dart';
 import 'SectionHeader.dart';
 import 'ShimmerWidgets.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 class PersonalDetailsSection extends StatelessWidget {
   final PersonalDetailModel? personalDetail;
@@ -43,7 +44,7 @@ class PersonalDetailsSection extends StatelessWidget {
             ),
             DetailRow(icon: Icons.cake_outlined, text: personalDetail!.dateOfBirth),
             DetailRow(icon: Icons.phone_outlined, text: personalDetail!.mobile),
-            DetailRow(icon: Icons.message_outlined, text: personalDetail!.whatsAppNumber),
+            DetailRowIconplus(icon: Bootstrap.whatsapp, text: personalDetail!.whatsAppNumber),
             DetailRow(
               icon: Icons.location_on_outlined,
               text: personalDetail!.state.isEmpty
@@ -72,6 +73,39 @@ class PersonalDetailsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: children,
+      ),
+    );
+  }
+}
+
+class DetailRowIconplus extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const DetailRowIconplus({super.key, required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final double widthScale = size.width / 360;
+    final double fontScale = widthScale.clamp(0.98, 1.02);
+    final double sizeScale = widthScale.clamp(0.98, 1.02);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 6 * sizeScale),
+      child: Row(
+        children: [
+          Icon(icon, size: 18 * sizeScale, color: const Color(0xFF005E6A)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 14 * fontScale),
+            ),
+          ),
+        ],
       ),
     );
   }

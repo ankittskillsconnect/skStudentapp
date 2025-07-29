@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../Model/AccountScrren_Image_Name_Model.dart';
+import '../../../Model/AccountScreen_Image_Name_Model.dart';
 
 class AccountImageApi {
   static Future<AcountScreenImageModel?> fetchAccountScreenData() async {
