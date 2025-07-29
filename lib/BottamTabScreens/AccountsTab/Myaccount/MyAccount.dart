@@ -25,7 +25,6 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditLa
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditPersonalDetailSheet.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditSkillsBottomSheet.dart';
 import 'package:icons_plus/icons_plus.dart';
-
 import '../../../Model/Image_update_Model.dart';
 import '../../../Model/Percentage_bar_Model.dart';
 import '../../../Utilities/MyAccount_Get_Post/Get/Image_Api.dart';
@@ -88,19 +87,16 @@ class _MyAccountState extends State<MyAccount> {
     final prefs = await SharedPreferences.getInstance();
     final authToken = prefs.getString('authToken') ?? '';
     final connectSid = prefs.getString('connectSid') ?? '';
-
     final data = await LoadImageApi.fetchUserImage(
       authToken: authToken,
       connectSid: connectSid,
     );
-
     if (mounted && data != null) {
       setState(() {
         _imageUpdateData = data;
       });
     }
   }
-
 
   Future<void> fetchEducationDetails() async {
     final prefs = await SharedPreferences.getInstance();
@@ -326,8 +322,6 @@ class _MyAccountState extends State<MyAccount> {
       },
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {

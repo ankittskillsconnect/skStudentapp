@@ -1,3 +1,4 @@
+
 class VideoIntroModel {
   final String aboutYourself;
   final String organizeYourDay;
