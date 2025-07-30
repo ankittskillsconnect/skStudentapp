@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http ;
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -28,6 +30,7 @@ import 'package:icons_plus/icons_plus.dart';
 import '../../../Model/Image_update_Model.dart';
 import '../../../Model/Percentage_bar_Model.dart';
 import '../../../Utilities/MyAccount_Get_Post/Get/Image_Api.dart';
+import '../../../Utilities/MyAccount_Get_Post/Post/Skills_Post_Api.dart';
 import 'MyaccountElements/CertificateDetails.dart';
 import 'MyaccountElements/EducationDetails.dart';
 import 'MyaccountElements/LanguageDetails.dart';
@@ -81,7 +84,10 @@ class _MyAccountState extends State<MyAccount> {
     fetchLanguageData();
     _fetchPersonalDetails();
     _loadProfileImageFromApi();
+
   }
+
+
 
   Future<void> _loadProfileImageFromApi() async {
     final prefs = await SharedPreferences.getInstance();
@@ -323,6 +329,7 @@ class _MyAccountState extends State<MyAccount> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -334,294 +341,320 @@ class _MyAccountState extends State<MyAccount> {
       backgroundColor: Colors.white,
       body: Builder(
         builder: (innerContext) => SafeArea(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: 16 * sizeScale,
-              vertical: 20 * sizeScale,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildProfileHeader(),
-                const SizedBox(height: 25),
-                ProfileCompletionBar(),
-                const SizedBox(height: 25),
-                PersonalDetailsSection(
-                  personalDetail: personalDetail,
-                  isLoading: isLoadingPersonalDetail,
-                  onEdit: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => EditPersonalDetailsSheet(
-                        initialData: personalDetail,
-                        onSave: (updatedData) {
-                          setState(() {
-                            personalDetail = updatedData;
-                          });
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
-                EducationSection(
-                  educationDetails: educationDetails,
-                  isLoading: isLoadingEducation,
-                  onAdd: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => EditEducationBottomSheet(
-                        onSave: (data) {
-                          setState(() {
-                            educationDetails.add(data['educationDetail']);
-                          });
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                  onEdit: (edu, index) {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => EditEducationBottomSheet(
-                        initialData: edu,
-                        onSave: (data) {
-                          setState(() {
-                            educationDetails[index] = data['educationDetail'];
-                          });
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                  onDelete: (index) {
-                    setState(() {
-                      educationDetails.removeAt(index);
-                    });
-                  },
-                ),
-                const SizedBox(height: 20),
-                ResumeSection(),
-                const SizedBox(height: 20),
-                SkillsSection(
-                  skillList: skillList,
-                  isLoading: isLoadingSkills,
-                  onEdit: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      builder: (_) => EditSkillsBottomSheet(
-                        initialSkills: skillList,
-                        onSave: (updatedSkills) {
-                          setState(() => skillList = updatedSkills);
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                  onAdd: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      builder: (_) => EditSkillsBottomSheet(
-                        initialSkills: skillList,
-                        onSave: (updatedSkills) {
-                          setState(() => skillList = updatedSkills);
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                  onDeleteSkill: (skill, singleSkill) {
-                    setState(() {
-                      final updatedSkills = skill.skills
-                          .split(',')
-                          .map((s) => s.trim())
-                          .where((s) => s != singleSkill)
-                          .toList();
-                      if (updatedSkills.isEmpty) {
-                        skillList.remove(skill);
-                      } else {
-                        skill.skills = updatedSkills.join(',');
+          child: RefreshIndicator(
+            onRefresh: () async {
+              setState(() {
+                isLoadingImage = true;
+                isLoadingEducation = true;
+                isLoadingProject = true;
+                isLoadingWorkExperience = true;
+                isLoadingCertificate = true;
+                isLoadingSkills = true;
+                isLoadingLanguages = true;
+                isLoadingPersonalDetail = true;
+              });
+              await Future.wait([
+                _loadProfileImageFromApi(),
+                fetchEducationDetails(),
+                fetchInternShipProjectDetails(),
+                _fetchPersonalDetails(),
+                fetchWorkExperienceDetails(),
+                fetchCertificateDetails(),
+                fetchSkills(),
+                fetchLanguageData(),
+              ]);
+            },
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: 16 * sizeScale,
+                vertical: 20 * sizeScale,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildProfileHeader(),
+                  const SizedBox(height: 25),
+                  ProfileCompletionBar(),
+                  const SizedBox(height: 25),
+                  PersonalDetailsSection(
+                    personalDetail: personalDetail,
+                    isLoading: isLoadingPersonalDetail,
+                    onEdit: () {
+                      showModalBottomSheet(
+                        context: innerContext,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        builder: (_) => EditPersonalDetailsSheet(
+                          initialData: personalDetail,
+                          onSave: (updatedData) {
+                            setState(() {
+                              personalDetail = updatedData;
+                            });
+
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  EducationSection(
+                    educationDetails: educationDetails,
+                    isLoading: isLoadingEducation,
+                    onAdd: () {
+                      showModalBottomSheet(
+                        context: innerContext,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        builder: (_) => EditEducationBottomSheet(
+                          onSave: (data) {
+                            setState(() {
+                              educationDetails.add(data['educationDetail']);
+                            });
+                            Navigator.pop(innerContext);
+                          },
+                        ),
+                      );
+                    },
+                    onEdit: (edu, index) {
+                      showModalBottomSheet(
+                        context: innerContext,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        builder: (_) => EditEducationBottomSheet(
+                          initialData: edu,
+                          onSave: (data) {
+                            setState(() {
+                              educationDetails[index] = data['educationDetail'];
+                            });
+                            Navigator.pop(innerContext);
+                          },
+                        ),
+                      );
+                    },
+                    onDelete: (index) {
+                      setState(() {
+                        educationDetails.removeAt(index);
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  ResumeSection(),
+                  const SizedBox(height: 20),
+                  SkillsSection(
+                    skillList: skillList,
+                    isLoading: isLoadingSkills,
+                    onEdit: () {
+                      showModalBottomSheet(
+                        context: innerContext,
+                        isScrollControlled: true,
+                        builder: (_) => EditSkillsBottomSheet(
+                          initialSkills: skillList,
+                          onSave: (updatedSkills) {
+                            setState(() => skillList = updatedSkills);
+                          },
+                        ),
+                      );
+                    },
+                    onAdd: () {
+                      showModalBottomSheet(
+                        context: innerContext,
+                        isScrollControlled: true,
+                        builder: (_) => EditSkillsBottomSheet(
+                          initialSkills: skillList,
+                          onSave: (updatedSkills) {
+                            setState(() => skillList = updatedSkills);
+                          },
+                        ),
+                      );
+                    },
+                      onDeleteSkill: (skill, singleSkill) {
+                        setState(() {
+                          final parsedSkills = skill.skills
+                              .split(RegExp(r',(?![^()]*\))'))
+                              .map((s) => s.trim())
+                              .where((s) => s.isNotEmpty)
+                              .toList();
+
+                          final updatedSkills = parsedSkills.where((s) => s != singleSkill).toList();
+
+                          if (updatedSkills.isEmpty) {
+                            skillList.remove(skill);
+                          } else {
+                            skill.skills = updatedSkills.join(', ');
+                          }
+                        });
                       }
-                    });
-                  },
-                ),
-                const SizedBox(height: 20),
-                ProjectsSection(
-                  projects: projects,
-                  isLoading: isLoadingProject,
-                  onAdd: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => EditProjectDetailsBottomSheet(
-                        initialData: null,
-                        onSave: (data) {
-                          setState(() {
-                            projects.add(data);
-                          });
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                  onEdit: (project, index) {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => EditProjectDetailsBottomSheet(
-                        initialData: project,
-                        onSave: (data) {
-                          setState(() {
-                            projects[index] = data;
-                          });
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                  onDelete: (index) {
-                    setState(() {
-                      projects.removeAt(index);
-                    });
-                  },
-                ),
-                const SizedBox(height: 20),
-                CertificatesSection(
-                  certificatesList: certificatesList,
-                  isLoading: isLoadingCertificate,
-                  onAdd: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => EditCertificateBottomSheet(
-                        initialData: null,
-                        onSave: (data) {
-                          setState(() {
-                            certificatesList.add(data);
-                          });
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                  onEdit: (certificate, index) {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => EditCertificateBottomSheet(
-                        initialData: certificate,
-                        onSave: (data) {
-                          setState(() {
-                            certificatesList[index] = data;
-                          });
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                  onDelete: (index) {
-                    setState(() {
-                      certificatesList.removeAt(index);
-                    });
-                  },
-                ),
-                const SizedBox(height: 20),
-                WorkExperienceSection(
-                  workExperiences: workExperiences,
-                  isLoading: isLoadingWorkExperience,
-                  onAdd: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => Editworkexperiencebottomsheet(
-                        initialData: null,
-                        onSave: (WorkExperienceModel newData) {
-                          setState(() {
-                            workExperiences.add(newData);
-                          });
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                  onEdit: (workExperience, index) {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => Editworkexperiencebottomsheet(
-                        initialData: workExperience,
-                        onSave: (WorkExperienceModel updated) {
-                          setState(() {
-                            workExperiences[index] = updated;
-                          });
-                          Navigator.pop(innerContext);
-                        },
-                      ),
-                    );
-                  },
-                  onDelete: (index) {
-                    setState(() {
-                      workExperiences.removeAt(index);
-                    });
-                  },
-                ),
-                const SizedBox(height: 20),
-                LanguagesSection(
-                  languageList: languageList,
-                  isLoading: isLoadingLanguages,
-                  onAdd: () {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => LanguageBottomSheet(
-                        initialData: null,
-                        onSave: (LanguagesModel data) {
-                          setState(() {
-                            languageList.add(data);
-                          });
-                        },
-                      ),
-                    );
-                  },
-                  onEdit: (language, index) {
-                    showModalBottomSheet(
-                      context: innerContext,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.white,
-                      builder: (_) => LanguageBottomSheet(
-                        initialData: language,
-                        onSave: (LanguagesModel data) {
-                          setState(() {
-                            languageList[index] = data;
-                          });
-                        },
-                      ),
-                    );
-                  },
-                  onDelete: (index) {
-                    setState(() {
-                      languageList.removeAt(index);
-                    });
-                  },
-                ),
-                const SizedBox(height: 20),
-              ],
+
+                  ),
+                  const SizedBox(height: 20),
+                  ProjectsSection(
+                    projects: projects,
+                    isLoading: isLoadingProject,
+                    onAdd: () {
+                      showModalBottomSheet(
+                        context: innerContext,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        builder: (_) => EditProjectDetailsBottomSheet(
+                          initialData: null,
+                          onSave: (data) {
+                            setState(() {
+                              projects.add(data);
+                            });
+                            Navigator.pop(innerContext);
+                          },
+                        ),
+                      );
+                    },
+                    onEdit: (project, index) {
+                      showModalBottomSheet(
+                        context: innerContext,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        builder: (_) => EditProjectDetailsBottomSheet(
+                          initialData: project,
+                          onSave: (data) {
+                            setState(() {
+                              projects[index] = data;
+                            });
+                            Navigator.pop(innerContext);
+                          },
+                        ),
+                      );
+                    },
+                    onDelete: (index) {
+                      setState(() {
+                        projects.removeAt(index);
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  CertificatesSection(
+                    certificatesList: certificatesList,
+                    isLoading: isLoadingCertificate,
+                    onAdd: () {
+                      showModalBottomSheet(
+                        context: innerContext,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        builder: (_) => EditCertificateBottomSheet(
+                          initialData: null,
+                          onSave: (data) {
+                            setState(() {
+                              certificatesList.add(data);
+                            });
+                            Navigator.pop(innerContext);
+                          },
+                        ),
+                      );
+                    },
+                    onEdit: (certificate, index) {
+                      showModalBottomSheet(
+                        context: innerContext,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        builder: (_) => EditCertificateBottomSheet(
+                          initialData: certificate,
+                          onSave: (data) {
+                            setState(() {
+                              certificatesList[index] = data;
+                            });
+                            Navigator.pop(innerContext);
+                          },
+                        ),
+                      );
+                    },
+                    onDelete: (index) {
+                      setState(() {
+                        certificatesList.removeAt(index);
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  WorkExperienceSection(
+                    workExperiences: workExperiences,
+                    isLoading: isLoadingWorkExperience,
+                    onAdd: () {
+                      showModalBottomSheet(
+                        context: innerContext,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        builder: (_) => Editworkexperiencebottomsheet(
+                          initialData: null,
+                          onSave: (WorkExperienceModel newData) {
+                            setState(() {
+                              workExperiences.add(newData);
+                            });
+                            Navigator.pop(innerContext);
+                          },
+                        ),
+                      );
+                    },
+                    onEdit: (workExperience, index) {
+                      showModalBottomSheet(
+                        context: innerContext,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        builder: (_) => Editworkexperiencebottomsheet(
+                          initialData: workExperience,
+                          onSave: (WorkExperienceModel updated) {
+                            setState(() {
+                              workExperiences[index] = updated;
+                            });
+                            Navigator.pop(innerContext);
+                          },
+                        ),
+                      );
+                    },
+                    onDelete: (index) {
+                      setState(() {
+                        workExperiences.removeAt(index);
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  LanguagesSection(
+                    languageList: languageList,
+                    isLoading: isLoadingLanguages,
+                    onAdd: () {
+                      showModalBottomSheet(
+                        context: innerContext,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        builder: (_) => LanguageBottomSheet(
+                          initialData: null,
+                          onSave: (LanguagesModel data) {
+                            setState(() {
+                              languageList.add(data);
+                            });
+                          },
+                        ),
+                      );
+                    },
+                    onEdit: (language, index) {
+                      showModalBottomSheet(
+                        context: innerContext,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.white,
+                        builder: (_) => LanguageBottomSheet(
+                          initialData: language,
+                          onSave: (LanguagesModel data) {
+                            setState(() {
+                              languageList[index] = data;
+                            });
+                          },
+                        ),
+                      );
+                    },
+                    onDelete: (index) {
+                      setState(() {
+                        languageList.removeAt(index);
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ),
@@ -703,6 +736,8 @@ class _MyAccountState extends State<MyAccount> {
   }
 
 }
+
+
 
 
 

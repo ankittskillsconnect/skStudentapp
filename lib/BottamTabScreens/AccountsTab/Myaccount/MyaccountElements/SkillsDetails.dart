@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:sk_loginscreen1/Model/Skiils_Model.dart';
 import 'SectionHeader.dart';
@@ -53,23 +56,25 @@ class SkillsSection extends StatelessWidget {
             child: Wrap(
               spacing: 8 * sizeScale,
               runSpacing: 8 * sizeScale,
-              children: skillList.expand((skill) {
-                return skill.skills
-                    .split(',')
-                    .map((s) => s.trim())
-                    .where((s) => s.isNotEmpty)
-                    .map((singleSkill) => Chip(
-                  label: Text(
-                    singleSkill,
-                    style: TextStyle(fontSize: 14 * fontScale),
-                  ),
-                  onDeleted: () => onDeleteSkill(skill, singleSkill),
-                  deleteIconColor: const Color(0xFF005E6A),
-                  backgroundColor: const Color(0xFFEBF6F7),
-                  labelStyle: const TextStyle(color: Color(0xFF003840)),
-                ));
-              }).toList(),
+              children: skillList
+                  .expand((skill) => skill.skills
+                  .split(',')
+                  .map((s) => s.trim())
+                  .where((s) => s.isNotEmpty)
+                  .map((singleSkill) => Chip(
+                label: Text(
+                  singleSkill,
+                  style: TextStyle(fontSize: 14 * fontScale),
+                ),
+                onDeleted: () => onDeleteSkill(skill, singleSkill),
+                deleteIconColor: const Color(0xFF005E6A),
+                backgroundColor: const Color(0xFFEBF6F7),
+                labelStyle: const TextStyle(color: Color(0xFF003840)),
+              )))
+                  .toList(),
             ),
+
+
           ),
       ],
     );

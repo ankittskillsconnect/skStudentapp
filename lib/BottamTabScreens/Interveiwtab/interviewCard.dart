@@ -56,19 +56,25 @@ class InterviewCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.maps_home_work_outlined, size: 18, color: Color(0xFF003840)),
-                        const SizedBox(width: 8),
-                        Text(
-                          model.company,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF003840),
-                            fontWeight: FontWeight.w500,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          const Icon(Icons.maps_home_work_outlined, size: 18, color: Color(0xFF003840)),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              model.company,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF003840),
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     LiveSlidingText(status: model.isActive ? 'Active' : 'Inactive'),
                   ],

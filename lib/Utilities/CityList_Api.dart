@@ -43,7 +43,6 @@ class CityListApi {
         );
 
         final resBody = await response.stream.bytesToString();
-        print("🔍 API Response for city '$cityName' with state ID '$stateId', offset $offset: $resBody");
 
         if (response.statusCode == 200) {
           final data = json.decode(resBody);

@@ -19,7 +19,7 @@ class _PasswordFieldState extends State<PasswordField> {
       obscureText: _obscureText,
       decoration: InputDecoration(
         hintText: "Password",
-        prefixIcon: const Icon(Icons.lock),
+        prefixIcon: const Icon(Icons.lock_outlined),
         suffixIcon: IconButton(
           icon: Icon(
             _obscureText ? Icons.visibility_off : Icons.visibility,

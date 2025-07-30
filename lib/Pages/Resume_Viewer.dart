@@ -11,7 +11,8 @@ class ResumeViewer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Resume")),
+      backgroundColor: Colors.white,
+      appBar: AppBar(title: const Text("Resume"), backgroundColor: Colors.white,),
       body: Builder(
         builder: (context) {
           try {

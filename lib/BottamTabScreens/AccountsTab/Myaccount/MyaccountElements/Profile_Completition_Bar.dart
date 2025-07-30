@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../../Utilities/MyAccount_Get_Post/Get/AccountProgress_Api.dart';
 
@@ -66,8 +67,6 @@ class _ProfileCompletionBarState extends State<ProfileCompletionBar> {
 
     final parsed = double.tryParse(percentage ?? '') ?? 0.0;
     final clampedPercent = parsed.clamp(0.0, 100.0);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final progressWidth = (clampedPercent / 100) * screenWidth;
     final isLow = clampedPercent < 30;
 
     return Column(
@@ -80,7 +79,7 @@ class _ProfileCompletionBarState extends State<ProfileCompletionBar> {
               "Profile Completion Status",
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.black87,
+                color: Color(0xFF005E6A),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -95,33 +94,21 @@ class _ProfileCompletionBarState extends State<ProfileCompletionBar> {
           ],
         ),
         const SizedBox(height: 8),
-        Stack(
-          children: [
-            Container(
-              height: 10,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 500),
-              height: 10,
-              width: progressWidth,
-              decoration: BoxDecoration(
-                color: isLow ? Colors.red : null,
-                gradient: isLow
-                    ? null
-                    : const LinearGradient(
-                  colors: [Color(0xFF027D92), Color(0xFF6ED4F9)],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ],
+        LinearPercentIndicator(
+          animation: true,
+          animationDuration: 500,
+          lineHeight: 10.0,
+          percent: clampedPercent / 100,
+          backgroundColor: Colors.grey.shade300,
+          progressColor: isLow ? Colors.red : null,
+          linearGradient: isLow
+              ? null
+              : const LinearGradient(
+            colors: [Color(0xFF027D92), Color(0xFF6ED4F9)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          barRadius: const Radius.circular(10),
         ),
       ],
     );

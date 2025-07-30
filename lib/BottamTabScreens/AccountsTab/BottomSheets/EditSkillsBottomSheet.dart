@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import '../../../Model/Skiils_Model.dart';
 
@@ -129,10 +132,28 @@ class _EditSkillsBottomSheetState extends State<EditSkillsBottomSheet> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
                 ElevatedButton(
+
                   onPressed: () {
-                    widget.onSave(skills);
+                    final updatedSkills = skills
+                        .map((s) => s.skills.trim())
+                        .where((s) => s.isNotEmpty)
+                        .toSet()
+                        .toList();
+
+                    postUpdatedSkills(
+                      context: context,
+                      updatedSkills: updatedSkills,
+                      onSuccess: () {
+                        widget.onSave(
+                          updatedSkills.map((s) => SkillsModel(skills: s)).toList(),
+                        );
+                        Navigator.of(context).pop();
+                      },
+                    );
                   },
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF005E6A),
                     minimumSize: const Size.fromHeight(50),
@@ -142,12 +163,69 @@ class _EditSkillsBottomSheetState extends State<EditSkillsBottomSheet> {
                   ),
                   child: const Text("Save", style: TextStyle(color: Colors.white)),
                 ),
+
                 const SizedBox(height: 20),
               ],
             ),
           );
         },
       ),
+    );
+  }
+}
+
+Future<void> postUpdatedSkills({
+  required BuildContext context,
+  required List<String> updatedSkills,
+  required VoidCallback onSuccess,
+}) async {
+  final prefs = await SharedPreferences.getInstance();
+  final authToken = prefs.getString('authToken') ?? '';
+  final connectSid = prefs.getString('connectSid') ?? '';
+
+  final cleanedSkills = updatedSkills
+      .map((e) => e.trim())
+      .where((e) => e.isNotEmpty)
+      .toSet()
+      .toList();
+
+  try {
+    final url = Uri.parse("https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/update-skills");
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $authToken',
+      'Cookie': connectSid,
+    };
+    final body = jsonEncode({"skills": cleanedSkills.join(', ')});
+
+
+    print("📤 Sending skills update...");
+    print("👉 URL: $url");
+    print("👉 Headers: $headers");
+    print("👉 Body: $body");
+
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: body,
+    );
+
+    print("📩 Response Status: ${response.statusCode}");
+    print("📩 Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      print("✅ Skills updated successfully!");
+      onSuccess();
+    } else {
+      print("❌ Failed to update skills. Server responded with status ${response.statusCode}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to update skills")),
+      );
+    }
+  } catch (e) {
+    print("❌ Error updating skills: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Something went wrong")),
     );
   }
 }

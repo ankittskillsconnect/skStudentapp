@@ -95,8 +95,8 @@ class DetailRowIconplus extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 6 * sizeScale),
       child: Row(
         children: [
-          Icon(icon, size: 18 * sizeScale, color: const Color(0xFF005E6A)),
-          const SizedBox(width: 12),
+          Icon(icon, size: 17 * sizeScale, color: const Color(0xFF005E6A)),
+          const SizedBox(width: 13),
           Expanded(
             child: Text(
               text,

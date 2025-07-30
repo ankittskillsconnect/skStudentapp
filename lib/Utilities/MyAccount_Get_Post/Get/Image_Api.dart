@@ -26,7 +26,6 @@ class LoadImageApi {
         final jsonString = await response.stream.bytesToString();
         final Map<String, dynamic> data = jsonDecode(jsonString);
 
-        print('✅ Image Full Response: $data');
 
         final List<dynamic> personalDetails = data['personalDetails'] ?? [];
 
