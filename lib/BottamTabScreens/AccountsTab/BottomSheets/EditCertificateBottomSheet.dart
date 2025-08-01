@@ -3,7 +3,7 @@ import '../../../Model/CertificateDetails_Model.dart';
 
 class EditCertificateBottomSheet extends StatefulWidget {
   final CertificateModel? initialData;
-  final Function(CertificateModel model) onSave;
+  final Function(CertificateModel) onSave;
 
   const EditCertificateBottomSheet({
     super.key,
@@ -12,232 +12,237 @@ class EditCertificateBottomSheet extends StatefulWidget {
   });
 
   @override
-  State<EditCertificateBottomSheet> createState() =>
-      _EditCertificateBottomSheetState();
+  State<EditCertificateBottomSheet> createState() => _EditCertificateBottomSheetState();
 }
 
-class _EditCertificateBottomSheetState
-    extends State<EditCertificateBottomSheet> {
+class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet> {
+  final _formKey = GlobalKey<FormState>();
+
   late TextEditingController _certificateNameController;
-  late TextEditingController _issuedByController;
-  late TextEditingController _credentialIdController;
-  late TextEditingController _issuedDateController;
-  late TextEditingController _expiredDateController;
+  late TextEditingController _issuedOrgController;
+  late TextEditingController _credIdController;
+  late TextEditingController _urlController;
   late TextEditingController _descriptionController;
+
+  String _issueMonth = 'Jan';
+  String _issueYear = '2025';
+  String _expiryMonth = 'Jan';
+  String _expiryYear = '2025';
+
+  bool isSaving = false;
 
   @override
   void initState() {
     super.initState();
-    _certificateNameController = TextEditingController(
-      text: widget.initialData?.certificateName ?? '',
-    );
-    _issuedByController = TextEditingController(
-      text: widget.initialData?.issuedOrgName ?? '',
-    );
-    _credentialIdController = TextEditingController(
-      text: widget.initialData?.credId ?? '',
-    );
-    _issuedDateController = TextEditingController(
-      text: widget.initialData?.issueDate ?? '',
-    );
-    _expiredDateController = TextEditingController(
-      text: widget.initialData?.expiryDate ?? '',
-    );
-    _descriptionController = TextEditingController(
-      text: widget.initialData?.description ?? '',
-    );
+    final data = widget.initialData;
+    _certificateNameController = TextEditingController(text: data?.certificateName ?? '');
+    _issuedOrgController = TextEditingController(text: data?.issuedOrgName ?? '');
+    _credIdController = TextEditingController(text: data?.credId ?? '');
+    _urlController = TextEditingController(text: data?.url ?? '');
+    _descriptionController = TextEditingController(text: data?.description ?? '');
+
+    if (data != null) {
+      final issueParts = data.issueDate.split('-');
+      final expiryParts = data.expiryDate.split('-');
+      if (issueParts.length == 2) {
+        _issueYear = issueParts[0];
+        _issueMonth = CertificateModel.numberToMonth(issueParts[1]);
+      }
+      if (expiryParts.length == 2) {
+        _expiryYear = expiryParts[0];
+        _expiryMonth = CertificateModel.numberToMonth(expiryParts[1]);
+      }
+    }
   }
 
   @override
   void dispose() {
     _certificateNameController.dispose();
-    _issuedByController.dispose();
-    _credentialIdController.dispose();
-    _issuedDateController.dispose();
-    _expiredDateController.dispose();
+    _issuedOrgController.dispose();
+    _credIdController.dispose();
+    _urlController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
 
-  Future<void> _selectDate(
-      BuildContext context,
-      TextEditingController controller,
-      ) async {
-    DateTime initialDate = DateTime.now();
-    if (controller.text.isNotEmpty) {
-      try {
-        initialDate = DateTime.parse(controller.text);
-      } catch (_) {}
-    }
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+  void _handleSave() {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => isSaving = true);
+
+    final certificate = CertificateModel(
+      certificationId: widget.initialData?.certificationId,
+      certificateName: _certificateNameController.text.trim(),
+      issuedOrgName: _issuedOrgController.text.trim(),
+      credId: _credIdController.text.trim(),
+      issueDate: '$_issueYear-${CertificateModel.monthToNumber(_issueMonth)}',
+      expiryDate: '$_expiryYear-${CertificateModel.monthToNumber(_expiryMonth)}',
+      description: _descriptionController.text.trim(),
+      url: _urlController.text.trim(),
+      userId: widget.initialData?.userId,
     );
-    if (picked != null) {
-      setState(() {
-        controller.text = picked.toIso8601String().split('T')[0];
-      });
-    }
+    widget.onSave(certificate);
   }
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
-
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.9,
       maxChildSize: 0.9,
       minChildSize: 0.9,
       builder: (context, scrollController) {
-        return Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: 20 * sizeScale,
-            vertical: 10 * sizeScale,
-          ),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    'Edit Certificate',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF003840),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Edit Certificate Details',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Color(0xFF005E6A)),
-                    onPressed: () => Navigator.pop(context),
+                  Expanded(
+                    child: ListView(
+                      controller: scrollController,
+                      children: [
+                        _buildLabel('Certificate Name'),
+                        _buildTextField(_certificateNameController, 'Enter certificate name'),
+                        _buildLabel('Issued Organization'),
+                        _buildTextField(_issuedOrgController, 'Enter organization name'),
+                        _buildLabel('Credential ID'),
+                        _buildTextField(_credIdController, 'Enter credential ID'),
+                        _buildLabel('Credential URL'),
+                        _buildTextField(_urlController, 'Enter URL', required: false),
+                        _buildLabel('Description'),
+                        _buildTextField(_descriptionController, 'Enter description'),
+                        _buildLabel('Issued Date'),
+                        _buildDateRow(_issueMonth, _issueYear,
+                                (m) => setState(() => _issueMonth = m),
+                                (y) => setState(() => _issueYear = y)),
+                        _buildLabel('Expiry Date'),
+                        _buildDateRow(_expiryMonth, _expiryYear,
+                                (m) => setState(() => _expiryMonth = m),
+                                (y) => setState(() => _expiryYear = y)),
+                        const SizedBox(height: 30),
+                        ElevatedButton(
+                          onPressed: isSaving ? null : _handleSave,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF005E6A),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            minimumSize: const Size.fromHeight(50),
+                          ),
+                          child: isSaving
+                              ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                              : const Text(
+                            'Save',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-              Expanded(
-                child: ListView(
-                  controller: scrollController,
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom,
-                  ),
-                  children: [
-                    _buildLabel("Certificate Name"),
-                    _buildTextField(
-                      "Enter certificate name",
-                      _certificateNameController,
-                    ),
-                    _buildLabel("Issued By"),
-                    _buildTextField(
-                      "Enter issuing organization",
-                      _issuedByController,
-                    ),
-                    _buildLabel("Credential ID"),
-                    _buildTextField(
-                      "Enter credential ID",
-                      _credentialIdController,
-                    ),
-                    _buildLabel("Issued Date"),
-                    _buildTextField(
-                      "Select issued date",
-                      _issuedDateController,
-                      suffixIcon: Icons.calendar_today,
-                      readOnly: true,
-                      onTap: () =>
-                          _selectDate(context, _issuedDateController),
-                    ),
-                    _buildLabel("Expired Date"),
-                    _buildTextField(
-                      "Select expiration date",
-                      _expiredDateController,
-                      suffixIcon: Icons.calendar_today,
-                      readOnly: true,
-                      onTap: () =>
-                          _selectDate(context, _expiredDateController),
-                    ),
-                    _buildLabel("Description"),
-                    _buildTextField(
-                      "Enter description",
-                      _descriptionController,
-                    ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF005E6A),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        minimumSize: const Size.fromHeight(50),
-                      ),
-                      onPressed: () {
-                        final model = CertificateModel(
-                          certificateName: _certificateNameController.text,
-                          issuedOrgName: _issuedByController.text,
-                          credId: _credentialIdController.text,
-                          issueDate: _issuedDateController.text,
-                          expiryDate: _expiredDateController.text,
-                          description: _descriptionController.text,
-                        );
-                        widget.onSave(model);
-                      },
-                      child: const Text(
-                        "Save",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text) => Padding(
+    padding: const EdgeInsets.only(top: 12, bottom: 6),
+    child: Text(text, style: const TextStyle(fontWeight: FontWeight.w700)),
+  );
+
+  Widget _buildTextField(TextEditingController controller, String label, {bool required = true}) {
     return Padding(
-      padding: const EdgeInsets.only(top: 16, bottom: 6),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-          color: Color(0xff003840),
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
+        validator: (value) => (required && (value == null || value.trim().isEmpty)) ? 'Required' : null,
       ),
     );
   }
 
-  Widget _buildTextField(
-      String hintText,
-      TextEditingController controller, {
-        IconData? suffixIcon,
-        bool readOnly = false,
-        VoidCallback? onTap,
-      }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: TextField(
-        controller: controller,
-        readOnly: readOnly,
-        onTap: onTap,
-        decoration: InputDecoration(
-          hintText: hintText,
-          suffixIcon: suffixIcon != null
-              ? IconButton(icon: Icon(suffixIcon), onPressed: onTap)
-              : null,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+  Widget _buildDateRow(String month, String year, Function(String) onMonthChanged, Function(String) onYearChanged) {
+    return Row(
+      children: [
+        Expanded(
+          child: DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              labelText: 'Month',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            ),
+            value: month,
+            onChanged: (val) => onMonthChanged(val!),
+            items: _monthItems(),
+            isExpanded: true,
+          ),
         ),
-      ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              labelText: 'Year',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            ),
+            value: year,
+            onChanged: (val) => onYearChanged(val!),
+            items: _yearItems(),
+            isExpanded: true,
+          ),
+        ),
+      ],
     );
+  }
+
+  List<DropdownMenuItem<String>> _monthItems() {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months.map((m) => DropdownMenuItem(value: m, child: Text(m))).toList();
+  }
+
+  List<DropdownMenuItem<String>> _yearItems() {
+    final currentYear = DateTime.now().year;
+    return List.generate(20, (i) {
+      final year = (currentYear - i).toString();
+      return DropdownMenuItem(value: year, child: Text(year));
+    });
   }
 }

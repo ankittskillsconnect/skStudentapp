@@ -539,11 +539,33 @@ class _MyAccountState extends State<MyAccount> {
                         backgroundColor: Colors.white,
                         builder: (_) => EditCertificateBottomSheet(
                           initialData: null,
-                          onSave: (data) {
-                            setState(() {
-                              certificatesList.add(data);
-                            });
-                            Navigator.pop(innerContext);
+                          onSave: (certif) async {
+                            try {
+                              final prefs = await SharedPreferences.getInstance();
+                              final authToken = prefs.getString('authToken') ?? '';
+                              final connectSid = prefs.getString('connectSid') ?? '';
+
+                              if (authToken.isEmpty || connectSid.isEmpty) {
+                                throw Exception('Missing auth token or session ID');
+                              }
+
+                              await CertificateApi.saveCertificateApi(
+                                model: certif,
+                                authToken: authToken,
+                                connectSid: connectSid,
+                              );
+
+                              await fetchCertificateDetails();
+                              if (innerContext.mounted) Navigator.pop(innerContext);
+                              // ScaffoldMessenger.of(innerContext).showSnackBar(
+                              //   const SnackBar(content: Text('Certificate added successfully')),
+                              // );
+                            } catch (e) {
+                              print('❌ Failed to add certificate: $e');
+                              ScaffoldMessenger.of(innerContext).showSnackBar(
+                                SnackBar(content: Text('Failed to add certificate: $e')),
+                              );
+                            }
                           },
                         ),
                       );
@@ -555,19 +577,64 @@ class _MyAccountState extends State<MyAccount> {
                         backgroundColor: Colors.white,
                         builder: (_) => EditCertificateBottomSheet(
                           initialData: certificate,
-                          onSave: (data) {
-                            setState(() {
-                              certificatesList[index] = data;
-                            });
-                            Navigator.pop(innerContext);
+                          onSave: (updatedCert) async {
+                            try {
+                              final prefs = await SharedPreferences.getInstance();
+                              final authToken = prefs.getString('authToken') ?? '';
+                              final connectSid = prefs.getString('connectSid') ?? '';
+
+                              if (authToken.isEmpty || connectSid.isEmpty) {
+                                throw Exception('Missing auth token or session ID');
+                              }
+
+                              await CertificateApi.saveCertificateApi(
+                                model: updatedCert,
+                                authToken: authToken,
+                                connectSid: connectSid,
+                              );
+
+                              await fetchCertificateDetails();
+                              if (innerContext.mounted) Navigator.pop(innerContext);
+                              // ScaffoldMessenger.of(innerContext).showSnackBar(
+                              //   const SnackBar(content: Text('Certificate updated successfully')),
+                              // );
+                            } catch (e) {
+                              print('❌ Failed to update certificate: $e');
+                              ScaffoldMessenger.of(innerContext).showSnackBar(
+                                SnackBar(content: Text('Failed to update certificate: $e')),
+                              );
+                            }
                           },
                         ),
                       );
                     },
-                    onDelete: (index) {
-                      setState(() {
-                        certificatesList.removeAt(index);
-                      });
+                    onDelete: (index) async {
+                      try {
+                        final cert = certificatesList[index];
+                        final prefs = await SharedPreferences.getInstance();
+                        final authToken = prefs.getString('authToken') ?? '';
+                        final connectSid = prefs.getString('connectSid') ?? '';
+
+                        if (authToken.isEmpty || connectSid.isEmpty) {
+                          throw Exception('Missing auth token or session ID');
+                        }
+
+                        // await CertificateApi.deleteCertificateApi(
+                        //   certificateId: cert.id, // replace with actual ID field name
+                        //   authToken: authToken,
+                        //   connectSid: connectSid,
+                        // );
+
+                        await fetchCertificateDetails();
+                        ScaffoldMessenger.of(innerContext).showSnackBar(
+                          const SnackBar(content: Text('Certificate deleted successfully')),
+                        );
+                      } catch (e) {
+                        print('❌ Failed to delete certificate: $e');
+                        ScaffoldMessenger.of(innerContext).showSnackBar(
+                          SnackBar(content: Text('Failed to delete: $e')),
+                        );
+                      }
                     },
                   ),
                   const SizedBox(height: 20),
@@ -631,21 +698,21 @@ class _MyAccountState extends State<MyAccount> {
                         ),
                       );
                     },
-                    onEdit: (language, index) {
-                      showModalBottomSheet(
-                        context: innerContext,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.white,
-                        builder: (_) => LanguageBottomSheet(
-                          initialData: language,
-                          onSave: (LanguagesModel data) {
-                            setState(() {
-                              languageList[index] = data;
-                            });
-                          },
-                        ),
-                      );
-                    },
+                    // onEdit: (language, index) {
+                    //   showModalBottomSheet(
+                    //     context: innerContext,
+                    //     isScrollControlled: true,
+                    //     backgroundColor: Colors.white,
+                    //     builder: (_) => LanguageBottomSheet(
+                    //       initialData: language,
+                    //       onSave: (LanguagesModel data) {
+                    //         setState(() {
+                    //           languageList[index] = data;
+                    //         });
+                    //       },
+                    //     ),
+                    //   );
+                    // },
                     onDelete: (index) {
                       setState(() {
                         languageList.removeAt(index);

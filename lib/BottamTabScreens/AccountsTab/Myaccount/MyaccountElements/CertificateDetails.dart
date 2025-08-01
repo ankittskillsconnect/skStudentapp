@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sk_loginscreen1/Model/CertificateDetails_Model.dart';
 import 'SectionHeader.dart';
 
-
 class CertificatesSection extends StatelessWidget {
   final List<CertificateModel> certificatesList;
   final bool isLoading;
@@ -90,20 +89,20 @@ class CertificatesSection extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        certificatesList[i].credId,
-                        style: TextStyle(
-                          fontSize: 13 * fontScale,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
                         certificatesList[i].description,
                         style: TextStyle(
                           fontSize: 13 * fontScale,
                           color: Colors.grey[600],
                         ),
                       ),
+                      // if (certificatesList[i].userId != null)
+                      //   Text(
+                      //     'User ID: ${certificatesList[i].userId}',
+                      //     style: TextStyle(
+                      //       fontSize: 12 * fontScale,
+                      //       color: Colors.grey[500],
+                      //     ),
+                      //   ),
                     ],
                   ),
                 ),

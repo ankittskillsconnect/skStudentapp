@@ -6,7 +6,7 @@ class LanguagesSection extends StatelessWidget {
   final List<LanguagesModel> languageList;
   final bool isLoading;
   final VoidCallback onAdd;
-  final Function(LanguagesModel, int) onEdit;
+  // final Function(LanguagesModel, int) onEdit;
   final Function(int) onDelete;
 
   const LanguagesSection({
@@ -14,7 +14,7 @@ class LanguagesSection extends StatelessWidget {
     required this.languageList,
     required this.isLoading,
     required this.onAdd,
-    required this.onEdit,
+    // required this.onEdit,
     required this.onDelete,
   });
 
@@ -81,10 +81,10 @@ class LanguagesSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
-                  onPressed: () => onEdit(languageList[i], i),
-                ),
+                // IconButton(
+                //   icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
+                //   onPressed: () => onEdit(languageList[i], i),
+                // ),
                 IconButton(
                   icon: const Icon(Icons.delete_outline, color: Colors.red),
                   onPressed: () => onDelete(i),

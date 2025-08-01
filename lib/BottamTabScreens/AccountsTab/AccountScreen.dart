@@ -28,6 +28,7 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
   AcountScreenImageModel? _profileData;
   int _selectedIndex = 0;
+  bool _isLoggingOut = false;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -39,8 +40,8 @@ class _AccountScreenState extends State<AccountScreen> {
     {"icon": Icons.person_outline, "label": "My Account"},
     {"icon": Icons.business_center_outlined, "label": "My Jobs"},
     {"icon": Icons.bookmark_add_outlined, "label": "Watchlist"},
-    {"icon": Icons.account_balance_outlined, "label": "Campus Ambassador"},
-    {"icon": Icons.ondemand_video_sharp, "label": "My interview videos"},
+    {"icon": Icons.assessment_outlined, "label": "Assessment"},
+    {"icon": Icons.ondemand_video_sharp, "label": "My Intro videos"},
     {"icon": Icons.settings_outlined, "label": "Account Settings"},
     {"icon": Icons.logout, "label": "Logout"},
   ];
@@ -48,10 +49,36 @@ class _AccountScreenState extends State<AccountScreen> {
   int selectedOptionIndex = -1;
 
   Future<void> _logout() async {
-    final loginService = loginUser();
-    await loginService.clearToken();
-    if (context.mounted) {
-      context.read<NavigationBloc>().add(GobackToLoginPage());
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldLogout == true) {
+      setState(() => _isLoggingOut = true);
+      final loginService = loginUser();
+      await loginService.clearToken();
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      if (context.mounted) {
+        context.read<NavigationBloc>().add(GobackToLoginPage());
+      }
+
+      setState(() => _isLoggingOut = false);
     }
   }
 
@@ -130,49 +157,51 @@ class _AccountScreenState extends State<AccountScreen> {
                 _profileData == null
                     ? ProfileHeaderShimmer(profileSize: profileSize)
                     : Column(
-                  children: [
-                    Container(
-                      width: profileSize,
-                      height: profileSize,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: const Color(0xFF005E6A),
-                          width: 2,
-                        ),
+                        children: [
+                          Container(
+                            width: profileSize,
+                            height: profileSize,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: const Color(0xFF005E6A),
+                                width: 2,
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: _profileData!.userImage != null
+                                  ? Image.network(
+                                      _profileData!.userImage!,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : const Image(
+                                      image: AssetImage(
+                                        'assets/placeholder.jpg',
+                                      ),
+                                      fit: BoxFit.cover,
+                                    ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            '${_profileData!.firstName ?? ''} ${_profileData!.lastName ?? ''}',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF005E6A),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          if (_profileData!.age != null)
+                            Text(
+                              _calculateAge(_profileData!.age!),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFF6A8E92),
+                              ),
+                            ),
+                        ],
                       ),
-                      child: ClipOval(
-                        child: _profileData!.userImage != null
-                            ? Image.network(
-                          _profileData!.userImage!,
-                          fit: BoxFit.cover,
-                        )
-                            : const Image(
-                          image: AssetImage('assets/placeholder.jpg'),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      '${_profileData!.firstName ?? ''} ${_profileData!.lastName ?? ''}',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF005E6A),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    if (_profileData!.age != null)
-                      Text(
-                        _calculateAge(_profileData!.age!),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF6A8E92),
-                        ),
-                      ),
-                  ],
-                ),
                 SizedBox(height: spacing * 1.0),
                 Expanded(
                   child: RefreshIndicator(
@@ -214,7 +243,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                   }
                                 });
                                 break;
-                              case 'My interview videos':
+                              case 'My Intro videos':
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -313,7 +342,6 @@ class _AccountOption extends StatelessWidget {
   }
 }
 
-
 class ProfileHeaderShimmer extends StatelessWidget {
   final double profileSize;
 
@@ -326,7 +354,6 @@ class ProfileHeaderShimmer extends StatelessWidget {
       highlightColor: Colors.grey.shade100,
       child: Column(
         children: [
-          // Profile circle placeholder
           Container(
             width: profileSize,
             height: profileSize,
@@ -336,26 +363,22 @@ class ProfileHeaderShimmer extends StatelessWidget {
             ),
           ),
 
-          // Matches: SizedBox(height: 12)
           const SizedBox(height: 12),
 
-          // Matches: Text first name + last name, fontSize 20
           Container(
-            width: 160, // Adjusted for realistic name width
-            height: 24, // Font size 20 + padding
+            width: 160,
+            height: 24,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(6),
             ),
           ),
 
-          // Matches: SizedBox(height: 2)
           const SizedBox(height: 2),
 
-          // Matches: Age text, fontSize 16
           Container(
             width: 100,
-            height: 18, // Font size 16 + padding
+            height: 18,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(6),
@@ -366,4 +389,3 @@ class ProfileHeaderShimmer extends StatelessWidget {
     );
   }
 }
-

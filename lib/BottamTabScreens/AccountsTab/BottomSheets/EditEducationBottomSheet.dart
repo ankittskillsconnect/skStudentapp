@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Model/EducationDetail_Model.dart';
 import '../../../Utilities/CollegeList_Api.dart';
+import '../../../Utilities/MyAccount_Get_Post/Get/EducationDetail_Api.dart';
 import '../../../Utilities/Specialization_Api.dart';
 import 'package:sk_loginscreen1/Utilities/AllCourse_Api.dart';
+import 'package:jwt_decode/jwt_decode.dart';
 
 class EditEducationBottomSheet extends StatefulWidget {
   final EducationDetailModel? initialData;
@@ -18,8 +20,7 @@ class EditEducationBottomSheet extends StatefulWidget {
   });
 
   @override
-  State<EditEducationBottomSheet> createState() =>
-      _EditEducationBottomSheetState();
+  State<EditEducationBottomSheet> createState() => _EditEducationBottomSheetState();
 }
 
 class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
@@ -29,16 +30,24 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
   late String courseName;
   late String specializationName;
   late String passingYear;
+  late String passingMonth;
+  late String courseType;
+  late String gradingSystem;
+  late String gradeName;
+  late String grade;
   bool isLoading = true;
 
   List<String> collegeList = [];
   List<String> courseList = [];
   List<String> specializationList = [];
+  List<String> courseTypeList = ['Full-Time', 'Part-Time', 'Corresponding/Distance'];
+  List<String> gradingSystemList = ['GPA out of 10', 'GPA out of 4', 'Percentage'];
 
   @override
   void initState() {
     super.initState();
     final data = widget.initialData;
+    print('Initial data: $data');
 
     _marksController = TextEditingController(text: data?.marks ?? '');
     degreeName = data?.degreeName ?? 'UnderGrad';
@@ -46,6 +55,11 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
     courseName = data?.courseName ?? '';
     specializationName = data?.specializationName ?? '';
     passingYear = data?.passingYear ?? '';
+    // passingMonth = data?.passingMonth ?? 'Jan';
+    // courseType = data?.courseType ?? 'Full-Time';
+    // gradingSystem = _mapGradingTypeToName(data?.gradingType ?? 1);
+    // gradeName = data?.gradeName ?? '';
+    // grade = data?.grade ?? '';
 
     _initData();
   }
@@ -121,15 +135,15 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
     try {
       final response = await http
           .post(
-            Uri.parse(
-              'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/course/list',
-            ),
-            headers: {
-              'Content-Type': 'application/json',
-              'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
-            },
-            body: jsonEncode({"course_name": courseName}),
-          )
+        Uri.parse(
+          'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/course/list',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
+        },
+        body: jsonEncode({"course_name": courseName}),
+      )
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
@@ -142,6 +156,42 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
       }
     } catch (_) {}
     return '';
+  }
+
+  Future<String> _resolveCollegeId(String collegeName) async {
+    // Placeholder: Implement college ID resolution API
+    return collegeName; // Temporary; replace with actual ID mapping
+  }
+
+  Future<String> _resolveSpecializationId(String specializationName) async {
+    // Placeholder: Implement specialization ID resolution API
+    return specializationName; // Temporary; replace with actual ID mapping
+  }
+
+  String _mapGradingTypeToName(int type) {
+    switch (type) {
+      case 1:
+        return 'GPA out of 10';
+      case 2:
+        return 'GPA out of 4';
+      case 3:
+        return 'Percentage';
+      default:
+        return 'Percentage';
+    }
+  }
+
+  int _mapGradingNameToType(String name) {
+    switch (name) {
+      case 'GPA out of 10':
+        return 1;
+      case 'GPA out of 4':
+        return 2;
+      case 'Percentage':
+        return 3;
+      default:
+        return 3;
+    }
   }
 
   @override
@@ -169,116 +219,132 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Edit Education Details',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                        ],
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Edit Education Details',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      Expanded(
-                        child: ListView(
-                          controller: scrollController,
-                          children: [
-                            _buildLabel("Degree Type"),
-                            _buildDropdownField(
-                              value: degreeName,
-                              items: const ["UnderGrad", "Graduate", "Open"],
-                              onChanged: (val) =>
-                                  setState(() => degreeName = val ?? ''),
-                            ),
-                            _buildLabel("College"),
-                            _buildDropdownField(
-                              value: collegeName,
-                              items: collegeList,
-                              onChanged: (val) =>
-                                  setState(() => collegeName = val ?? ''),
-                            ),
-                            _buildLabel("Course"),
-                            _buildDropdownField(
-                              value: courseName,
-                              items: courseList,
-                              onChanged: (val) {
-                                setState(() => courseName = val ?? '');
-                                _fetchSpecializationList();
-                              },
-                            ),
-                            _buildLabel("Specialization"),
-                            _buildDropdownField(
-                              value: specializationName,
-                              items: specializationList,
-                              onChanged: (val) => setState(
-                                () => specializationName = val ?? '',
-                              ),
-                            ),
-                            _buildLabel("Marks"),
-                            _buildTextField(
-                              "Enter percentage or grade",
-                              _marksController,
-                              keyboardType: TextInputType.number,
-                            ),
-                            _buildLabel("Year of Passing"),
-                            _buildDropdownField(
-                              value: passingYear,
-                              items: const ["2023", "2024", "2025"],
-                              onChanged: (val) =>
-                                  setState(() => passingYear = val ?? ''),
-                            ),
-                            const SizedBox(height: 30),
-                            ElevatedButton(
-                              onPressed: () {
-                                if (collegeList[0].contains("No") ||
-                                    courseList[0].contains("No") ||
-                                    specializationList[0].contains("No")) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        "Please ensure all data is loaded",
-                                      ),
-                                    ),
-                                  );
-                                  return;
-                                }
-                                final data = {
-                                  'educationDetail': EducationDetailModel(
-                                    marks: _marksController.text,
-                                    passingYear: passingYear,
-                                    degreeName: degreeName,
-                                    courseName: courseName,
-                                    specializationName: specializationName,
-                                    collegeMasterName: collegeName,
-                                  ),
-                                };
-                                widget.onSave(data);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF005E6A),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: ListView(
+                    controller: scrollController,
+                    children: [
+                      _buildLabel("Degree Type"),
+                      _buildDropdownField(
+                        value: degreeName,
+                        items: const ["UnderGrad", "Graduate", "PostGraduate"],
+                        onChanged: (val) => setState(() => degreeName = val ?? ''),
+                      ),
+                      _buildLabel("College"),
+                      _buildDropdownField(
+                        value: collegeName,
+                        items: collegeList,
+                        onChanged: (val) => setState(() => collegeName = val ?? ''),
+                      ),
+                      _buildLabel("Course"),
+                      _buildDropdownField(
+                        value: courseName,
+                        items: courseList,
+                        onChanged: (val) {
+                          setState(() => courseName = val ?? '');
+                          _fetchSpecializationList();
+                        },
+                      ),
+                      _buildLabel("Specialization"),
+                      _buildDropdownField(
+                        value: specializationName,
+                        items: specializationList,
+                        onChanged: (val) => setState(() => specializationName = val ?? ''),
+                      ),
+                      _buildLabel("Course Type"),
+                      _buildDropdownField(
+                        value: courseType,
+                        items: courseTypeList,
+                        onChanged: (val) => setState(() => courseType = val ?? ''),
+                      ),
+                      _buildLabel("Grading System"),
+                      _buildDropdownField(
+                        value: gradingSystem,
+                        items: gradingSystemList,
+                        onChanged: (val) => setState(() => gradingSystem = val ?? ''),
+                      ),
+                      _buildLabel("Marks"),
+                      _buildTextField(
+                        "Enter percentage or grade",
+                        _marksController,
+                        keyboardType: TextInputType.number,
+                      ),
+                      _buildLabel("Year of Passing"),
+                      _buildDropdownField(
+                        value: passingYear,
+                        items: const ["2023", "2024", "2025", "2026", "2027", "2028", "2029"],
+                        onChanged: (val) => setState(() => passingYear = val ?? ''),
+                      ),
+                      _buildLabel("Month of Passing"),
+                      _buildDropdownField(
+                        value: passingMonth,
+                        items: const [
+                          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                        ],
+                        onChanged: (val) => setState(() => passingMonth = val ?? ''),
+                      ),
+                      const SizedBox(height: 30),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (collegeList[0].contains("No") ||
+                              courseList[0].contains("No") ||
+                              specializationList[0].contains("No")) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Please ensure all data is loaded",
                                 ),
-                                minimumSize: const Size.fromHeight(50),
                               ),
-                              child: const Text(
-                                "Save",
-                                style: TextStyle(color: Colors.white),
-                              ),
+                            );
+                            return;
+                          }
+                          final data = {
+                            'educationDetail': EducationDetailModel(
+                              marks: _marksController.text,
+                              passingYear: passingYear,
+                              degreeName: degreeName,
+                              courseName: courseName,
+                              specializationName: specializationName,
+                              collegeMasterName: collegeName,
                             ),
-                          ],
+                          };
+                          widget.onSave(data);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF005E6A),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          minimumSize: const Size.fromHeight(50),
+                        ),
+                        child: const Text(
+                          "Save",
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
                     ],
                   ),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -313,10 +379,10 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
   }
 
   Widget _buildTextField(
-    String label,
-    TextEditingController controller, {
-    TextInputType keyboardType = TextInputType.text,
-  }) {
+      String label,
+      TextEditingController controller, {
+        TextInputType keyboardType = TextInputType.text,
+      }) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,

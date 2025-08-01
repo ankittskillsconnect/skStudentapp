@@ -218,45 +218,45 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
     }
   }
 
-  static Future<void> updatePersonalDetails({
-    required BuildContext context,
-    required PersonalDetailUpdateRequest request,
-    required VoidCallback onSuccess,
-  }) async {
-    final prefs = await SharedPreferences.getInstance();
-    final authToken = prefs.getString('authToken') ?? '';
-    final connectSid = prefs.getString('connectSid') ?? '';
-
-    final url = Uri.parse(
-      "https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/personal-details",
-    );
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': authToken,
-          'Cookie': connectSid,
-        },
-        body: jsonEncode(request.toJson()),
-      );
-
-      if (response.statusCode == 200) {
-        onSuccess();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Failed to update. Status: ${response.statusCode}"),
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e")));
-    }
-  }
+  // static Future<void> updatePersonalDetails({
+  //   required BuildContext context,
+  //   required PersonalDetailUpdateRequest request,
+  //   required VoidCallback onSuccess,
+  // }) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final authToken = prefs.getString('authToken') ?? '';
+  //   final connectSid = prefs.getString('connectSid') ?? '';
+  //
+  //   final url = Uri.parse(
+  //     "https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/personal-details",
+  //   );
+  //
+  //   try {
+  //     final response = await http.post(
+  //       url,
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': authToken,
+  //         'Cookie': connectSid,
+  //       },
+  //       body: jsonEncode(request.toJson()),
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       onSuccess();
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text("Failed to update. Status: ${response.statusCode}"),
+  //         ),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(
+  //       context,
+  //     ).showSnackBar(SnackBar(content: Text("Error: $e")));
+  //   }
+  // }
 
   @override
   void dispose() {
@@ -451,8 +451,8 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
-
                       const SizedBox(height: 20),
+
                     ],
                   ),
                 ),

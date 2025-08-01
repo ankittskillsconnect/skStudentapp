@@ -21,17 +21,35 @@ class loginUser {
         headers: headers,
         body: requestBody,
       );
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final token = data['token'];
 
+        String connectSid = '';
+        final rawCookie = response.headers['set-cookie'] ?? '';
+        final match = RegExp(r'connect\.sid=([^;]+)').firstMatch(rawCookie);
+        if (match != null) {
+          connectSid = match.group(1) ?? '';
+          print('✅ Extracted connect.sid: $connectSid');
+        } else {
+          print('⚠️ connect.sid not found in Set-Cookie header.');
+        }
+
         if (token != null && token is String) {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString(_tokenKey, token);
+          await prefs.setString('connectSid', connectSid);
+
+          print('✅ Token and connectSid saved to SharedPreferences.');
+          print('🔐 authToken: $token');
+          print('🍪 connectSid: $connectSid');
+
           return {
             'success': true,
             'message': 'Login successful',
             'token': token,
+            'cookie': rawCookie,
           };
         } else {
           return {'success': false, 'message': 'Token not found in response'};
@@ -55,5 +73,6 @@ class loginUser {
   Future<void> clearToken() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
+    await prefs.remove('connectSid');
   }
 }

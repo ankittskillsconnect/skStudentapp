@@ -82,14 +82,14 @@ class EducationSection extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${edu.courseName} \n${edu.specializationName} \nMarks - ${edu.marks}',
+                          '${edu.courseName} \n${edu.specializationName}\nMarks - ${edu.marks}',
                           style: TextStyle(
                             fontSize: 14 * fontScale,
                             color: const Color(0xFF003840),
                           ),
                         ),
                         Text(
-                          '${edu.collegeMasterName}\n${edu.passingYear}',
+                          '${edu.collegeMasterName}\n${edu.passingYear} ',
                           style: TextStyle(
                             fontSize: 14 * fontScale,
                             color: const Color(0xFF003840),
