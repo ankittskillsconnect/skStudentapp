@@ -474,9 +474,7 @@ class _MyAccountState extends State<MyAccount> {
                               .map((s) => s.trim())
                               .where((s) => s.isNotEmpty)
                               .toList();
-
                           final updatedSkills = parsedSkills.where((s) => s != singleSkill).toList();
-
                           if (updatedSkills.isEmpty) {
                             skillList.remove(skill);
                           } else {
@@ -548,13 +546,11 @@ class _MyAccountState extends State<MyAccount> {
                               if (authToken.isEmpty || connectSid.isEmpty) {
                                 throw Exception('Missing auth token or session ID');
                               }
-
                               await CertificateApi.saveCertificateApi(
                                 model: certif,
                                 authToken: authToken,
                                 connectSid: connectSid,
                               );
-
                               await fetchCertificateDetails();
                               if (innerContext.mounted) Navigator.pop(innerContext);
                               // ScaffoldMessenger.of(innerContext).showSnackBar(
@@ -626,9 +622,9 @@ class _MyAccountState extends State<MyAccount> {
                         // );
 
                         await fetchCertificateDetails();
-                        ScaffoldMessenger.of(innerContext).showSnackBar(
-                          const SnackBar(content: Text('Certificate deleted successfully')),
-                        );
+                        // ScaffoldMessenger.of(innerContext).showSnackBar(
+                        //   const SnackBar(content: Text('Certificate deleted successfully')),
+                        // );
                       } catch (e) {
                         print('❌ Failed to delete certificate: $e');
                         ScaffoldMessenger.of(innerContext).showSnackBar(

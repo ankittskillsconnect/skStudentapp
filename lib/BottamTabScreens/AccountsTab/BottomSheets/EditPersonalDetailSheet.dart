@@ -452,7 +452,6 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
                         ),
                       ),
                       const SizedBox(height: 20),
-
                     ],
                   ),
                 ),

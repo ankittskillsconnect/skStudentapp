@@ -28,7 +28,6 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
   String _issueYear = '2025';
   String _expiryMonth = 'Jan';
   String _expiryYear = '2025';
-
   bool isSaving = false;
 
   @override
@@ -126,15 +125,15 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
                       controller: scrollController,
                       children: [
                         _buildLabel('Certificate Name'),
-                        _buildTextField(_certificateNameController, 'Enter certificate name'),
+                        _buildTextField(_certificateNameController,),
                         _buildLabel('Issued Organization'),
-                        _buildTextField(_issuedOrgController, 'Enter organization name'),
+                        _buildTextField(_issuedOrgController, ),
                         _buildLabel('Credential ID'),
-                        _buildTextField(_credIdController, 'Enter credential ID'),
+                        _buildTextField(_credIdController, ),
                         _buildLabel('Credential URL'),
-                        _buildTextField(_urlController, 'Enter URL', required: false),
+                        _buildTextField(_urlController,  required: false),
                         _buildLabel('Description'),
-                        _buildTextField(_descriptionController, 'Enter description'),
+                        _buildTextField(_descriptionController, ),
                         _buildLabel('Issued Date'),
                         _buildDateRow(_issueMonth, _issueYear,
                                 (m) => setState(() => _issueMonth = m),
@@ -184,13 +183,13 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
     child: Text(text, style: const TextStyle(fontWeight: FontWeight.w700)),
   );
 
-  Widget _buildTextField(TextEditingController controller, String label, {bool required = true}) {
+  Widget _buildTextField(TextEditingController controller,  {bool required = true}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
-          labelText: label,
+
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
@@ -240,9 +239,20 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
 
   List<DropdownMenuItem<String>> _yearItems() {
     final currentYear = DateTime.now().year;
-    return List.generate(20, (i) {
-      final year = (currentYear - i).toString();
-      return DropdownMenuItem(value: year, child: Text(year));
-    });
+    final selectedYears = {
+      int.tryParse(_issueYear) ?? currentYear,
+      int.tryParse(_expiryYear) ?? currentYear,
+    };
+    final allYears = {
+      for (int i = 0; i < 20; i++) currentYear - i,
+      ...selectedYears,
+    }.toList()
+      ..sort((a, b) => b.compareTo(a));
+
+    return allYears.map((year) {
+      final yearStr = year.toString();
+      return DropdownMenuItem(value: yearStr, child: Text(yearStr));
+    }).toList();
   }
+
 }
