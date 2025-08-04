@@ -17,19 +17,15 @@ class PersonalDetailPostApi {
     required VoidCallback onSuccess,
   }) async {
     try {
-      print('🧠 Step 1: Getting SharedPreferences...');
       final prefs = await SharedPreferences.getInstance();
       final authToken = prefs.getString('authToken') ?? '';
       final connectSid = prefs.getString('connectSid') ?? '';
-      print('✅ Step 1 done. Tokens acquired.');
 
       print('🌐 Step 2: Resolving State ID for "$state"...');
       final stateId = await _resolveStateId(state);
       print('✅ State ID: $stateId');
 
-      print('🌐 Step 3: Resolving City ID for "$city"...');
       final cityId = await _resolveCityId(city, stateId);
-      print('✅ City ID: $cityId');
 
       var headers = {
         'Content-Type': 'application/json',
@@ -50,15 +46,12 @@ class PersonalDetailPostApi {
       });
 
 
-      print("📤 Step 4: Sending POST request with body: $body");
-
       var response = await http.post(
         Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/update-personal-details'),
         headers: headers,
         body: body,
       );
 
-      print('📩 Step 5: Response received. Status code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final res = json.decode(response.body);

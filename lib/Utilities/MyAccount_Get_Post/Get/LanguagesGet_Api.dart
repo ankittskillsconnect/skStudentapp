@@ -8,6 +8,7 @@ class LanguageDetailApi {
     required String connectSid,
   }) async {
     try {
+
       final url = Uri.parse(
         'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/language-details',
       );
@@ -54,6 +55,45 @@ class LanguageDetailApi {
     } catch (e) {
       print(' Language fetch error: $e');
       return [];
+    }
+  }
+
+
+  static Future<bool> updateLanguages({
+    required String authToken,
+    required String connectSid,
+    required LanguagesModel language,
+  }) async {
+    final url = Uri.parse(
+      'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/update-languages',
+    );
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
+    };
+
+    final body = json.encode(language.toJson());
+
+    try {
+      final request = http.Request('POST', url)
+        ..headers.addAll(headers)
+        ..body = body;
+
+      final response = await request.send();
+
+      final responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        print("✅ updateLanguages response: $responseBody");
+        return true;
+      } else {
+        print("❌ updateLanguages failed: ${response.statusCode} - $responseBody");
+        return false;
+      }
+    } catch (e) {
+      print("🚨 Exception in updateLanguages: $e");
+      return false;
     }
   }
 }

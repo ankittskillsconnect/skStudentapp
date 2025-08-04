@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../Model/LanguageMaster_Model.dart';
 import '../../../Model/Languages_Model.dart';
 import '../../../Utilities/Language_Api.dart';
+import '../../../Utilities/MyAccount_Get_Post/Get/LanguagesGet_Api.dart';
 
 class LanguageBottomSheet extends StatefulWidget {
   final LanguagesModel? initialData;
@@ -19,10 +21,12 @@ class LanguageBottomSheet extends StatefulWidget {
 
 class _LanguageBottomSheetState extends State<LanguageBottomSheet>
     with SingleTickerProviderStateMixin {
-  late String selectedLanguage;
-  late String selectedProficiency;
   bool isLoading = true;
-  List<String> allLanguages = [];
+  bool isSaving = false;
+  List<LanguageMasterModel> masterLanguages = [];
+
+  LanguageMasterModel? selectedLanguage;
+  late String selectedProficiency;
 
   final List<String> _proficiencyLevels = [
     'Basic',
@@ -37,7 +41,6 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
   void initState() {
     super.initState();
 
-    selectedLanguage = widget.initialData?.languageName ?? '';
     selectedProficiency =
         widget.initialData?.proficiency ?? _proficiencyLevels[0];
 
@@ -57,23 +60,52 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
     final authToken = prefs.getString('authToken') ?? '';
     final connectSid = prefs.getString('connectSid') ?? '';
 
-    final languages = await LanguageListApi.fetchLanguages(
-      authToken: authToken,
-      connectSid: connectSid,
-    );
+    print("🔐 [Auth] authToken: $authToken");
+    print("🔐 [Auth] connectSid: $connectSid");
 
-    setState(() {
-      allLanguages = languages;
-      if (allLanguages.isNotEmpty) {
-        final isInitialValid = allLanguages.contains(selectedLanguage);
-        if (!isInitialValid) {
-          selectedLanguage = allLanguages[0];
-        }
+    try {
+      print("🌐 Calling fetchLanguages API...");
+      final languages = await LanguageListApi.fetchLanguages(
+        authToken: authToken,
+        connectSid: connectSid,
+      );
+
+      print("✅ API returned ${languages.length} languages");
+      for (var lang in languages) {
+        print("📝 Language item => id: ${lang.languageId}, name: ${lang.languageName}");
       }
-      isLoading = false;
-    });
 
-    _animationController.forward();
+      setState(() {
+        masterLanguages = languages;
+
+        if (widget.initialData != null) {
+          print("🔄 Matching initialData with fetched list...");
+          selectedLanguage = masterLanguages.firstWhere(
+                (lang) => lang.languageName == widget.initialData!.languageName,
+            orElse: () {
+              print("⚠️ No exact match found. Defaulting to first item.");
+              return masterLanguages.first;
+            },
+          );
+          print("✅ Selected from initialData: ${selectedLanguage?.languageName}");
+        } else {
+          selectedLanguage = masterLanguages.isNotEmpty ? masterLanguages.first : null;
+          print("🔰 No initial data. Defaulted selectedLanguage to: ${selectedLanguage?.languageName}");
+        }
+
+        isLoading = false;
+      });
+
+      _animationController.forward();
+    } catch (e, stackTrace) {
+      print("❌ fetchLanguages error: $e");
+      print("🧱 StackTrace:\n$stackTrace");
+
+      setState(() => isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load languages: $e')),
+      );
+    }
   }
 
   @override
@@ -116,8 +148,7 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
                   child: ListView(
                     controller: scrollController,
                     padding: EdgeInsets.only(
-                      bottom:
-                      MediaQuery.of(context).viewInsets.bottom +
+                      bottom: MediaQuery.of(context).viewInsets.bottom +
                           10 * sizeScale,
                     ),
                     children: [
@@ -202,40 +233,39 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
   }
 
   Widget _buildLanguageDropdown() {
-    return _buildDropdownField(
-      value: selectedLanguage,
-      items: allLanguages,
-      onChanged: (val) => setState(() => selectedLanguage = val ?? ''),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: DropdownButtonFormField<LanguageMasterModel>(
+        value: selectedLanguage,
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+        ),
+        items: masterLanguages.map((lang) {
+          return DropdownMenuItem(
+            value: lang,
+            child: Text(lang.languageName),
+          );
+        }).toList(),
+        onChanged: (val) => setState(() => selectedLanguage = val),
+      ),
     );
   }
 
   Widget _buildProficiencyDropdown() {
-    return _buildDropdownField(
-      value: selectedProficiency,
-      items: _proficiencyLevels,
-      onChanged: (val) => setState(() => selectedProficiency = val ?? ''),
-    );
-  }
-
-  Widget _buildDropdownField({
-    required String value,
-    required List<String> items,
-    required void Function(String?) onChanged,
-  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: DropdownButtonFormField<String>(
-        value: items.contains(value) ? value : null,
+        value: selectedProficiency,
         decoration: const InputDecoration(
           border: OutlineInputBorder(),
         ),
-        items: items.toSet().map((item) {
+        items: _proficiencyLevels.map((level) {
           return DropdownMenuItem<String>(
-            value: item,
-            child: Text(item),
+            value: level,
+            child: Text(level),
           );
         }).toList(),
-        onChanged: onChanged,
+        onChanged: (val) => setState(() => selectedProficiency = val ?? ''),
       ),
     );
   }
@@ -251,24 +281,57 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
             borderRadius: BorderRadius.circular(30),
           ),
         ),
-        onPressed: () {
-          if (selectedLanguage.isEmpty || selectedProficiency.isEmpty) {
+        onPressed: isSaving
+            ? null
+            : () async {
+          if (selectedLanguage == null || selectedProficiency.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Please fill all required fields')),
             );
             return;
           }
 
-          final result = LanguagesModel(
-            languageName: selectedLanguage,
+          setState(() => isSaving = true);
+
+          final prefs = await SharedPreferences.getInstance();
+          final authToken = prefs.getString('authToken') ?? '';
+          final connectSid = prefs.getString('connectSid') ?? '';
+
+          final languageToSave = LanguagesModel(
+            languageId: selectedLanguage!.languageId,
+            languageName: selectedLanguage!.languageName,
             proficiency: selectedProficiency,
           );
 
-          widget.onSave(result);
-          Navigator.pop(context);
+          final success = await LanguageDetailApi.updateLanguages(
+            authToken: authToken,
+            connectSid: connectSid,
+            language: languageToSave,
+          );
+
+          setState(() => isSaving = false);
+
+          if (success) {
+            widget.onSave(languageToSave);
+            Navigator.pop(context);
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   const SnackBar(content: Text('Language updated successfully!')),
+            // );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Failed to update language. Please try again.')),
+            );
+          }
         },
-        child: const Text("Submit", style: TextStyle(color: Colors.white)),
+        child: isSaving
+            ? const SizedBox(
+          height: 20,
+          width: 20,
+          child: CircularProgressIndicator(color: Colors.white),
+        )
+            : const Text("Submit", style: TextStyle(color: Colors.white)),
       ),
     );
   }
+
 }

@@ -307,7 +307,6 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
                       _buildLabel("First Name"),
                       _buildTextField("Enter first name", firstNameController),
                       _buildLabel("Last Name"),
@@ -361,7 +360,6 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
                             ? null
                             : () async {
                           setState(() => isSubmitting = true);
-
                           final firstName = firstNameController.text.trim();
                           final lastName = lastNameController.text.trim();
                           final dob = dobController.text.trim();
@@ -369,30 +367,30 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
                           final whatsapp = whatsappController.text.trim();
                           final email = emailController.text.trim();
 
-                          if (selectedState == 'No States Available' || selectedCity.contains('No')) {
+                          if (selectedState == 'No States Available' ||
+                              selectedState.isEmpty ||
+                              selectedCity.isEmpty ||
+                              selectedCity == 'Select a state first' ||
+                              selectedCity.contains('No')) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("Please ensure all data is valid"),
+                                content: Text("Please select a valid state and city."),
                               ),
                             );
                             setState(() => isSubmitting = false);
                             return;
                           }
-
                           if (firstName.isEmpty ||
                               lastName.isEmpty ||
-                              dob.isEmpty ||
-                              selectedState.isEmpty ||
-                              selectedCity.isEmpty) {
+                              dob.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("Please fill all required fields"),
+                                content: Text("Please fill all required fields."),
                               ),
                             );
                             setState(() => isSubmitting = false);
                             return;
                           }
-
                           final request = PersonalDetailUpdateRequest(
                             firstName: firstName,
                             lastName: lastName,
@@ -400,7 +398,6 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
                             state: selectedState,
                             city: selectedCity,
                           );
-
                           await PersonalDetailPostApi.updatePersonalDetails(
                             context: context,
                             request: request,
@@ -415,9 +412,7 @@ class _EditPersonalDetailsSheetState extends State<EditPersonalDetailsSheet>
                                 state: selectedState,
                                 city: selectedCity,
                               );
-
                               widget.onSave(updatedData);
-
                               if (context.mounted) {
                                 context.read<ProfileBloc>().add(LoadProfileData());
                                 Navigator.of(context).pop();

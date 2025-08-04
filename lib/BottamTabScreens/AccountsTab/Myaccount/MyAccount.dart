@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http ;
+import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -28,6 +28,7 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditPe
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditSkillsBottomSheet.dart';
 import 'package:icons_plus/icons_plus.dart';
 import '../../../Model/Image_update_Model.dart';
+import '../../../Model/LanguageMaster_Model.dart';
 import '../../../Model/Percentage_bar_Model.dart';
 import '../../../Utilities/MyAccount_Get_Post/Get/Image_Api.dart';
 import '../../../Utilities/MyAccount_Get_Post/Post/Skills_Post_Api.dart';
@@ -49,7 +50,6 @@ class MyAccount extends StatefulWidget {
 }
 
 class _MyAccountState extends State<MyAccount> {
-
   String fullname = "John";
   EducationDetailModel? educationDetail;
   PersonalDetailModel? personalDetail;
@@ -72,6 +72,9 @@ class _MyAccountState extends State<MyAccount> {
   File? _profileImage;
   ProfileCompletionModel? profileCompletion;
   bool isLoadingProfilePercentage = true;
+  // List<Map<String, dynamic>> availableLanguages = [];
+  // late List<LanguageMasterModel> parsedLanguageList = [];
+
 
   @override
   void initState() {
@@ -84,10 +87,7 @@ class _MyAccountState extends State<MyAccount> {
     fetchLanguageData();
     _fetchPersonalDetails();
     _loadProfileImageFromApi();
-
   }
-
-
 
   Future<void> _loadProfileImageFromApi() async {
     final prefs = await SharedPreferences.getInstance();
@@ -249,6 +249,45 @@ class _MyAccountState extends State<MyAccount> {
     }
   }
 
+  // static Future<Map<String, dynamic>> fetchLanguagesRawResponse({
+  //   required String authToken,
+  //   required String connectSid,
+  // }) async {
+  //   final url = Uri.parse(
+  //     'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/language-details',
+  //   );
+  //
+  //   final headers = {
+  //     'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
+  //   };
+  //
+  //   print('📤 [fetchLanguagesRawResponse] Sending request to: $url');
+  //   print('📤 [fetchLanguagesRawResponse] Headers: $headers');
+  //
+  //   try {
+  //     final request = http.Request('GET', url)..headers.addAll(headers);
+  //     final streamedResponse = await request.send();
+  //     final responseBody = await streamedResponse.stream.bytesToString();
+  //
+  //     print('📥 [fetchLanguagesRawResponse] Status: ${streamedResponse.statusCode}');
+  //     print('📥 [fetchLanguagesRawResponse] Body: $responseBody');
+  //
+  //     if (streamedResponse.statusCode == 200) {
+  //       final decoded = json.decode(responseBody);
+  //       return {
+  //         'languages': decoded['languages'] ?? [],
+  //       };
+  //     }
+  //
+  //     print('❌ [fetchLanguagesRawResponse] Failed to fetch language list.');
+  //     return {'languages': []};
+  //   } catch (e) {
+  //     print('❌ [fetchLanguagesRawResponse] Exception: $e');
+  //     return {'languages': []};
+  //   }
+  // }
+
+
   Future<void> fetchLanguageData() async {
     final prefs = await SharedPreferences.getInstance();
     final authToken = prefs.getString('authToken') ?? '';
@@ -329,7 +368,6 @@ class _MyAccountState extends State<MyAccount> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -390,7 +428,6 @@ class _MyAccountState extends State<MyAccount> {
                             setState(() {
                               personalDetail = updatedData;
                             });
-
                           },
                         ),
                       );
@@ -467,22 +504,23 @@ class _MyAccountState extends State<MyAccount> {
                         ),
                       );
                     },
-                      onDeleteSkill: (skill, singleSkill) {
-                        setState(() {
-                          final parsedSkills = skill.skills
-                              .split(RegExp(r',(?![^()]*\))'))
-                              .map((s) => s.trim())
-                              .where((s) => s.isNotEmpty)
-                              .toList();
-                          final updatedSkills = parsedSkills.where((s) => s != singleSkill).toList();
-                          if (updatedSkills.isEmpty) {
-                            skillList.remove(skill);
-                          } else {
-                            skill.skills = updatedSkills.join(', ');
-                          }
-                        });
-                      }
-
+                    onDeleteSkill: (skill, singleSkill) {
+                      setState(() {
+                        final parsedSkills = skill.skills
+                            .split(RegExp(r',(?![^()]*\))'))
+                            .map((s) => s.trim())
+                            .where((s) => s.isNotEmpty)
+                            .toList();
+                        final updatedSkills = parsedSkills
+                            .where((s) => s != singleSkill)
+                            .toList();
+                        if (updatedSkills.isEmpty) {
+                          skillList.remove(skill);
+                        } else {
+                          skill.skills = updatedSkills.join(', ');
+                        }
+                      });
+                    },
                   ),
                   const SizedBox(height: 20),
                   ProjectsSection(
@@ -539,12 +577,17 @@ class _MyAccountState extends State<MyAccount> {
                           initialData: null,
                           onSave: (certif) async {
                             try {
-                              final prefs = await SharedPreferences.getInstance();
-                              final authToken = prefs.getString('authToken') ?? '';
-                              final connectSid = prefs.getString('connectSid') ?? '';
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              final authToken =
+                                  prefs.getString('authToken') ?? '';
+                              final connectSid =
+                                  prefs.getString('connectSid') ?? '';
 
                               if (authToken.isEmpty || connectSid.isEmpty) {
-                                throw Exception('Missing auth token or session ID');
+                                throw Exception(
+                                  'Missing auth token or session ID',
+                                );
                               }
                               await CertificateApi.saveCertificateApi(
                                 model: certif,
@@ -552,14 +595,19 @@ class _MyAccountState extends State<MyAccount> {
                                 connectSid: connectSid,
                               );
                               await fetchCertificateDetails();
-                              if (innerContext.mounted) Navigator.pop(innerContext);
+                              if (innerContext.mounted)
+                                Navigator.pop(innerContext);
                               // ScaffoldMessenger.of(innerContext).showSnackBar(
                               //   const SnackBar(content: Text('Certificate added successfully')),
                               // );
                             } catch (e) {
                               print('❌ Failed to add certificate: $e');
                               ScaffoldMessenger.of(innerContext).showSnackBar(
-                                SnackBar(content: Text('Failed to add certificate: $e')),
+                                SnackBar(
+                                  content: Text(
+                                    'Failed to add certificate: $e',
+                                  ),
+                                ),
                               );
                             }
                           },
@@ -575,12 +623,17 @@ class _MyAccountState extends State<MyAccount> {
                           initialData: certificate,
                           onSave: (updatedCert) async {
                             try {
-                              final prefs = await SharedPreferences.getInstance();
-                              final authToken = prefs.getString('authToken') ?? '';
-                              final connectSid = prefs.getString('connectSid') ?? '';
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              final authToken =
+                                  prefs.getString('authToken') ?? '';
+                              final connectSid =
+                                  prefs.getString('connectSid') ?? '';
 
                               if (authToken.isEmpty || connectSid.isEmpty) {
-                                throw Exception('Missing auth token or session ID');
+                                throw Exception(
+                                  'Missing auth token or session ID',
+                                );
                               }
 
                               await CertificateApi.saveCertificateApi(
@@ -590,14 +643,19 @@ class _MyAccountState extends State<MyAccount> {
                               );
 
                               await fetchCertificateDetails();
-                              if (innerContext.mounted) Navigator.pop(innerContext);
+                              if (innerContext.mounted)
+                                Navigator.pop(innerContext);
                               // ScaffoldMessenger.of(innerContext).showSnackBar(
                               //   const SnackBar(content: Text('Certificate updated successfully')),
                               // );
                             } catch (e) {
                               print('❌ Failed to update certificate: $e');
                               ScaffoldMessenger.of(innerContext).showSnackBar(
-                                SnackBar(content: Text('Failed to update certificate: $e')),
+                                SnackBar(
+                                  content: Text(
+                                    'Failed to update certificate: $e',
+                                  ),
+                                ),
                               );
                             }
                           },
@@ -694,6 +752,12 @@ class _MyAccountState extends State<MyAccount> {
                         ),
                       );
                     },
+                    onDelete: (index) {
+                      setState(() {
+                        languageList.removeAt(index);
+                      });
+                    },
+                    // // If you want to enable edit too:
                     // onEdit: (language, index) {
                     //   showModalBottomSheet(
                     //     context: innerContext,
@@ -709,12 +773,8 @@ class _MyAccountState extends State<MyAccount> {
                     //     ),
                     //   );
                     // },
-                    onDelete: (index) {
-                      setState(() {
-                        languageList.removeAt(index);
-                      });
-                    },
                   ),
+
                   const SizedBox(height: 20),
                 ],
               ),
@@ -784,8 +844,11 @@ class _MyAccountState extends State<MyAccount> {
         ),
         const SizedBox(height: 12),
         Text(
-          '${_imageUpdateData?.firstName ?? ''} ${_imageUpdateData?.lastName ?? ''}'.trim().isNotEmpty
-              ? '${_imageUpdateData?.firstName ?? ''} ${_imageUpdateData?.lastName ?? ''}'.trim()
+          '${_imageUpdateData?.firstName ?? ''} ${_imageUpdateData?.lastName ?? ''}'
+                  .trim()
+                  .isNotEmpty
+              ? '${_imageUpdateData?.firstName ?? ''} ${_imageUpdateData?.lastName ?? ''}'
+                    .trim()
               : '',
           style: TextStyle(
             fontSize: 20,
@@ -793,16 +856,7 @@ class _MyAccountState extends State<MyAccount> {
             color: const Color(0xFF005E6A),
           ),
         ),
-
       ],
     );
   }
-
 }
-
-
-
-
-
-
-
