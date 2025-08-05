@@ -60,17 +60,13 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
     final authToken = prefs.getString('authToken') ?? '';
     final connectSid = prefs.getString('connectSid') ?? '';
 
-    print("🔐 [Auth] authToken: $authToken");
-    print("🔐 [Auth] connectSid: $connectSid");
 
     try {
-      print("🌐 Calling fetchLanguages API...");
       final languages = await LanguageListApi.fetchLanguages(
         authToken: authToken,
         connectSid: connectSid,
       );
 
-      print("✅ API returned ${languages.length} languages");
       for (var lang in languages) {
         print("📝 Language item => id: ${lang.languageId}, name: ${lang.languageName}");
       }
@@ -79,7 +75,6 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
         masterLanguages = languages;
 
         if (widget.initialData != null) {
-          print("🔄 Matching initialData with fetched list...");
           selectedLanguage = masterLanguages.firstWhere(
                 (lang) => lang.languageName == widget.initialData!.languageName,
             orElse: () {
@@ -90,7 +85,6 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
           print("✅ Selected from initialData: ${selectedLanguage?.languageName}");
         } else {
           selectedLanguage = masterLanguages.isNotEmpty ? masterLanguages.first : null;
-          print("🔰 No initial data. Defaulted selectedLanguage to: ${selectedLanguage?.languageName}");
         }
 
         isLoading = false;
@@ -98,9 +92,6 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
 
       _animationController.forward();
     } catch (e, stackTrace) {
-      print("❌ fetchLanguages error: $e");
-      print("🧱 StackTrace:\n$stackTrace");
-
       setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load languages: $e')),
@@ -152,10 +143,10 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
                           10 * sizeScale,
                     ),
                     children: [
-                      _buildLabel("Select language*", required: true),
+                      _buildLabel("Select language", required: true),
                       _buildLanguageDropdown(),
                       const SizedBox(height: 16),
-                      _buildLabel("Select proficiency*", required: true),
+                      _buildLabel("Select proficiency", required: true),
                       _buildProficiencyDropdown(),
                       const SizedBox(height: 30),
                       _buildSubmitButton(),
@@ -281,6 +272,7 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
             borderRadius: BorderRadius.circular(30),
           ),
         ),
+
         onPressed: isSaving
             ? null
             : () async {

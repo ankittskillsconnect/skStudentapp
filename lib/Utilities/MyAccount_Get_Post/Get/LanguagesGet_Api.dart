@@ -58,7 +58,6 @@ class LanguageDetailApi {
     }
   }
 
-
   static Future<bool> updateLanguages({
     required String authToken,
     required String connectSid,

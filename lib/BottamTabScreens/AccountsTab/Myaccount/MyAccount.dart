@@ -697,32 +697,48 @@ class _MyAccountState extends State<MyAccount> {
                     isLoading: isLoadingWorkExperience,
                     onAdd: () {
                       showModalBottomSheet(
-                        context: innerContext,
+                        context: context,
                         isScrollControlled: true,
                         backgroundColor: Colors.white,
-                        builder: (_) => Editworkexperiencebottomsheet(
+                        builder: (_) => EditWorkExperienceBottomSheet(
                           initialData: null,
-                          onSave: (WorkExperienceModel newData) {
-                            setState(() {
-                              workExperiences.add(newData);
-                            });
-                            Navigator.pop(innerContext);
+                          onSave: (WorkExperienceModel newData) async {
+                            final prefs = await SharedPreferences.getInstance();
+                            final authToken = prefs.getString('authToken') ?? '';
+                            final connectSid = prefs.getString('connectSid') ?? '';
+
+                            final success = await WorkExperienceApi.saveWorkExperience(
+                              model: newData,
+                              authToken: authToken,
+                              connectSid: connectSid,
+                            );
+
+                            if (success) await fetchWorkExperienceDetails();
+
+                            Navigator.pop(context);
                           },
                         ),
                       );
                     },
                     onEdit: (workExperience, index) {
                       showModalBottomSheet(
-                        context: innerContext,
+                        context: context,
                         isScrollControlled: true,
                         backgroundColor: Colors.white,
-                        builder: (_) => Editworkexperiencebottomsheet(
+                        builder: (_) => EditWorkExperienceBottomSheet(
                           initialData: workExperience,
-                          onSave: (WorkExperienceModel updated) {
-                            setState(() {
-                              workExperiences[index] = updated;
-                            });
-                            Navigator.pop(innerContext);
+                          onSave: (WorkExperienceModel updated) async {
+                            final prefs = await SharedPreferences.getInstance();
+                            final authToken = prefs.getString('authToken') ?? '';
+                            final connectSid = prefs.getString('connectSid') ?? '';
+
+                            final success = await WorkExperienceApi.saveWorkExperience(
+                              model: updated,
+                              authToken: authToken,
+                              connectSid: connectSid,
+                            );
+                            if (success) await fetchWorkExperienceDetails();
+                            Navigator.pop(context);
                           },
                         ),
                       );
@@ -733,6 +749,7 @@ class _MyAccountState extends State<MyAccount> {
                       });
                     },
                   ),
+
                   const SizedBox(height: 20),
                   LanguagesSection(
                     languageList: languageList,

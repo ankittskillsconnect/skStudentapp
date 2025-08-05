@@ -2,36 +2,54 @@ import 'package:flutter/material.dart';
 
 import '../../../Model/WorkExperience_Model.dart';
 
-class Editworkexperiencebottomsheet extends StatefulWidget {
+class EditWorkExperienceBottomSheet extends StatefulWidget {
   final WorkExperienceModel? initialData;
   final Function(WorkExperienceModel) onSave;
 
-  const Editworkexperiencebottomsheet({
+  const EditWorkExperienceBottomSheet({
     super.key,
     required this.initialData,
     required this.onSave,
   });
 
   @override
-  State<Editworkexperiencebottomsheet> createState() =>
-      _EditworkexperiencebottomsheetState();
+  State<EditWorkExperienceBottomSheet> createState() =>
+      _EditWorkExperienceBottomSheetState();
 }
 
-class _EditworkexperiencebottomsheetState
-    extends State<Editworkexperiencebottomsheet> {
+class _EditWorkExperienceBottomSheetState
+    extends State<EditWorkExperienceBottomSheet> {
+  final _formKey = GlobalKey<FormState>();
+
   late TextEditingController _jobTitleController;
   late TextEditingController _organizationController;
   late TextEditingController _skillsController;
-  late TextEditingController _fromDateController;
-  late TextEditingController _toDateController;
+  late TextEditingController _jobDescriptionController;
+
+  late String _fromMonth;
+  late String _fromYear;
+  late String _toMonth;
+  late String _toYear;
+
   late String experienceInYear;
   late String experienceInMonths;
-  late TextEditingController _salaryInLakhsController;
-  late TextEditingController _jobDescriptionController;
+  late String salaryInLakhs;
+  late String salaryInThousands;
+
+  bool saving = false;
 
   @override
   void initState() {
     super.initState();
+
+    const validMonths = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+
+    final currentYear = DateTime.now().year;
+    final validYears = List<String>.generate(30, (i) => (currentYear - i).toString());
+
     _jobTitleController = TextEditingController(
       text: widget.initialData?.jobTitle ?? '',
     );
@@ -41,60 +59,69 @@ class _EditworkexperiencebottomsheetState
     _skillsController = TextEditingController(
       text: widget.initialData?.skills ?? '',
     );
-    _fromDateController = TextEditingController(
-      text: widget.initialData?.workFromDate ?? '',
-    );
-    _toDateController = TextEditingController(
-      text: widget.initialData?.workToDate ?? '',
-    );
-    experienceInYear = widget.initialData?.totalExperienceYears ?? '0';
-    experienceInMonths = widget.initialData?.totalExperienceMonths ?? '0';
-    _salaryInLakhsController = TextEditingController(
-      text: widget.initialData?.salaryInLakhs ?? '',
-    );
     _jobDescriptionController = TextEditingController(
       text: widget.initialData?.jobDescription ?? '',
     );
+
+    _fromMonth = validMonths.contains(widget.initialData?.exStartMonth)
+        ? widget.initialData!.exStartMonth
+        : 'Jan';
+
+    _fromYear = validYears.contains(widget.initialData?.exStartYear)
+        ? widget.initialData!.exStartYear
+        : currentYear.toString();
+
+    _toMonth = validMonths.contains(widget.initialData?.exEndMonth)
+        ? widget.initialData!.exEndMonth
+        : 'Jan';
+
+    _toYear = validYears.contains(widget.initialData?.exEndYear)
+        ? widget.initialData!.exEndYear
+        : currentYear.toString();
+
+    experienceInYear = widget.initialData?.totalExperienceYears ?? '0';
+    experienceInMonths = widget.initialData?.totalExperienceMonths ?? '0';
+    salaryInLakhs = widget.initialData?.salaryInLakhs ?? '0';
+    salaryInThousands = widget.initialData?.salaryInThousands ?? '0';
   }
+
 
   @override
   void dispose() {
     _jobTitleController.dispose();
     _organizationController.dispose();
     _skillsController.dispose();
-    _fromDateController.dispose();
-    _toDateController.dispose();
-    _salaryInLakhsController.dispose();
     _jobDescriptionController.dispose();
     super.dispose();
   }
 
-  Future<void> _selectDate(
-    BuildContext context,
-    TextEditingController controller,
-  ) async {
-    DateTime initialDate = DateTime.now();
-    if (controller.text.isNotEmpty) {
-      initialDate = DateTime.parse(controller.text);
-    }
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+  void _handleSave() {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => saving = true);
+    final workExperience = WorkExperienceModel(
+      workExperienceId: widget.initialData?.workExperienceId,
+      jobTitle: _jobTitleController.text.trim(),
+      organization: _organizationController.text.trim(),
+      skills: _skillsController.text.trim(),
+      workFromDate: '$_fromMonth-$_fromYear',
+      workToDate: '$_toMonth-$_toYear',
+      totalExperienceYears: experienceInYear,
+      totalExperienceMonths: experienceInMonths,
+      salaryInLakhs: salaryInLakhs,
+      salaryInThousands: salaryInThousands,
+      jobDescription: _jobDescriptionController.text.trim(),
+      exStartMonth: _fromMonth,
+      exStartYear: _fromYear,
+      exEndMonth: _toMonth,
+      exEndYear: _toYear,
     );
-    if (picked != null) {
-      setState(() {
-        controller.text = picked.toIso8601String().split('T')[0];
-      });
+    print("📤 Saving WorkExperienceModel with:");
+    print("🔍 initialData is null: ${widget.initialData == null}");
+    if (widget.initialData != null) {
+      print("🟡 initialData.workExperienceId: ${widget.initialData!.workExperienceId}");
     }
-  }
-
-  String _formatWorkExpDetail() {
-    return '''
-${_jobTitleController.text}\nCompany name : ${_organizationController.text}\nskills: ${_skillsController.text}\n fromDate: ${_fromDateController.text} - toDate: ${_toDateController.text}- Experience Year - $experienceInYear
-Experience month - $experienceInMonths AnnuaL Salary - ${_salaryInLakhsController.text} Job detail - ${_jobDescriptionController.text}
-''';
+    print("🟡 workExperienceId in model: ${workExperience.workExperienceId}");
+    widget.onSave(workExperience);
   }
 
   @override
@@ -118,123 +145,150 @@ Experience month - $experienceInMonths AnnuaL Salary - ${_salaryInLakhsControlle
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Work Experience',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF003840),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Color(0xFF005E6A)),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: ListView(
-                  controller: scrollController,
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom,
-                  ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildLabel("Job Title"),
-                    _buildTextField("Enter Job name", _jobTitleController),
-                    _buildLabel("Company Name"),
-                    _buildTextField(
-                      "Enter issuing organization",
-                      _organizationController,
-                    ),
-                    _buildLabel("Add Skills"),
-                    _buildTextField("Enter skills", _skillsController),
-                    _buildLabel("From Date"),
-                    _buildTextField(
-                      "Select date",
-                      _fromDateController,
-                      suffixIcon: Icons.calendar_today,
-                      readOnly: true,
-                      onTap: () => _selectDate(context, _fromDateController),
-                    ),
-                    _buildLabel("To Date"),
-                    _buildTextField(
-                      "Select  date",
-                      _toDateController,
-                      suffixIcon: Icons.calendar_today,
-                      readOnly: true,
-                      onTap: () => _selectDate(context, _toDateController),
-                    ),
-                    _buildLabel("Experience in years"),
-                    _dropdownField(
-                      value: experienceInYear,
-                      items: const ["1", "2", "3", "4", "5", "6"],
-                      onChanged: (val) =>
-                          setState(() => experienceInYear = val!),
-                    ),
-                    _buildLabel("Experience in months"),
-                    _dropdownField(
-                      value: experienceInMonths,
-                      items: const [
-                        "1",
-                        "2",
-                        "3",
-                        "4",
-                        "5",
-                        "6",
-                        "7",
-                        "8",
-                        "9",
-                        "10",
-                        "11",
-                        "12",
-                      ],
-                      onChanged: (val) =>
-                          setState(() => experienceInMonths = val!),
-                    ),
-                    _buildLabel("Annual Salary "),
-                    _buildTextField("in LPA", _salaryInLakhsController),
-                    _buildLabel("Add Details "),
-                    _buildTextField("Job details ", _jobDescriptionController),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF005E6A),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        minimumSize: const Size.fromHeight(50),
-                      ),
-                      onPressed: () {
-                        final workExperience = WorkExperienceModel(
-                          jobTitle: _jobTitleController.text,
-                          organization: _organizationController.text,
-                          skills: _skillsController.text,
-                          workFromDate: _fromDateController.text,
-                          workToDate: _toDateController.text,
-                          totalExperienceYears: experienceInYear,
-                          totalExperienceMonths: experienceInMonths,
-                          salaryInLakhs: _salaryInLakhsController.text,
-                          salaryInThousands: "",
-                          jobDescription: _jobDescriptionController.text,
-                        );
-
-                        widget.onSave(workExperience);
-                      },
-                      child: const Text(
-                        "Save",
-                        style: TextStyle(color: Colors.white),
+                    const Text(
+                      'Work Experience',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF003840),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Color(0xFF005E6A)),
+                      onPressed: () => Navigator.pop(context),
+                    ),
                   ],
                 ),
-              ),
-            ],
+                Expanded(
+                  child: ListView(
+                    controller: scrollController,
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    children: [
+                      _buildLabel("Job Title"),
+                      _buildTextField("Enter Job name", _jobTitleController),
+                      _buildLabel("Company Name"),
+                      _buildTextField("Enter issuing organization", _organizationController),
+                      _buildLabel("Add Skills"),
+                      _buildTextField("Enter skills", _skillsController),
+                      _buildLabel("From Date"),
+                      _buildDateRow(
+                        _fromMonth,
+                        _fromYear,
+                            (val) => setState(() => _fromMonth = val),
+                            (val) => setState(() => _fromYear = val),
+                      ),
+                      _buildLabel("To Date"),
+                      _buildDateRow(
+                        _toMonth,
+                        _toYear,
+                            (val) => setState(() => _toMonth = val),
+                            (val) => setState(() => _toYear = val),
+                      ),
+                      _buildLabel("Experience"),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildLabel("Years"),
+                                _dropdownField(
+                                  value: experienceInYear,
+                                  items: List.generate(31, (i) => "$i"),
+                                  onChanged: (val) => setState(() => experienceInYear = val!),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildLabel("Months"),
+                                _dropdownField(
+                                  value: experienceInMonths,
+                                  items: List.generate(12, (i) => "${i + 1}"),
+                                  onChanged: (val) => setState(() => experienceInMonths = val!),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      _buildLabel("Current Salary"),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildLabel("Lakhs"),
+                                _dropdownField(
+                                  value: salaryInLakhs,
+                                  items: List.generate(31, (i) => "$i"),
+                                  onChanged: (val) => setState(() => salaryInLakhs = val!),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildLabel("Thousands"),
+                                _dropdownField(
+                                  value: salaryInThousands,
+                                  items: ["0", "5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95"],
+                                  onChanged: (val) => setState(() => salaryInThousands = val!),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      _buildLabel("Add Details "),
+                      _buildTextField("Job details ", _jobDescriptionController),
+                      const SizedBox(height: 30),
+                      ElevatedButton(
+                        onPressed: saving ? null : _handleSave,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF005E6A),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          minimumSize: const Size.fromHeight(50),
+                        ),
+                        child: saving
+                            ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                            : const Text(
+                          'Save',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -263,30 +317,25 @@ Experience month - $experienceInMonths AnnuaL Salary - ${_salaryInLakhsControlle
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: DropdownButtonFormField<String>(
-        value: value.isEmpty || !items.contains(value) ? items[0] : value,
-        items: items
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-            .toList(),
+        value: value.isNotEmpty && items.contains(value) ? value : items.first,
+        items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
         onChanged: onChanged,
         decoration: InputDecoration(
           hintText: 'Please select',
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 14,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         ),
       ),
     );
   }
 
   Widget _buildTextField(
-    String hintText,
-    TextEditingController controller, {
-    IconData? suffixIcon,
-    bool readOnly = false,
-    VoidCallback? onTap,
-  }) {
+      String hintText,
+      TextEditingController controller, {
+        IconData? suffixIcon,
+        bool readOnly = false,
+        VoidCallback? onTap,
+      }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: TextField(
@@ -301,6 +350,38 @@ Experience month - $experienceInMonths AnnuaL Salary - ${_salaryInLakhsControlle
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
+    );
+  }
+
+  Widget _buildDateRow(
+      String month,
+      String year,
+      Function(String) onMonthChanged,
+      Function(String) onYearChanged,
+      ) {
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    final years = List.generate(30, (index) => (2000 + index).toString());
+    return Row(
+      children: [
+        Expanded(
+          child: _dropdownField(
+            value: month,
+            items: months,
+            onChanged: (val) => onMonthChanged(val!),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: _dropdownField(
+            value: year,
+            items: years,
+            onChanged: (val) => onYearChanged(val!),
+          ),
+        ),
+      ],
     );
   }
 }

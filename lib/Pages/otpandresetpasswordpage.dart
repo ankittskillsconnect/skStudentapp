@@ -86,7 +86,6 @@ class _OtpAndPasswordResetState extends State<OtpAndPasswordReset> {
               ),
             ),
           ),
-
           Expanded(
             flex: 2,
             child: Container(
@@ -120,9 +119,11 @@ class _OtpAndPasswordResetState extends State<OtpAndPasswordReset> {
                         height: 50,
                         child: ElevatedButton.icon(
                           onPressed: _isLoading ? null : _resetPassword,
-                          label: Text(
-                            _isLoading ? "Please wait..." : "Reset Password",
-                            style: const TextStyle(color: Colors.white, fontSize: 18),
+                          label: Expanded(
+                            child: Text(
+                              _isLoading ? "Please wait..." : "Reset Password",
+                              style: const TextStyle(color: Colors.white, fontSize: 18),
+                            ),
                           ),
                           icon: const Icon(Icons.lock_reset, color: Colors.white),
                           style: ElevatedButton.styleFrom(
