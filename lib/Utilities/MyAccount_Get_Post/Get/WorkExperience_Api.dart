@@ -37,6 +37,7 @@ class WorkExperienceApi {
       return [];
     }
   }
+
   static Future<bool> saveWorkExperience({
     required WorkExperienceModel model,
     required String authToken,

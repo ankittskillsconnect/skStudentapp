@@ -38,7 +38,6 @@ class EducationDetailModel {
       passingYear: json['passing_year'],
       // educationId: json['educationid'],
       degreeName: json['degree_name'] ?? '',
-
       courseName: json['course_name'],
       // gradeName: json['grade_name'],
       // grade: json['grade'],

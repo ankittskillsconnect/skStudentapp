@@ -134,21 +134,24 @@ class _MyAccountState extends State<MyAccount> {
     final authToken = prefs.getString('authToken') ?? '';
     final connectSid = prefs.getString('connectSid') ?? '';
     try {
-      final internshipProjectApi =
-          await InternshipProjectApi.fetchInternshipProjects(
-            authToken: authToken,
-            connectSid: connectSid,
-          );
-      setState(() {
-        projects = internshipProjectApi;
-        isLoadingProject = false;
-        print('Projects Fetched');
-      });
+      final internshipProjectApi = await InternshipProjectApi.fetchInternshipProjects(
+        authToken: authToken,
+        connectSid: connectSid,
+      );
+      if (mounted) {
+        setState(() {
+          projects = internshipProjectApi;
+          isLoadingProject = false;
+          print('Projects Fetched');
+        });
+      }
     } catch (e) {
-      print("❌ Error fetching project details: $e");
-      setState(() {
-        isLoadingProject = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoadingProject = false;
+        });
+        print("❌ Error fetching project details: $e");
+      }
     }
   }
 
@@ -248,7 +251,6 @@ class _MyAccountState extends State<MyAccount> {
       print(' Error fetching skills: $e');
     }
   }
-
   // static Future<Map<String, dynamic>> fetchLanguagesRawResponse({
   //   required String authToken,
   //   required String connectSid,
@@ -286,8 +288,6 @@ class _MyAccountState extends State<MyAccount> {
   //     return {'languages': []};
   //   }
   // }
-
-
   Future<void> fetchLanguageData() async {
     final prefs = await SharedPreferences.getInstance();
     final authToken = prefs.getString('authToken') ?? '';
@@ -526,39 +526,73 @@ class _MyAccountState extends State<MyAccount> {
                   ProjectsSection(
                     projects: projects,
                     isLoading: isLoadingProject,
-                    onAdd: () {
+                    onAdd: () async {
+                      final prefs = await SharedPreferences.getInstance();
+                      final authToken = prefs.getString('authToken') ?? '';
+                      final connectSid = prefs.getString('connectSid') ?? '';
+                      if (authToken.isEmpty || connectSid.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error: Please log in again.')),
+                        );
+                        return;
+                      }
+                      print("🆕 Opening Add Project BottomSheet");
+                      bool isSaveComplete = false;
                       showModalBottomSheet(
-                        context: innerContext,
+                        context: context,
                         isScrollControlled: true,
-                        backgroundColor: Colors.white,
-                        builder: (_) => EditProjectDetailsBottomSheet(
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                        ),
+                        builder: (context) => EditProjectDetailsBottomSheet(
                           initialData: null,
-                          onSave: (data) {
-                            setState(() {
-                              projects.add(data);
-                            });
-                            Navigator.pop(innerContext);
+                          onSave: (newData) async {
+                            if (!isSaveComplete) {
+                              print("✅ [onAdd -> onSave] Saved new project: ${newData.projectName} | Type: ${newData.type}");
+                              isSaveComplete = true;
+                              await fetchInternShipProjectDetails();
+                              if (mounted) Navigator.pop(context); // Safe navigation
+                            }
                           },
                         ),
                       );
                     },
-                    onEdit: (project, index) {
+                    onEdit: (project, index) async {
+                      final prefs = await SharedPreferences.getInstance();
+                      final authToken = prefs.getString('authToken') ?? '';
+                      final connectSid = prefs.getString('connectSid') ?? '';
+                      if (authToken.isEmpty || connectSid.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error: Please log in again.')),
+                        );
+                        return;
+                      }
+                      print("🛠 Opening Edit BottomSheet");
+                      print("📍 internshipId: ${project.internshipId}"); // Debug to confirm
+                      print("📍 userId: ${project.userId}");
+                      print("📍 type: ${project.type}");
+                      bool isSaveComplete = false;
                       showModalBottomSheet(
-                        context: innerContext,
+                        context: context,
                         isScrollControlled: true,
-                        backgroundColor: Colors.white,
-                        builder: (_) => EditProjectDetailsBottomSheet(
-                          initialData: project,
-                          onSave: (data) {
-                            setState(() {
-                              projects[index] = data;
-                            });
-                            Navigator.pop(innerContext);
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                        ),
+                        builder: (context) => EditProjectDetailsBottomSheet(
+                          initialData: project, // Ensure project contains internshipId
+                          onSave: (updatedData) async {
+                            if (!isSaveComplete) {
+                              print("✅ [onEdit -> onSave] Updated project: ${updatedData.projectName} | Type: ${updatedData.type}");
+                              isSaveComplete = true;
+                              await fetchInternShipProjectDetails();
+                              if (mounted) Navigator.pop(context); // Safe navigation
+                            }
                           },
                         ),
                       );
                     },
                     onDelete: (index) {
+                      print("🗑 Deleting project at index: $index");
                       setState(() {
                         projects.removeAt(index);
                       });
@@ -706,15 +740,12 @@ class _MyAccountState extends State<MyAccount> {
                             final prefs = await SharedPreferences.getInstance();
                             final authToken = prefs.getString('authToken') ?? '';
                             final connectSid = prefs.getString('connectSid') ?? '';
-
                             final success = await WorkExperienceApi.saveWorkExperience(
                               model: newData,
                               authToken: authToken,
                               connectSid: connectSid,
                             );
-
                             if (success) await fetchWorkExperienceDetails();
-
                             Navigator.pop(context);
                           },
                         ),
@@ -749,7 +780,6 @@ class _MyAccountState extends State<MyAccount> {
                       });
                     },
                   ),
-
                   const SizedBox(height: 20),
                   LanguagesSection(
                     languageList: languageList,
@@ -791,7 +821,6 @@ class _MyAccountState extends State<MyAccount> {
                     //   );
                     // },
                   ),
-
                   const SizedBox(height: 20),
                 ],
               ),

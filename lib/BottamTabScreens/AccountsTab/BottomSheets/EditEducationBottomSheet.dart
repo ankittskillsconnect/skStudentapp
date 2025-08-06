@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Model/EducationDetail_Model.dart';
 import '../../../Utilities/CollegeList_Api.dart';
-import '../../../Utilities/MyAccount_Get_Post/Get/EducationDetail_Api.dart';
 import '../../../Utilities/Specialization_Api.dart';
 import 'package:sk_loginscreen1/Utilities/AllCourse_Api.dart';
-import 'package:jwt_decode/jwt_decode.dart';
+import 'CustomDropdownEducation.dart';
 
 class EditEducationBottomSheet extends StatefulWidget {
   final EducationDetailModel? initialData;
@@ -36,6 +35,8 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
   late String gradeName;
   late String grade;
   bool isLoading = true;
+  final GlobalKey _marksFieldKey = GlobalKey();
+  final FocusNode _marksFocusNode = FocusNode();
 
   List<String> collegeList = [];
   List<String> courseList = [];
@@ -55,13 +56,25 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
     courseName = data?.courseName ?? '';
     specializationName = data?.specializationName ?? '';
     passingYear = data?.passingYear ?? '';
-    // passingMonth = data?.passingMonth ?? 'Jan';
-    // courseType = data?.courseType ?? 'Full-Time';
-    // gradingSystem = _mapGradingTypeToName(data?.gradingType ?? 1);
-    // gradeName = data?.gradeName ?? '';
-    // grade = data?.grade ?? '';
-
+    passingMonth = 'Jan';
+    courseType = data?.courseType ?? 'Full-Time';
+    gradingSystem = 'Percentage';
+    gradeName = '';
+    grade = '';
+    _marksFocusNode.addListener(_handleMarksFocusChange);
     _initData();
+  }
+
+  void _handleMarksFocusChange() {
+    if (_marksFocusNode.hasFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Scrollable.ensureVisible(
+          _marksFieldKey.currentContext!,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      });
+    }
   }
 
   Future<void> _initData() async {
@@ -158,44 +171,10 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
     return '';
   }
 
-  Future<String> _resolveCollegeId(String collegeName) async {
-    // Placeholder: Implement college ID resolution API
-    return collegeName; // Temporary; replace with actual ID mapping
-  }
-
-  Future<String> _resolveSpecializationId(String specializationName) async {
-    // Placeholder: Implement specialization ID resolution API
-    return specializationName; // Temporary; replace with actual ID mapping
-  }
-
-  String _mapGradingTypeToName(int type) {
-    switch (type) {
-      case 1:
-        return 'GPA out of 10';
-      case 2:
-        return 'GPA out of 4';
-      case 3:
-        return 'Percentage';
-      default:
-        return 'Percentage';
-    }
-  }
-
-  int _mapGradingNameToType(String name) {
-    switch (name) {
-      case 'GPA out of 10':
-        return 1;
-      case 'GPA out of 4':
-        return 2;
-      case 'Percentage':
-        return 3;
-      default:
-        return 3;
-    }
-  }
-
   @override
   void dispose() {
+    _marksFocusNode.removeListener(_handleMarksFocusChange);
+    _marksFocusNode.dispose();
     _marksController.dispose();
     super.dispose();
   }
@@ -211,7 +190,12 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
         return GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 16,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            ),
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -242,19 +226,19 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
                     controller: scrollController,
                     children: [
                       _buildLabel("Degree Type"),
-                      _buildDropdownField(
+                      SearchableDropdownField(
                         value: degreeName,
                         items: const ["UnderGrad", "Graduate", "PostGraduate"],
                         onChanged: (val) => setState(() => degreeName = val ?? ''),
                       ),
                       _buildLabel("College"),
-                      _buildDropdownField(
+                      SearchableDropdownField(
                         value: collegeName,
                         items: collegeList,
                         onChanged: (val) => setState(() => collegeName = val ?? ''),
                       ),
                       _buildLabel("Course"),
-                      _buildDropdownField(
+                      SearchableDropdownField(
                         value: courseName,
                         items: courseList,
                         onChanged: (val) {
@@ -263,19 +247,19 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
                         },
                       ),
                       _buildLabel("Specialization"),
-                      _buildDropdownField(
+                      SearchableDropdownField(
                         value: specializationName,
                         items: specializationList,
                         onChanged: (val) => setState(() => specializationName = val ?? ''),
                       ),
                       _buildLabel("Course Type"),
-                      _buildDropdownField(
+                      SearchableDropdownField(
                         value: courseType,
                         items: courseTypeList,
                         onChanged: (val) => setState(() => courseType = val ?? ''),
                       ),
                       _buildLabel("Grading System"),
-                      _buildDropdownField(
+                      SearchableDropdownField(
                         value: gradingSystem,
                         items: gradingSystemList,
                         onChanged: (val) => setState(() => gradingSystem = val ?? ''),
@@ -285,15 +269,17 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
                         "Enter percentage or grade",
                         _marksController,
                         keyboardType: TextInputType.number,
+                        key: _marksFieldKey,
+                        focusNode: _marksFocusNode,
                       ),
                       _buildLabel("Year of Passing"),
-                      _buildDropdownField(
+                      SearchableDropdownField(
                         value: passingYear,
                         items: const ["2023", "2024", "2025", "2026", "2027", "2028", "2029"],
                         onChanged: (val) => setState(() => passingYear = val ?? ''),
                       ),
                       _buildLabel("Month of Passing"),
-                      _buildDropdownField(
+                      SearchableDropdownField(
                         value: passingMonth,
                         items: const [
                           "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -324,6 +310,7 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
                               courseName: courseName,
                               specializationName: specializationName,
                               collegeMasterName: collegeName,
+                              courseType: courseType,
                             ),
                           };
                           widget.onSave(data);
@@ -356,36 +343,18 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
     child: Text(text, style: const TextStyle(fontWeight: FontWeight.w700)),
   );
 
-  Widget _buildDropdownField({
-    required String? value,
-    required List<String> items,
-    required void Function(String?) onChanged,
-  }) {
-    final displayValue = items.contains(value)
-        ? value
-        : (items.isNotEmpty ? items[0] : null);
-    return DropdownButtonFormField<String>(
-      value: displayValue,
-      items: items
-          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-          .toList(),
-      onChanged: onChanged,
-      isExpanded: true,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      ),
-    );
-  }
-
   Widget _buildTextField(
       String label,
       TextEditingController controller, {
         TextInputType keyboardType = TextInputType.text,
+        Key? key,
+        FocusNode? focusNode,
       }) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
+      focusNode: focusNode,
+      key: key,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

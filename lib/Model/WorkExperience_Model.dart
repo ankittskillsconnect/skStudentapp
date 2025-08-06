@@ -70,11 +70,6 @@ class WorkExperienceModel {
       'total_experience_months': totalExperienceMonths,
       'job_description': jobDescription,
     };
-
-    print("🧩 toJson() called with isNew: $isNew");
-    print("🧩 workExperienceId: $workExperienceId");
-    print("🧩 Final POST data: $data");
-
     return data;
   }
 

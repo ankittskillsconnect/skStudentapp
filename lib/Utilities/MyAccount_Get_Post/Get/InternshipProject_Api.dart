@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:sk_loginscreen1/Model/Internship_Projects_Model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InternshipProjectApi {
   static Future<List<InternshipProjectModel>> fetchInternshipProjects({
@@ -38,4 +39,56 @@ class InternshipProjectApi {
       return [];
     }
   }
+
+  static Future<bool> saveInternshipProject({
+    required InternshipProjectModel model,
+    required String authToken,
+    required String connectSid,
+  }) async {
+    try {
+      print("📦 [saveInternshipProject] Starting API call...");
+
+      print("📎 internshipId: ${model.internshipId}");
+      print("📎 userId: ${model.userId}");
+      print("📎 type: ${model.type}");
+      print("📎 projectName: ${model.projectName}");
+      print("📎 companyName: ${model.companyName}");
+      print("📎 duration: ${model.duration} ${model.durationPeriod}");
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $authToken',
+        'Cookie': 'connect.sid=$connectSid',
+      };
+
+      final body = jsonEncode(model.toJson()); // Ensure internshipId is included
+       print("📤 Request Body: $body");
+
+      final url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/update-project-internship');
+      print("🌐 POST URL: $url");
+
+      final response = await http.post(url, headers: headers, body: body);
+      print("📥 Status Code: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        print("✅ API Success: ${decoded['msg'] ?? 'No message'}");
+        return true;
+      } else {
+        try {
+          final error = jsonDecode(response.body);
+          print("❗ Server Error: ${error['msg'] ?? 'Unknown error'}");
+        } catch (_) {
+          print("❗ Error parsing response body: ${response.body}");
+        }
+        return false;
+      }
+    } catch (e, stack) {
+      print("❌ Exception during API call: $e");
+      print("🧱 StackTrace: $stack");
+      return false;
+    }
+  }
+
 }
+

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../Model/WorkExperience_Model.dart';
 
 class EditWorkExperienceBottomSheet extends StatefulWidget {
@@ -115,12 +114,12 @@ class _EditWorkExperienceBottomSheetState
       exEndMonth: _toMonth,
       exEndYear: _toYear,
     );
-    print("📤 Saving WorkExperienceModel with:");
-    print("🔍 initialData is null: ${widget.initialData == null}");
-    if (widget.initialData != null) {
-      print("🟡 initialData.workExperienceId: ${widget.initialData!.workExperienceId}");
-    }
-    print("🟡 workExperienceId in model: ${workExperience.workExperienceId}");
+    // print("📤 Saving WorkExperienceModel with:");
+    // print("🔍 initialData is null: ${widget.initialData == null}");
+    // if (widget.initialData != null) {
+    //   print("🟡 initialData.workExperienceId: ${widget.initialData!.workExperienceId}");
+    // }
+    // print("🟡 workExperienceId in model: ${workExperience.workExperienceId}");
     widget.onSave(workExperience);
   }
 
@@ -257,7 +256,7 @@ class _EditWorkExperienceBottomSheetState
                           ),
                         ],
                       ),
-                      _buildLabel("Add Details "),
+                      _buildLabel("Add Details"),
                       _buildTextField("Job details ", _jobDescriptionController),
                       const SizedBox(height: 30),
                       ElevatedButton(
