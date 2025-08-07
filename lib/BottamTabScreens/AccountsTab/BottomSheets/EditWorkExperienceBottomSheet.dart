@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../Model/WorkExperience_Model.dart';
-import 'CustomDropdownEducation.dart';
+import 'CustomDropDowns/CustomDropdownEducation.dart';
 
 class EditWorkExperienceBottomSheet extends StatefulWidget {
   final WorkExperienceModel? initialData;

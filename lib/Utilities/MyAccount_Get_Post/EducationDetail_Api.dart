@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../../Model/EducationDetail_Model.dart';
+import '../../Model/EducationDetail_Model.dart';
 
 class EducationDetailApi {
   static Future<List<EducationDetailModel>> fetchEducationDetails({

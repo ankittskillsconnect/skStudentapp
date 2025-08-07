@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../../Model/Languages_Model.dart';
+import '../../Model/Languages_Model.dart';
 
 class LanguageDetailApi {
   static Future<List<LanguagesModel>> fetchLanguages({

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../Model/Percentage_bar_Model.dart';
+import '../../Model/Percentage_bar_Model.dart';
 
 class ProfileCompletionApi {
   static Future<ProfileCompletionModel?> fetchProfileCompletion() async {

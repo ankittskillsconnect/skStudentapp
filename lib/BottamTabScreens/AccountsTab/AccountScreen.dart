@@ -7,7 +7,7 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyInterviewVid/MyIn
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/WatchListScreen/WatchList.dart';
 import 'package:sk_loginscreen1/Model/Image_update_Model.dart';
 import 'package:sk_loginscreen1/Pages/bottombar.dart';
-import 'package:sk_loginscreen1/Utilities/MyAccount_Get_Post/Get/AccountImageApi.dart';
+import 'package:sk_loginscreen1/Utilities/MyAccount_Get_Post/AccountImageApi.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_state.dart';

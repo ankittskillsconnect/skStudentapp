@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:sk_loginscreen1/Model/Internship_Projects_Model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../Utilities/MyAccount_Get_Post/Get/InternshipProject_Api.dart';
-import 'CustomDropDownProjectIntern.dart';
+import '../../../Utilities/MyAccount_Get_Post/InternshipProject_Api.dart';
+import 'CustomDropDowns/CustomDropDownProjectIntern.dart';
 
 class EditProjectDetailsBottomSheet extends StatefulWidget {
   final InternshipProjectModel? initialData;

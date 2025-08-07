@@ -7,11 +7,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../Model/PersonalDetailPost_Model.dart';
 import '../../../ProfileLogic/ProfileEvent.dart';
 import '../../../ProfileLogic/ProfileLogic.dart';
-import '../../../Utilities/MyAccount_Get_Post/Post/PostApi_Personal_Detail.dart';
+import '../../../Utilities/MyAccount_Get_Post/PostApi_Personal_Detail.dart';
 import '../../../Utilities/StateList_Api.dart';
 import '../../../Utilities/CityList_Api.dart';
 import '../../../Model/PersonalDetail_Model.dart';
-import 'CustomDropDownPersonalDetail.dart';
+import 'CustomDropDowns/CustomDropDownPersonalDetail.dart';
 
 class EditPersonalDetailsSheet extends StatefulWidget {
   final PersonalDetailModel? initialData;

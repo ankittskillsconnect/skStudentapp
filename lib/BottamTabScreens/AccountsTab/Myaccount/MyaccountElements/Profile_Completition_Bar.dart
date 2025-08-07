@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../../../Utilities/MyAccount_Get_Post/Get/AccountProgress_Api.dart';
+import '../../../../Utilities/MyAccount_Get_Post/AccountProgress_Api.dart';
 
 class ProfileCompletionBar extends StatefulWidget {
   const ProfileCompletionBar({super.key});

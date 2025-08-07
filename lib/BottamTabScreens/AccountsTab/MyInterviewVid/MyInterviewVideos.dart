@@ -8,7 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 import '../../../Model/My_Interview_Videos_Model.dart';
-import '../../../Utilities/MyAccount_Get_Post/Get/My_Interview_Videos_Api.dart';
+import '../../../Utilities/MyAccount_Get_Post/My_Interview_Videos_Api.dart';
 import 'VideopreviewScreen.dart';
 
 class MyInterviewVideos extends StatefulWidget {

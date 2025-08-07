@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../../Model/Skiils_Model.dart';
+import '../../Model/Skiils_Model.dart';
 
 class SkillsApi {
   static Future<List<SkillsModel>> fetchSkills({

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../Model/My_Interview_Videos_Model.dart';
+import '../../Model/My_Interview_Videos_Model.dart';
 
 class VideoIntroApi {
   Future<VideoIntroModel?> fetchVideoIntroQuestions() async {

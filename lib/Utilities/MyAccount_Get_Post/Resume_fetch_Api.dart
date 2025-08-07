@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../Model/Resume_fetch_Model.dart';
+import '../../Model/Resume_fetch_Model.dart';
 
 class ResumeFetchApi {
   static Future<ResumeModel?> fetchResume() async {

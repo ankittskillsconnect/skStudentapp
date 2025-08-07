@@ -93,18 +93,17 @@ class _CustomFieldCertificateDropdownState extends State<CustomFieldCertificateD
     final availableSpaceAbove = position.dy - padding.top;
     const fixedDropdownHeight = 200.0;
 
-    // Force upward opening for lower elements
     bool openAbove = position.dy > screenHeight / 2 || availableSpaceBelow < fixedDropdownHeight;
 
     return OverlayEntry(
       builder: (context) => GestureDetector(
-        behavior: HitTestBehavior.opaque, // Capture taps outside the overlay
+        behavior: HitTestBehavior.opaque,
         onTap: () {
-          _removeOverlay(); // Close dropdown when tapping outside
-          FocusScope.of(context).unfocus(); // Remove focus
+          _removeOverlay();
+          FocusScope.of(context).unfocus();
         },
         child: Container(
-          color: Colors.transparent, // Transparent background to allow underlying UI visibility
+          color: Colors.transparent,
           child: Stack(
             children: [
               Positioned(

@@ -80,9 +80,7 @@ class EducationSection extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const Spacer(),
-
                       IconButton(
                         icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
                         iconSize: 18,
@@ -99,9 +97,7 @@ class EducationSection extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 5),
-
                   Text(
                     'Degree : ${edu.courseName}\nSpecialization : ${edu.specializationName}\nMarks : ${edu.marks}',
                     style: TextStyle(
@@ -109,7 +105,6 @@ class EducationSection extends StatelessWidget {
                       color: const Color(0xFF003840),
                     ),
                   ),
-
                   Text(
                     'College : ${edu.collegeMasterName}\n${edu.passingYear}',
                     style: TextStyle(

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-import '../../../Model/LanguageMaster_Model.dart';
+import '../../../../Model/LanguageMaster_Model.dart';
 
 class CustomFieldLanguageDropdown<T> extends StatefulWidget {
   final List<T> items;
@@ -34,7 +34,7 @@ class _CustomFieldLanguageDropdownState<T> extends State<CustomFieldLanguageDrop
   void initState() {
     super.initState();
     _searchController = TextEditingController();
-    _filteredItems = widget.items.whereType<T>().toSet().toList(); // Filter out nulls
+    _filteredItems = widget.items.whereType<T>().toSet().toList();
     _focusNode.addListener(_handleFocusChange);
     print('Init: FocusNode created, hasFocus: ${_focusNode.hasFocus}, Items: ${widget.items.length}, Filtered: ${_filteredItems.length}');
   }
@@ -102,7 +102,7 @@ class _CustomFieldLanguageDropdownState<T> extends State<CustomFieldLanguageDrop
     final padding = mediaQuery.padding;
     final availableSpaceBelow = screenHeight - position.dy - size.height - padding.bottom - keyboardHeight;
     final availableSpaceAbove = position.dy - padding.top;
-    const fixedDropdownHeight = 200.0;
+    const fixedDropdownHeight = 160.0;
 
     bool openAbove = position.dy > screenHeight / 2 || availableSpaceBelow < fixedDropdownHeight;
 
@@ -141,32 +141,32 @@ class _CustomFieldLanguageDropdownState<T> extends State<CustomFieldLanguageDrop
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              TextField(
-                                controller: _searchController,
-                                focusNode: _focusNode,
-                                decoration: InputDecoration(
-                                  hintText: 'Search...',
-                                  isDense: true,
-                                  border: const OutlineInputBorder(),
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                                ),
-                                onChanged: (query) {
-                                  print('OnChanged: Query: $query, Focus: ${_focusNode.hasFocus}');
-                                  if (_debounce?.isActive ?? false) _debounce?.cancel();
-                                  _debounce = Timer(const Duration(milliseconds: 300), () {
-                                    setState(() {
-                                      _filteredItems = widget.items
-                                          .whereType<T>()
-                                          .where((item) => item.toString().toLowerCase().contains(query.toLowerCase()))
-                                          .toSet()
-                                          .toList();
-                                      print('Debounce: Filtered to ${_filteredItems.length} items, Focus: ${_focusNode.hasFocus}');
-                                    });
-                                  });
-                                },
-                                onSubmitted: (_) => _focusNode.requestFocus(),
-                              ),
-                              const SizedBox(height: 4),
+                              // TextField(
+                              //   controller: _searchController,
+                              //   focusNode: _focusNode,
+                              //   decoration: InputDecoration(
+                              //     hintText: 'Search...',
+                              //     isDense: true,
+                              //     border: const OutlineInputBorder(),
+                              //     contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                              //   ),
+                              //   onChanged: (query) {
+                              //     print('OnChanged: Query: $query, Focus: ${_focusNode.hasFocus}');
+                              //     if (_debounce?.isActive ?? false) _debounce?.cancel();
+                              //     _debounce = Timer(const Duration(milliseconds: 300), () {
+                              //       setState(() {
+                              //         _filteredItems = widget.items
+                              //             .whereType<T>()
+                              //             .where((item) => item.toString().toLowerCase().contains(query.toLowerCase()))
+                              //             .toSet()
+                              //             .toList();
+                              //         print('Debounce: Filtered to ${_filteredItems.length} items, Focus: ${_focusNode.hasFocus}');
+                              //       });
+                              //     });
+                              //   },
+                              //   onSubmitted: (_) => _focusNode.requestFocus(),
+                              // ),
+                              // const SizedBox(height: 4),
                               Expanded(
                                 child: _filteredItems.isEmpty
                                     ? const Center(child: Text('No items available'))

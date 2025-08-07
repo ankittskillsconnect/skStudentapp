@@ -25,7 +25,6 @@ class ProjectsSection extends StatelessWidget {
     final double widthScale = size.width / 360;
     final double fontScale = widthScale.clamp(0.98, 1.02);
     final double sizeScale = widthScale.clamp(0.98, 1.02);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -67,7 +66,6 @@ class ProjectsSection extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-
                         Container(
                           padding: EdgeInsets.all(6 * sizeScale),
                           decoration: BoxDecoration(
@@ -81,7 +79,6 @@ class ProjectsSection extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 10),
-
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
@@ -98,9 +95,7 @@ class ProjectsSection extends StatelessWidget {
                             ),
                           ),
                         ),
-
                         const Spacer(),
-
                         IconButton(
                           icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
                           iconSize: 18,
@@ -117,10 +112,7 @@ class ProjectsSection extends StatelessWidget {
                         ),
                       ],
                     ),
-
-
                     const SizedBox(height: 6),
-
                     Text(
                       'Project Name : ${proj.projectName}',
                       style: TextStyle(
@@ -129,7 +121,6 @@ class ProjectsSection extends StatelessWidget {
                         color: const Color(0xFF005E6A),
                       ),
                     ),
-
                     Text(
                       'Company Name : ${proj.companyName}',
                       style: TextStyle(
@@ -137,7 +128,6 @@ class ProjectsSection extends StatelessWidget {
                         color: const Color(0xFF003840),
                       ),
                     ),
-
                     Text(
                       'Duration : ${proj.duration} - ${proj.durationPeriod}',
                       style: TextStyle(
@@ -145,7 +135,6 @@ class ProjectsSection extends StatelessWidget {
                         color: const Color(0xFF003840),
                       ),
                     ),
-
                     Text(
                       'Skills : ${proj.skills}',
                       style: TextStyle(
@@ -153,7 +142,6 @@ class ProjectsSection extends StatelessWidget {
                         color: const Color(0xFF003840),
                       ),
                     ),
-
                     Text(
                       'Details : ${proj.details}',
                       style: TextStyle(

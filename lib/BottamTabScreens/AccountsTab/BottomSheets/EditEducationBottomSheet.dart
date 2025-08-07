@@ -6,7 +6,7 @@ import '../../../Model/EducationDetail_Model.dart';
 import '../../../Utilities/CollegeList_Api.dart';
 import '../../../Utilities/Specialization_Api.dart';
 import 'package:sk_loginscreen1/Utilities/AllCourse_Api.dart';
-import 'CustomDropdownEducation.dart';
+import 'CustomDropDowns/CustomDropdownEducation.dart';
 
 class EditEducationBottomSheet extends StatefulWidget {
   final EducationDetailModel? initialData;

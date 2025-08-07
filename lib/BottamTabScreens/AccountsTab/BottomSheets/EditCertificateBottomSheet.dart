@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../Model/CertificateDetails_Model.dart';
-import 'CustomDropDownCertificate.dart';
+import 'CustomDropDowns/CustomDropDownCertificate.dart';
 
 class EditCertificateBottomSheet extends StatefulWidget {
   final CertificateModel? initialData;
