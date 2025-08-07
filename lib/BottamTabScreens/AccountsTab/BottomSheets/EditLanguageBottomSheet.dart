@@ -4,6 +4,7 @@ import '../../../Model/LanguageMaster_Model.dart';
 import '../../../Model/Languages_Model.dart';
 import '../../../Utilities/Language_Api.dart';
 import '../../../Utilities/MyAccount_Get_Post/Get/LanguagesGet_Api.dart';
+import 'CustomDropDownLanguage.dart';
 
 class LanguageBottomSheet extends StatefulWidget {
   final LanguagesModel? initialData;
@@ -226,18 +227,14 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
   Widget _buildLanguageDropdown() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: DropdownButtonFormField<LanguageMasterModel>(
-        value: selectedLanguage,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-        ),
-        items: masterLanguages.map((lang) {
-          return DropdownMenuItem(
-            value: lang,
-            child: Text(lang.languageName),
-          );
-        }).toList(),
-        onChanged: (val) => setState(() => selectedLanguage = val),
+      child: CustomFieldLanguageDropdown<LanguageMasterModel>(
+        masterLanguages.isNotEmpty ? masterLanguages : [LanguageMasterModel(languageId: 0, languageName: 'No languages available')],
+        selectedLanguage,
+            (val) => setState(() {
+          selectedLanguage = val;
+          print("Selected language updated to: ${val?.languageName}");
+        }),
+        hintText: 'Select language',
       ),
     );
   }
@@ -245,22 +242,17 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
   Widget _buildProficiencyDropdown() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: DropdownButtonFormField<String>(
-        value: selectedProficiency,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-        ),
-        items: _proficiencyLevels.map((level) {
-          return DropdownMenuItem<String>(
-            value: level,
-            child: Text(level),
-          );
-        }).toList(),
-        onChanged: (val) => setState(() => selectedProficiency = val ?? ''),
+      child: CustomFieldLanguageDropdown<String>(
+        _proficiencyLevels,
+        selectedProficiency,
+            (val) => setState(() {
+          selectedProficiency = val ?? '';
+          print("Selected proficiency updated to: $selectedProficiency");
+        }),
+        hintText: 'Select proficiency',
       ),
     );
   }
-
   Widget _buildSubmitButton() {
     return SizedBox(
       width: double.infinity,
@@ -272,7 +264,6 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet>
             borderRadius: BorderRadius.circular(30),
           ),
         ),
-
         onPressed: isSaving
             ? null
             : () async {

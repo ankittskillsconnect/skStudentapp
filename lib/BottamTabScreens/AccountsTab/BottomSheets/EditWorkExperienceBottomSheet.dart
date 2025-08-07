@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../Model/WorkExperience_Model.dart';
+import 'CustomDropdownEducation.dart';
 
 class EditWorkExperienceBottomSheet extends StatefulWidget {
   final WorkExperienceModel? initialData;
@@ -84,7 +85,6 @@ class _EditWorkExperienceBottomSheetState
     salaryInThousands = widget.initialData?.salaryInThousands ?? '0';
   }
 
-
   @override
   void dispose() {
     _jobTitleController.dispose();
@@ -114,12 +114,6 @@ class _EditWorkExperienceBottomSheetState
       exEndMonth: _toMonth,
       exEndYear: _toYear,
     );
-    // print("📤 Saving WorkExperienceModel with:");
-    // print("🔍 initialData is null: ${widget.initialData == null}");
-    // if (widget.initialData != null) {
-    //   print("🟡 initialData.workExperienceId: ${widget.initialData!.workExperienceId}");
-    // }
-    // print("🟡 workExperienceId in model: ${workExperience.workExperienceId}");
     widget.onSave(workExperience);
   }
 
@@ -128,11 +122,12 @@ class _EditWorkExperienceBottomSheetState
     final size = MediaQuery.of(context).size;
     final double widthScale = size.width / 360;
     final double sizeScale = widthScale.clamp(0.98, 1.02);
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.9,
-      maxChildSize: 0.9,
+      maxChildSize: 1.0, // Set to maximum allowed value
       minChildSize: 0.9,
       builder: (context, scrollController) {
         return Container(
@@ -168,8 +163,10 @@ class _EditWorkExperienceBottomSheetState
                 Expanded(
                   child: ListView(
                     controller: scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                      bottom: keyboardHeight + 20, // Dynamic padding for keyboard
+                      top: 10,
                     ),
                     children: [
                       _buildLabel("Job Title"),
@@ -282,7 +279,7 @@ class _EditWorkExperienceBottomSheetState
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ),
@@ -313,16 +310,16 @@ class _EditWorkExperienceBottomSheetState
     required List<String> items,
     required void Function(String?) onChanged,
   }) {
+    final focusNode = FocusNode();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
-      child: DropdownButtonFormField<String>(
-        value: value.isNotEmpty && items.contains(value) ? value : items.first,
-        items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          hintText: 'Please select',
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      child: EnsureVisibleWhenFocused(
+        focusNode: focusNode,
+        child: SearchableDropdownField(
+          value: value.isNotEmpty && items.contains(value) ? value : items.first,
+          items: items,
+          onChanged: onChanged,
+          label: 'Please select',
         ),
       ),
     );
@@ -335,18 +332,23 @@ class _EditWorkExperienceBottomSheetState
         bool readOnly = false,
         VoidCallback? onTap,
       }) {
+    final focusNode = FocusNode();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
-      child: TextField(
-        controller: controller,
-        readOnly: readOnly,
-        onTap: onTap,
-        decoration: InputDecoration(
-          hintText: hintText,
-          suffixIcon: suffixIcon != null
-              ? IconButton(icon: Icon(suffixIcon), onPressed: onTap)
-              : null,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      child: EnsureVisibleWhenFocused(
+        focusNode: focusNode,
+        child: TextField(
+          controller: controller,
+          focusNode: focusNode,
+          readOnly: readOnly,
+          onTap: onTap,
+          decoration: InputDecoration(
+            hintText: hintText,
+            suffixIcon: suffixIcon != null
+                ? IconButton(icon: Icon(suffixIcon), onPressed: onTap)
+                : null,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         ),
       ),
     );
@@ -382,5 +384,64 @@ class _EditWorkExperienceBottomSheetState
         ),
       ],
     );
+  }
+}
+
+class EnsureVisibleWhenFocused extends StatefulWidget {
+  final FocusNode focusNode;
+  final Widget child;
+
+  const EnsureVisibleWhenFocused({
+    super.key,
+    required this.focusNode,
+    required this.child,
+  });
+
+  @override
+  State<EnsureVisibleWhenFocused> createState() => _EnsureVisibleWhenFocusedState();
+}
+
+class _EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused> {
+  @override
+  void initState() {
+    super.initState();
+    widget.focusNode.addListener(_ensureVisible);
+  }
+
+  @override
+  void dispose() {
+    widget.focusNode.removeListener(_ensureVisible);
+    super.dispose();
+  }
+
+  void _ensureVisible() {
+    if (widget.focusNode.hasFocus) {
+      final RenderObject? object = context.findRenderObject();
+      if (object is RenderBox) {
+        final ScrollableState? scrollable = Scrollable.of(context);
+        if (scrollable != null) {
+          final position = scrollable.position;
+          final offset = object.localToGlobal(Offset.zero, ancestor: scrollable.context.findRenderObject());
+          final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+          final targetOffset = offset.dy - keyboardHeight - 20; // Adjust for keyboard and padding
+          position.ensureVisible(
+            object,
+            alignment: 0.0,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+          );
+          // Ensure the scroll position doesn’t exceed the content height
+          final maxScrollExtent = position.maxScrollExtent;
+          if (targetOffset > maxScrollExtent) {
+            position.jumpTo(maxScrollExtent);
+          }
+        }
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }

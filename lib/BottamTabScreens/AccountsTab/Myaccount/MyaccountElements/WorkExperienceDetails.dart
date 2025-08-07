@@ -37,91 +37,120 @@ class WorkExperienceSection extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(14 * sizeScale),
-            margin: const EdgeInsets.only(top: 8),
+            margin: const EdgeInsets.only(top: 10),
             decoration: BoxDecoration(
               border: Border.all(color: const Color(0xFFBCD8DB)),
               borderRadius: BorderRadius.circular(12 * sizeScale),
             ),
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: EdgeInsets.all(6 * sizeScale),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEBF6F7),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.work_history_outlined,
-                    size: 24,
-                    color: Color(0xFF005E6A),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        workExperiences[i].jobTitle,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14 * fontScale,
-                          color: const Color(0xFF005E6A),
-                        ),
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(6 * sizeScale),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEBF6F7),
+                        borderRadius: BorderRadius.circular(12 * sizeScale),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
+                      child: Icon(
+                        Icons.work_history_outlined,
+                        size: 20 * sizeScale,
+                        color: const Color(0xFF005E6A),
+                      ),
+                    ),
+                    SizedBox(width: 10 * sizeScale),
+                    Expanded(
+                      child: Text(
                         workExperiences[i].organization,
                         style: TextStyle(
                           fontSize: 14 * fontScale,
-                          color: const Color(0xFF003840),
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF005E6A),
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${workExperiences[i].workFromDate} - ${workExperiences[i].workToDate}',
-                        style: TextStyle(
-                          fontSize: 14 * fontScale,
-                          color: const Color(0xFF003840),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Skills: ${workExperiences[i].skills}',
-                        style: TextStyle(
-                          fontSize: 13 * fontScale,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Exp: ${workExperiences[i].totalExperienceYears} yrs ${workExperiences[i].totalExperienceMonths} months \n'
-                            'Salary: ${workExperiences[i].salaryInLakhs}.${workExperiences[i].salaryInThousands} LPA',
-                        style: TextStyle(
-                          fontSize: 13 * fontScale,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        workExperiences[i].jobDescription,
-                        style: TextStyle(
-                          fontSize: 13 * fontScale,
-                          color: Colors.grey[600],
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
+                      iconSize: 18 * sizeScale,
+                      onPressed: () => onEdit(workExperiences[i], i),
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    SizedBox(width: 4 * sizeScale),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      iconSize: 18 * sizeScale,
+                      onPressed: () => onDelete(i),
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 8 * sizeScale),
+                Text(
+                  'Project Name : ${workExperiences[i].jobTitle}',
+                 style: TextStyle(
+                    fontSize: 13 * fontScale,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF003840),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
-                  onPressed: () => onEdit(workExperiences[i], i),
+
+                SizedBox(height: 4 * sizeScale),
+                Text(
+                  'Duration : ${workExperiences[i].workFromDate} - ${workExperiences[i].workToDate}',
+                 style: TextStyle(
+                    fontSize: 13 * fontScale,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF003840),
+                  ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  onPressed: () => onDelete(i),
+
+                SizedBox(height: 4 * sizeScale),
+                Text(
+                  'Skills : ${workExperiences[i].skills}',
+                 style: TextStyle(
+                    fontSize: 13 * fontScale,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF003840),
+                  ),
+                ),
+
+                SizedBox(height: 4 * sizeScale),
+                Text(
+                  'Exp : ${workExperiences[i].totalExperienceYears} yrs ${workExperiences[i].totalExperienceMonths} months',
+                 style: TextStyle(
+                    fontSize: 13 * fontScale,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF003840),
+                  ),
+                ),
+
+                SizedBox(height: 4 * sizeScale),
+
+                Text(
+                  'Salary : ${workExperiences[i].salaryInLakhs}.${workExperiences[i].salaryInThousands} LPA',
+                 style: TextStyle(
+                    fontSize: 13 * fontScale,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF003840),
+                  ),
+                ),
+
+                SizedBox(height: 4 * sizeScale),
+
+                Text(
+                  'Details : ${workExperiences[i].jobDescription}',
+                   style: TextStyle(
+                    fontSize: 13 * fontScale,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF003840),
+                    height: 1.4,
+                  ),
                 ),
               ],
             ),

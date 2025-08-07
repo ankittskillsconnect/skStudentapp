@@ -37,82 +37,98 @@ class CertificatesSection extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(14 * sizeScale),
-            margin: const EdgeInsets.only(top: 8),
+            margin: const EdgeInsets.only(top: 10),
             decoration: BoxDecoration(
               border: Border.all(color: const Color(0xFFBCD8DB)),
               borderRadius: BorderRadius.circular(12 * sizeScale),
             ),
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: EdgeInsets.all(6 * sizeScale),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEBF6F7),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.file_copy_outlined,
-                    size: 24,
-                    color: Color(0xFF005E6A),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(6 * sizeScale),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEBF6F7),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.file_copy_outlined,
+                        size: 24,
+                        color: Color(0xFF005E6A),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
                         certificatesList[i].certificateName,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 14 * fontScale,
                           color: const Color(0xFF005E6A),
-                          height: 1.4,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        certificatesList[i].issuedOrgName,
-                        style: TextStyle(
-                          fontSize: 14 * fontScale,
-                          color: const Color(0xFF003840),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${certificatesList[i].issueDate} - ${certificatesList[i].expiryDate}',
-                        style: TextStyle(
-                          fontSize: 14 * fontScale,
-                          color: const Color(0xFF003840),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        certificatesList[i].description,
-                        style: TextStyle(
-                          fontSize: 13 * fontScale,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      // if (certificatesList[i].userId != null)
-                      //   Text(
-                      //     'User ID: ${certificatesList[i].userId}',
-                      //     style: TextStyle(
-                      //       fontSize: 12 * fontScale,
-                      //       color: Colors.grey[500],
-                      //     ),
-                      //   ),
-                    ],
+                    ),
+
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
+                      iconSize: 18,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () => onEdit(certificatesList[i], i),
+                    ),
+
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      iconSize: 18,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () => onDelete(i),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  'Organization : ${certificatesList[i].issuedOrgName}',
+                  style: TextStyle(
+                    fontSize: 13 * fontScale,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF003840),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
-                  onPressed: () => onEdit(certificatesList[i], i),
+                const SizedBox(height: 4),
+
+                Text(
+                  'Issue Date : ${certificatesList[i].issueDate}',
+                  style: TextStyle(
+                    fontSize: 13 * fontScale,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF003840),
+                  ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  onPressed: () => onDelete(i),
+                const SizedBox(height: 4),
+
+                Text(
+                  'Expiry Date : ${certificatesList[i].expiryDate}',
+                   style: TextStyle(
+                    fontSize: 13 * fontScale,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF003840),
+                  ),
+                ),
+                const SizedBox(height: 4),
+
+                Text(
+                  'Details : ${certificatesList[i].description}',
+                  style: TextStyle(
+                    fontSize: 13 * fontScale,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF003840),
+                  ),
                 ),
               ],
             ),

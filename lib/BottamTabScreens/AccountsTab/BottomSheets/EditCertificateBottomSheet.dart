@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../Model/CertificateDetails_Model.dart';
+import 'CustomDropDownCertificate.dart';
 
 class EditCertificateBottomSheet extends StatefulWidget {
   final CertificateModel? initialData;
@@ -94,7 +95,12 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
         return GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              top: 10,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 10, // Adaptive padding for keyboard
+            ),
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -125,15 +131,15 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
                       controller: scrollController,
                       children: [
                         _buildLabel('Certificate Name'),
-                        _buildTextField(_certificateNameController,),
+                        _buildTextField(_certificateNameController),
                         _buildLabel('Issued Organization'),
-                        _buildTextField(_issuedOrgController, ),
+                        _buildTextField(_issuedOrgController),
                         _buildLabel('Credential ID'),
-                        _buildTextField(_credIdController, ),
+                        _buildTextField(_credIdController),
                         _buildLabel('Credential URL'),
-                        _buildTextField(_urlController,  required: false),
+                        _buildTextField(_urlController, required: false),
                         _buildLabel('Description'),
-                        _buildTextField(_descriptionController, ),
+                        _buildTextField(_descriptionController),
                         _buildLabel('Issued Date'),
                         _buildDateRow(_issueMonth, _issueYear,
                                 (m) => setState(() => _issueMonth = m),
@@ -183,13 +189,12 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
     child: Text(text, style: const TextStyle(fontWeight: FontWeight.w700)),
   );
 
-  Widget _buildTextField(TextEditingController controller,  {bool required = true}) {
+  Widget _buildTextField(TextEditingController controller, {bool required = true}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
-
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
@@ -199,52 +204,45 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
   }
 
   Widget _buildDateRow(String month, String year, Function(String) onMonthChanged, Function(String) onYearChanged) {
-    return Row(
-      children: [
-        Expanded(
-          child: DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              labelText: 'Month',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: CustomFieldCertificateDropdown(
+              const ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+              month,
+                  (val) => onMonthChanged(val ?? 'Jan'),
+              label: 'Month',
             ),
-            value: month,
-            onChanged: (val) => onMonthChanged(val!),
-            items: _monthItems(),
-            isExpanded: true,
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              labelText: 'Year',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          const SizedBox(width: 12),
+          Expanded(
+            child: CustomFieldCertificateDropdown(
+              _yearItems().map((item) => item.value!).whereType<String>().toList(), // Filter out nulls
+              year,
+                  (val) => onYearChanged(val ?? '2025'),
+              label: 'Year',
             ),
-            value: year,
-            onChanged: (val) => onYearChanged(val!),
-            items: _yearItems(),
-            isExpanded: true,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
-
-  List<DropdownMenuItem<String>> _monthItems() {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return months.map((m) => DropdownMenuItem(value: m, child: Text(m))).toList();
-  }
-
+  // List<DropdownMenuItem<String>> _monthItems() {
+  //   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  //   return months.map((m) => DropdownMenuItem(value: m, child: Text(m))).toList();
+  // }
   List<DropdownMenuItem<String>> _yearItems() {
-    final currentYear = DateTime.now().year;
+    final currentYear = DateTime.now().year; // 2025
     final selectedYears = {
       int.tryParse(_issueYear) ?? currentYear,
       int.tryParse(_expiryYear) ?? currentYear,
     };
+    final startYear = currentYear - 35;
+    final endYear = currentYear + 10;
     final allYears = {
-      for (int i = 0; i < 20; i++) currentYear - i,
+      for (int year = startYear; year <= endYear; year++) year,
       ...selectedYears,
     }.toList()
       ..sort((a, b) => b.compareTo(a));
@@ -254,5 +252,4 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
       return DropdownMenuItem(value: yearStr, child: Text(yearStr));
     }).toList();
   }
-
 }

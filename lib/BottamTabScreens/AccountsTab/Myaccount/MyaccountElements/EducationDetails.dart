@@ -3,7 +3,6 @@ import 'package:sk_loginscreen1/Model/EducationDetail_Model.dart';
 import 'SectionHeader.dart';
 import 'ShimmerWidgets.dart';
 
-
 class EducationSection extends StatelessWidget {
   final List<EducationDetailModel> educationDetails;
   final bool isLoading;
@@ -47,32 +46,32 @@ class EducationSection extends StatelessWidget {
             return Container(
               width: double.infinity,
               padding: EdgeInsets.all(14 * sizeScale),
-              margin: const EdgeInsets.only(top: 8),
+              margin: const EdgeInsets.only(top: 10),
               decoration: BoxDecoration(
                 border: Border.all(color: const Color(0xFFBCD8DB)),
                 borderRadius: BorderRadius.circular(12 * sizeScale),
               ),
-              child: Row(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(6 * sizeScale),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEBF6F7),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.school_outlined,
-                      size: 24,
-                      color: Color(0xFF005E6A),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(6 * sizeScale),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEBF6F7),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.school_outlined,
+                          size: 24,
+                          color: Color(0xFF005E6A),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
                           edu.degreeName,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
@@ -80,32 +79,44 @@ class EducationSection extends StatelessWidget {
                             color: const Color(0xFF005E6A),
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${edu.courseName} \n${edu.specializationName}\nMarks - ${edu.marks}',
-                          style: TextStyle(
-                            fontSize: 14 * fontScale,
-                            color: const Color(0xFF003840),
-                          ),
-                        ),
-                        Text(
-                          '${edu.collegeMasterName}\n${edu.passingYear} ',
-                          style: TextStyle(
-                            fontSize: 14 * fontScale,
-                            color: const Color(0xFF003840),
-                            height: 1.4,
-                          ),
-                        ),
-                      ],
+                      ),
+
+                      const Spacer(),
+
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
+                        iconSize: 18,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () => onEdit(edu, index),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, color: Colors.red),
+                        iconSize: 18,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () => onDelete(index),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 5),
+
+                  Text(
+                    'Degree : ${edu.courseName}\nSpecialization : ${edu.specializationName}\nMarks : ${edu.marks}',
+                    style: TextStyle(
+                      fontSize: 14 * fontScale,
+                      color: const Color(0xFF003840),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
-                    onPressed: () => onEdit(edu, index),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    onPressed: () => onDelete(index),
+
+                  Text(
+                    'College : ${edu.collegeMasterName}\n${edu.passingYear}',
+                    style: TextStyle(
+                      fontSize: 14 * fontScale,
+                      color: const Color(0xFF003840),
+                      height: 1.4,
+                    ),
                   ),
                 ],
               ),

@@ -6,7 +6,6 @@ class LanguagesSection extends StatelessWidget {
   final List<LanguagesModel> languageList;
   final bool isLoading;
   final VoidCallback onAdd;
-  // final Function(LanguagesModel, int) onEdit;
   final Function(int) onDelete;
 
   const LanguagesSection({
@@ -14,7 +13,6 @@ class LanguagesSection extends StatelessWidget {
     required this.languageList,
     required this.isLoading,
     required this.onAdd,
-    // required this.onEdit,
     required this.onDelete,
   });
 
@@ -37,32 +35,32 @@ class LanguagesSection extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(14 * sizeScale),
-            margin: const EdgeInsets.only(top: 8),
+            margin: const EdgeInsets.only(top: 10),
             decoration: BoxDecoration(
               border: Border.all(color: const Color(0xFFBCD8DB)),
               borderRadius: BorderRadius.circular(12 * sizeScale),
             ),
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: EdgeInsets.all(6 * sizeScale),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEBF6F7),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.language,
-                    size: 24,
-                    color: Color(0xFF005E6A),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
+                /// Top Row: Icon + Language Name + Delete
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(6 * sizeScale),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEBF6F7),
+                        borderRadius: BorderRadius.circular(12 * sizeScale),
+                      ),
+                      child: Icon(
+                        Icons.language,
+                        size: 20 * sizeScale,
+                        color: const Color(0xFF005E6A),
+                      ),
+                    ),
+                    SizedBox(width: 10 * sizeScale),
+                    Expanded(
+                      child: Text(
                         languageList[i].languageName,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
@@ -70,24 +68,26 @@ class LanguagesSection extends StatelessWidget {
                           color: const Color(0xFF005E6A),
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        languageList[i].proficiency,
-                        style: TextStyle(
-                          fontSize: 12 * fontScale,
-                          color: Colors.black54,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      iconSize: 20 * sizeScale,
+                      onPressed: () => onDelete(i),
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
                 ),
-                // IconButton(
-                //   icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
-                //   onPressed: () => onEdit(languageList[i], i),
-                // ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  onPressed: () => onDelete(i),
+
+                SizedBox(height: 6 * sizeScale),
+
+                Text(
+                  languageList[i].proficiency,
+                  style: TextStyle(
+                    fontSize: 13 * fontScale,
+                    color: Colors.black54,
+                  ),
                 ),
               ],
             ),

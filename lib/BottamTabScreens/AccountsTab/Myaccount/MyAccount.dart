@@ -551,7 +551,6 @@ class _MyAccountState extends State<MyAccount> {
                               print("✅ [onAdd -> onSave] Saved new project: ${newData.projectName} | Type: ${newData.type}");
                               isSaveComplete = true;
                               await fetchInternShipProjectDetails();
-                              if (mounted) Navigator.pop(context); // Safe navigation
                             }
                           },
                         ),
@@ -585,7 +584,6 @@ class _MyAccountState extends State<MyAccount> {
                               print("✅ [onEdit -> onSave] Updated project: ${updatedData.projectName} | Type: ${updatedData.type}");
                               isSaveComplete = true;
                               await fetchInternShipProjectDetails();
-                              if (mounted) Navigator.pop(context); // Safe navigation
                             }
                           },
                         ),

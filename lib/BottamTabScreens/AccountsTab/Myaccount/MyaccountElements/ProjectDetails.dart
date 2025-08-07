@@ -3,7 +3,6 @@ import 'package:sk_loginscreen1/Model/Internship_Projects_Model.dart';
 import 'SectionHeader.dart';
 import 'ShimmerWidgets.dart';
 
-
 class ProjectsSection extends StatelessWidget {
   final List<InternshipProjectModel> projects;
   final bool isLoading;
@@ -53,99 +52,115 @@ class ProjectsSection extends StatelessWidget {
         else
           Column(
             children: List.generate(projects.length, (i) {
+              final proj = projects[i];
               return Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(14 * sizeScale),
-                margin: const EdgeInsets.only(top: 8),
+                margin: const EdgeInsets.only(top: 10),
                 decoration: BoxDecoration(
                   border: Border.all(color: const Color(0xFFBCD8DB)),
                   borderRadius: BorderRadius.circular(12 * sizeScale),
                 ),
-                child: Row(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(6 * sizeScale),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEBF6F7),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.workspaces_filled,
-                        size: 24,
-                        color: Color(0xFF005E6A),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: Colors.lightGreen,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: const Color(0xFFBCD8DB)),
-                            ),
-                            child: Text(
-                              projects[i].type,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+
+                        Container(
+                          padding: EdgeInsets.all(6 * sizeScale),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEBF6F7),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            projects[i].projectName,
-                            style: TextStyle(
+                          child: const Icon(
+                            Icons.workspaces_filled,
+                            size: 24,
+                            color: Color(0xFF005E6A),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.lightGreen,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: const Color(0xFFBCD8DB)),
+                          ),
+                          child: Text(
+                            proj.type,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              fontSize: 14 * fontScale,
-                              color: const Color(0xFF005E6A),
                             ),
                           ),
-                          Text(
-                            projects[i].companyName,
-                            style: TextStyle(
-                              fontSize: 14 * fontScale,
-                              color: const Color(0xFF003840),
-                            ),
-                          ),
-                          Text(
-                            '${projects[i].duration} - ${projects[i].durationPeriod}',
-                            style: TextStyle(
-                              fontSize: 14 * fontScale,
-                              color: const Color(0xFF003840),
-                            ),
-                          ),
-                          Text(
-                            projects[i].skills,
-                            style: TextStyle(
-                              fontSize: 13 * fontScale,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          Text(
-                            projects[i].details,
-                            style: TextStyle(
-                              fontSize: 13 * fontScale,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w700,
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
+                        ),
+
+                        const Spacer(),
+
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
+                          iconSize: 18,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () => onEdit(proj, i),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline, color: Colors.red),
+                          iconSize: 18,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () => onDelete(i),
+                        ),
+                      ],
+                    ),
+
+
+                    const SizedBox(height: 6),
+
+                    Text(
+                      'Project Name : ${proj.projectName}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14 * fontScale,
+                        color: const Color(0xFF005E6A),
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
-                      onPressed: () => onEdit(projects[i], i),
+
+                    Text(
+                      'Company Name : ${proj.companyName}',
+                      style: TextStyle(
+                        fontSize: 14 * fontScale,
+                        color: const Color(0xFF003840),
+                      ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline, color: Colors.red),
-                      onPressed: () => onDelete(i),
+
+                    Text(
+                      'Duration : ${proj.duration} - ${proj.durationPeriod}',
+                      style: TextStyle(
+                        fontSize: 14 * fontScale,
+                        color: const Color(0xFF003840),
+                      ),
+                    ),
+
+                    Text(
+                      'Skills : ${proj.skills}',
+                      style: TextStyle(
+                        fontSize: 14 * fontScale,
+                        color: const Color(0xFF003840),
+                      ),
+                    ),
+
+                    Text(
+                      'Details : ${proj.details}',
+                      style: TextStyle(
+                        fontSize: 14 * fontScale,
+                        color: const Color(0xFF003840),
+                        height: 1.4,
+                      ),
                     ),
                   ],
                 ),
