@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -28,10 +26,8 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditPe
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditSkillsBottomSheet.dart';
 import 'package:icons_plus/icons_plus.dart';
 import '../../../Model/Image_update_Model.dart';
-import '../../../Model/LanguageMaster_Model.dart';
 import '../../../Model/Percentage_bar_Model.dart';
 import '../../../Utilities/MyAccount_Get_Post/Image_Api.dart';
-import '../../../Utilities/MyAccount_Get_Post/Skills_Post_Api.dart';
 import 'MyaccountElements/CertificateDetails.dart';
 import 'MyaccountElements/EducationDetails.dart';
 import 'MyaccountElements/LanguageDetails.dart';

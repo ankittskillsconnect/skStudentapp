@@ -1,11 +1,7 @@
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:sk_loginscreen1/Model/Skiils_Model.dart';
 import 'SectionHeader.dart';
 import 'ShimmerWidgets.dart';
-
 
 class SkillsSection extends StatelessWidget {
   final List<SkillsModel> skillList;

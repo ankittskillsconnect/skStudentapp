@@ -1,9 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sk_loginscreen1/Pages/PasswordField.dart';
-import 'package:sk_loginscreen1/Pages/forgotPasswordPage.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_state.dart';
@@ -21,6 +21,8 @@ class _LoginpageState extends State<Loginpage> {
   final TextEditingController passwordController = TextEditingController();
   bool _isLoading = false;
   final loginUser _loginService = loginUser();
+  bool _internetToastShown = false;
+  bool _snackBarShown = false;
 
   @override
   void initState() {
@@ -45,45 +47,70 @@ class _LoginpageState extends State<Loginpage> {
     super.dispose();
   }
 
-  bool _areFieldsValid() {
-    return emailController.text.trim().isNotEmpty &&
-        passwordController.text.trim().isNotEmpty;
+
+
+  Future<bool> _hasInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
   }
 
-  bool _emailIsValid() {
-    final email = emailController.text.trim();
-    final emailRegex = RegExp(r"@");
-    return email.isNotEmpty && emailRegex.hasMatch(email);
+  void _showSnackBarOnce(BuildContext context, String message, {int cooldownSeconds = 3}) {
+    if (_snackBarShown) return;
+
+    _snackBarShown = true;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: cooldownSeconds),
+      ),
+    );
+
+    Future.delayed(Duration(seconds: cooldownSeconds), () {
+      _snackBarShown = false;
+    });
   }
 
   Future<void> _login() async {
-    if (!_areFieldsValid()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Fill in all the details"),
-          backgroundColor: Colors.red,
-        ),
-      );
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty && password.isEmpty) {
+      _showSnackBarOnce(context, "Fill in all the details");
       return;
     }
 
-    if (!_emailIsValid()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Enter a valid email"),
-          backgroundColor: Colors.red,
-        ),
-      );
+    if (email.isEmpty) {
+      _showSnackBarOnce(context, "Email is incorrect");
+      return;
+    }
+
+    if (password.isEmpty) {
+      _showSnackBarOnce(context, "Password is required");
+      return;
+    }
+
+    if (!await _hasInternetConnection()) {
+      if (!_internetToastShown) {
+        _internetToastShown = true;
+        _showSnackBarOnce(context, "No internet available");
+        Future.delayed(const Duration(seconds: 3), () {
+          _internetToastShown = false;
+        });
+      }
       return;
     }
 
     setState(() {
       _isLoading = true;
     });
-
     final result = await _loginService.login(
-      emailController.text,
-      passwordController.text,
+      email,
+      password,
     );
 
     setState(() {
@@ -114,19 +141,25 @@ class _LoginpageState extends State<Loginpage> {
 
       context.read<NavigationBloc>().add(GotoHomeScreen2());
     } else {
-      final message = result['message'].toString().toLowerCase();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            message.contains('error') || message.contains('exception')
-                ? result['message']
-                : "Enter correct credentials",
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
+      final message = result['message']?.toString().toLowerCase() ?? '';
+
+      if (message.contains('email') || message.contains('e-mail') || message.contains('username')) {
+        _showSnackBarOnce(context, "Email is incorrect");
+
+      } else if (message.contains('password')) {
+        _showSnackBarOnce(context, "Password is incorrect");
+
+      } else {
+        _showSnackBarOnce(
+          context,
+          message.contains('error') || message.contains('exception')
+              ? result['message'].toString()
+              : "Enter correct credentials",
+        );
+      }
     }
   }
+
 
 
   @override

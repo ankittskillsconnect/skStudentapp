@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:sk_loginscreen1/Model/Internship_Projects_Model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class InternshipProjectApi {
   static Future<List<InternshipProjectModel>> fetchInternshipProjects({
@@ -61,7 +60,7 @@ class InternshipProjectApi {
         'Cookie': 'connect.sid=$connectSid',
       };
 
-      final body = jsonEncode(model.toJson()); // Ensure internshipId is included
+      final body = jsonEncode(model.toJson());
        print("📤 Request Body: $body");
 
       final url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/update-project-internship');

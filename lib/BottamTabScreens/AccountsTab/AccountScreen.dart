@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -5,7 +7,6 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyJobs/AppliedJobs.
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/Myaccount/MyAccount.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyInterviewVid/MyInterviewVideos.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/WatchListScreen/WatchList.dart';
-import 'package:sk_loginscreen1/Model/Image_update_Model.dart';
 import 'package:sk_loginscreen1/Pages/bottombar.dart';
 import 'package:sk_loginscreen1/Utilities/MyAccount_Get_Post/AccountImageApi.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
@@ -14,7 +15,6 @@ import 'package:sk_loginscreen1/blocpage/bloc_state.dart';
 import '../../Model/AccountScreen_Image_Name_Model.dart';
 import '../../ProfileLogic/ProfileEvent.dart';
 import '../../ProfileLogic/ProfileLogic.dart';
-import '../../ProfileLogic/ProfileState.dart';
 import '../../Utilities/auth/LoginUserApi.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -29,6 +29,8 @@ class _AccountScreenState extends State<AccountScreen> {
   AcountScreenImageModel? _profileData;
   int _selectedIndex = 0;
   bool _isLoggingOut = false;
+  bool _snackBarShown = false;
+
 
   void _onItemTapped(int index) {
     setState(() {
@@ -47,6 +49,31 @@ class _AccountScreenState extends State<AccountScreen> {
   ];
 
   int selectedOptionIndex = -1;
+
+  Future<bool> _hasInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  void _showSnackBarOnce(BuildContext context, String message, {int cooldownSeconds = 3}) {
+    if (_snackBarShown) return;
+    _snackBarShown = true;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: cooldownSeconds),
+      ),
+    );
+
+    Future.delayed(Duration(seconds: cooldownSeconds), () {
+      _snackBarShown = false;
+    });
+  }
 
   Future<void> _logout() async {
     final shouldLogout = await showDialog<bool>(
@@ -69,6 +96,11 @@ class _AccountScreenState extends State<AccountScreen> {
     );
 
     if (shouldLogout == true) {
+      if (!await _hasInternetConnection()) {
+        _showSnackBarOnce(context, "No internet ");
+        return;
+      }
+
       setState(() => _isLoggingOut = true);
       final loginService = loginUser();
       await loginService.clearToken();

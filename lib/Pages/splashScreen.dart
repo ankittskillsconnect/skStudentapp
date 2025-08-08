@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sk_loginscreen1/blocpage/bloc_event.dart';
 import 'package:sk_loginscreen1/Pages/Splashpagefile.dart';
-import '../blocpage/bloc_logic.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
