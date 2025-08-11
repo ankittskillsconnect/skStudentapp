@@ -165,7 +165,7 @@ class _EditWorkExperienceBottomSheetState
                     controller: scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.only(
-                      bottom: keyboardHeight + 20, // Dynamic padding for keyboard
+                      bottom: keyboardHeight + 20,
                       top: 10,
                     ),
                     children: [

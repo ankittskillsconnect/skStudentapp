@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -31,7 +30,6 @@ class _AccountScreenState extends State<AccountScreen> {
   bool _isLoggingOut = false;
   bool _snackBarShown = false;
 
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -47,7 +45,6 @@ class _AccountScreenState extends State<AccountScreen> {
     {"icon": Icons.settings_outlined, "label": "Account Settings"},
     {"icon": Icons.logout, "label": "Logout"},
   ];
-
   int selectedOptionIndex = -1;
 
   Future<bool> _hasInternetConnection() async {
@@ -69,7 +66,6 @@ class _AccountScreenState extends State<AccountScreen> {
         duration: Duration(seconds: cooldownSeconds),
       ),
     );
-
     Future.delayed(Duration(seconds: cooldownSeconds), () {
       _snackBarShown = false;
     });
@@ -80,16 +76,19 @@ class _AccountScreenState extends State<AccountScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
         title: const Text('Confirm Logout'),
         content: const Text('Are you sure you want to logout?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            style: ButtonStyle(
+            ),
+            child: const Text('Cancel', style: TextStyle(color: Colors.black),),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Logout'),
+            child: const Text('Logout', style: TextStyle(color: Colors.black),),
           ),
         ],
       ),
@@ -100,16 +99,13 @@ class _AccountScreenState extends State<AccountScreen> {
         _showSnackBarOnce(context, "No internet ");
         return;
       }
-
       setState(() => _isLoggingOut = true);
       final loginService = loginUser();
       await loginService.clearToken();
       await Future.delayed(const Duration(milliseconds: 500));
-
       if (context.mounted) {
         context.read<NavigationBloc>().add(GobackToLoginPage());
       }
-
       setState(() => _isLoggingOut = false);
     }
   }
@@ -157,7 +153,6 @@ class _AccountScreenState extends State<AccountScreen> {
     final double iconSize = media.width * 0.065;
     final double profileSize = media.width * 0.37;
     final double spacing = media.height * 0.015;
-
     return BlocListener<NavigationBloc, NavigationState>(
       listener: (_, __) {},
       child: Scaffold(

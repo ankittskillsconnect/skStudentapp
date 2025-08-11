@@ -6,8 +6,9 @@ import 'package:sk_loginscreen1/BottamTabScreens/JobTab/JobdetailPage/Jobdetailp
 import 'package:sk_loginscreen1/Pages/bottombar.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_state.dart';
-import '../../ProfileLogic/ProfileEvent.dart';
-import '../../ProfileLogic/ProfileLogic.dart';
+import '../../Pages/noInternetPage_jobs.dart';
+// import '../../ProfileLogic/ProfileEvent.dart';
+// import '../../ProfileLogic/ProfileLogic.dart';
 import '../../Utilities/JobList_Api.dart';
 import 'JobCardBT.dart';
 
@@ -37,7 +38,6 @@ class _JobScreenbtState extends State<Jobscreenbt> {
     });
     try {
       final fetchedJobs = await JobApi.fetchJobs();
-      print("Fetched jobs: $fetchedJobs");
       setState(() {
         jobs = fetchedJobs.map((job) {
           final location = (job['location'] as String?)?.isNotEmpty ?? false
@@ -47,8 +47,7 @@ class _JobScreenbtState extends State<Jobscreenbt> {
               .map((loc) => loc['city_name'] as String? ?? 'Unknown')
               .join(' • ')
               : 'N/A';
-          // print("Job ${job['title']} - Location mapped to: $location"); // Debug location can be deleted
-          // print("Job ${job['title']} - LogoUrl: ${job['logoUrl']}"); // Debug logo can be deleted
+
           return {
             'title': job['title'] ?? 'Untitled',
             'company': job['company'] ?? 'Unknown Company',
@@ -64,21 +63,15 @@ class _JobScreenbtState extends State<Jobscreenbt> {
         isLoading = false;
       });
     } catch (e) {
-      print("Error fetching jobs: $e");// debug print
       setState(() {
         isLoading = false;
-        errorMessage = 'Failed to load jobs: $e';
-        //Snackbar not necessary
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text('Failed to load jobs: $e')),
-        // );
+        errorMessage = 'no_internet';
       });
     }
   }
 
   Future<void> _onRefresh() async {
-    context.read<ProfileBloc>().add(_fetchJobs() as ProfileEvent);
-    await Future.delayed(const Duration(seconds: 1));
+    await _fetchJobs();
   }
 
   void _onItemTapped(int index) {
@@ -101,58 +94,49 @@ class _JobScreenbtState extends State<Jobscreenbt> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: Appbarjobscreen(),
-        body: RefreshIndicator(
-          onRefresh:_onRefresh,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  const SizedBox(height: 10),
-                  Expanded(
-                    child: isLoading
-                        ? ListView.builder(
-                      itemCount: 5,
-                      itemBuilder: (context, index) => _buildShimmerCard(),
-                    )
-                        : errorMessage != null
-                        ? Center(
-                      child: Text(
-                       errorMessage!,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                    )
-                        : jobs.isEmpty
-                        ? const Center(child: Text('No jobs found'))
-                        : ListView.builder(
-                      itemCount: jobs.length,
-                      itemBuilder: (context, index) {
-                        final job = jobs[index];
-                        return InkWell(
-                          onTap: () {
-                            // print("Navigating with jobToken: ${job['jobToken']}");
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => JobDetailPage2(jobToken: job['jobToken']),
-                              ),
-                            );
-                          },
-                          child: JobCardBT(
-                            jobTitle: job['title'],
-                            company: job['company'],
-                            location: job['location'],
-                            salary: job['salary'],
-                            postTime: job['postTime'],
-                            expiry: job['expiry'],
-                            tags: job['tags'],
-                            logoUrl: job['logoUrl'],
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: isLoading
+                ? ListView.builder(
+              itemCount: 5,
+              itemBuilder: (context, index) => _buildShimmerCard(),
+            )
+                : errorMessage == 'no_internet'
+                ? NoInternetPage(
+              onRetry: _fetchJobs,
+            )
+                : jobs.isEmpty
+                ? const Center(child: Text('No jobs found'))
+                : RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: ListView.builder(
+                itemCount: jobs.length,
+                itemBuilder: (context, index){
+                  final job = jobs[index];
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => JobDetailPage2(
+                              jobToken: job['jobToken']
                           ),
-                        );
-                      },
+                        ),
+                      );
+                    },
+                    child: JobCardBT(
+                      jobTitle: job['title'],
+                      company: job['company'],
+                      location: job['location'],
+                      salary: job['salary'],
+                      postTime: job['postTime'],
+                      expiry: job['expiry'],
+                      tags: job['tags'],
+                      logoUrl: job['logoUrl'],
                     ),
-                  )
-                ],
+                  );
+                },
               ),
             ),
           ),
