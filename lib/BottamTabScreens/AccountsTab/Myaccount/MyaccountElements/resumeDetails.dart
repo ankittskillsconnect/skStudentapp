@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -84,10 +85,12 @@ class _ResumeSectionState extends State<ResumeSection> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double fontScale = widthScale.clamp(0.98, 1.02);
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,29 +98,32 @@ class _ResumeSectionState extends State<ResumeSection> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               "Resume",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF005E6A),
-                padding: EdgeInsets.symmetric(horizontal: 16 * sizeScale),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30 * sizeScale),
+            SizedBox(
+              width: 100.w,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF005E6A),
+                  padding: EdgeInsets.symmetric(horizontal: 14.w),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25.r),
+                  ),
                 ),
-              ),
-              onPressed: () {
-                _fetchAndSaveResumePdf();
-              },
-              child: Text(
-                "Update",
-                style: TextStyle(color: Colors.white, fontSize: 14 * fontScale),
+                onPressed: () {
+                  _fetchAndSaveResumePdf();
+                },
+                child: Text(
+                  "Update",
+                  style: TextStyle(color: Colors.white, fontSize: 12.sp),
+                ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 8.h),
         GestureDetector(
           onTap: () {
             if (_resumeUrl != null) {
@@ -142,30 +148,30 @@ class _ResumeSectionState extends State<ResumeSection> {
           behavior: HitTestBehavior.opaque,
           child: Container(
             width: double.infinity,
-            height: 80,
-            padding: EdgeInsets.symmetric(vertical: 10 * sizeScale, horizontal: 16 * sizeScale),
+            height: 70.h,
+            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 14.w),
             decoration: BoxDecoration(
               border: Border.all(color: const Color(0xFFBCD8DB)),
-              borderRadius: BorderRadius.circular(12 * sizeScale),
+              borderRadius: BorderRadius.circular(10.r),
               color: Colors.white,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.description, size: 40, color: Color(0xFF005E6A)),
-                const SizedBox(width: 10),
+                Icon(Icons.description, size: 35.w, color: const Color(0xFF005E6A)),
+                SizedBox(width: 8.w),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Text(
                       "Resume Preview",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 5),
+                    SizedBox(height: 4.h),
                     Text(
                       "Tap to view full resume",
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                      style: TextStyle(fontSize: 12.sp, color: Colors.grey),
                     ),
                   ],
                 ),

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditCertificateBottomSheet.dart';
@@ -68,9 +69,6 @@ class _MyAccountState extends State<MyAccount> {
   File? _profileImage;
   ProfileCompletionModel? profileCompletion;
   bool isLoadingProfilePercentage = true;
-  // List<Map<String, dynamic>> availableLanguages = [];
-  // late List<LanguageMasterModel> parsedLanguageList = [];
-
 
   @override
   void initState() {
@@ -106,10 +104,10 @@ class _MyAccountState extends State<MyAccount> {
     final connectSid = prefs.getString('connectSid') ?? '';
     try {
       final educationDetailsFromApi =
-          await EducationDetailApi.fetchEducationDetails(
-            authToken: authToken,
-            connectSid: connectSid,
-          );
+      await EducationDetailApi.fetchEducationDetails(
+        authToken: authToken,
+        connectSid: connectSid,
+      );
       setState(() {
         educationDetail = educationDetailsFromApi.isNotEmpty
             ? educationDetailsFromApi.first
@@ -247,43 +245,7 @@ class _MyAccountState extends State<MyAccount> {
       print(' Error fetching skills: $e');
     }
   }
-  // static Future<Map<String, dynamic>> fetchLanguagesRawResponse({
-  //   required String authToken,
-  //   required String connectSid,
-  // }) async {
-  //   final url = Uri.parse(
-  //     'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/language-details',
-  //   );
-  //
-  //   final headers = {
-  //     'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
-  //   };
-  //
-  //   print('📤 [fetchLanguagesRawResponse] Sending request to: $url');
-  //   print('📤 [fetchLanguagesRawResponse] Headers: $headers');
-  //
-  //   try {
-  //     final request = http.Request('GET', url)..headers.addAll(headers);
-  //     final streamedResponse = await request.send();
-  //     final responseBody = await streamedResponse.stream.bytesToString();
-  //
-  //     print('📥 [fetchLanguagesRawResponse] Status: ${streamedResponse.statusCode}');
-  //     print('📥 [fetchLanguagesRawResponse] Body: $responseBody');
-  //
-  //     if (streamedResponse.statusCode == 200) {
-  //       final decoded = json.decode(responseBody);
-  //       return {
-  //         'languages': decoded['languages'] ?? [],
-  //       };
-  //     }
-  //
-  //     print('❌ [fetchLanguagesRawResponse] Failed to fetch language list.');
-  //     return {'languages': []};
-  //   } catch (e) {
-  //     print('❌ [fetchLanguagesRawResponse] Exception: $e');
-  //     return {'languages': []};
-  //   }
-  // }
+
   Future<void> fetchLanguageData() async {
     final prefs = await SharedPreferences.getInstance();
     final authToken = prefs.getString('authToken') ?? '';
@@ -311,21 +273,22 @@ class _MyAccountState extends State<MyAccount> {
   void _showImagePickerOption() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
       ),
       builder: (_) {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(
+              leading: Icon(
                 Icons.photo_library_outlined,
-                color: Color(0xFF005E6A),
+                color: const Color(0xFF005E6A),
+                size: 22.w,
               ),
-              title: const Text(
+              title: Text(
                 'Choose from Gallery',
-                style: TextStyle(fontSize: 16, color: Color(0xFF003840)),
+                style: TextStyle(fontSize: 14.sp, color: const Color(0xFF003840)),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -333,13 +296,14 @@ class _MyAccountState extends State<MyAccount> {
               },
             ),
             ListTile(
-              leading: const Icon(
+              leading: Icon(
                 Icons.camera_alt_outlined,
-                color: Color(0xFF005E6A),
+                color: const Color(0xFF005E6A),
+                size: 22.w,
               ),
-              title: const Text(
+              title: Text(
                 'Take a Photo',
-                style: TextStyle(fontSize: 16, color: Color(0xFF003840)),
+                style: TextStyle(fontSize: 14.sp, color: const Color(0xFF003840)),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -348,10 +312,10 @@ class _MyAccountState extends State<MyAccount> {
             ),
             if (_profileImage != null)
               ListTile(
-                leading: const Icon(Icons.delete_outline, color: Colors.red),
-                title: const Text(
+                leading: Icon(Icons.delete_outline, color: Colors.red, size: 22.w),
+                title: Text(
                   'Remove Image',
-                  style: TextStyle(fontSize: 16, color: Colors.red),
+                  style: TextStyle(fontSize: 14.sp, color: Colors.red),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -366,12 +330,15 @@ class _MyAccountState extends State<MyAccount> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
 
     return Scaffold(
-      appBar: AccountAppBar(),
+      appBar: const AccountAppBar(),
       backgroundColor: Colors.white,
       body: Builder(
         builder: (innerContext) => SafeArea(
@@ -399,17 +366,14 @@ class _MyAccountState extends State<MyAccount> {
               ]);
             },
             child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                horizontal: 16 * sizeScale,
-                vertical: 20 * sizeScale,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 17.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   _buildProfileHeader(),
-                  const SizedBox(height: 25),
-                  ProfileCompletionBar(),
-                  const SizedBox(height: 25),
+                  SizedBox(height: 22.h),
+                  const ProfileCompletionBar(),
+                  SizedBox(height: 22.h),
                   PersonalDetailsSection(
                     personalDetail: personalDetail,
                     isLoading: isLoadingPersonalDetail,
@@ -429,7 +393,7 @@ class _MyAccountState extends State<MyAccount> {
                       );
                     },
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 17.h),
                   EducationSection(
                     educationDetails: educationDetails,
                     isLoading: isLoadingEducation,
@@ -470,9 +434,9 @@ class _MyAccountState extends State<MyAccount> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20),
-                  ResumeSection(),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 17.h),
+                  const ResumeSection(),
+                  SizedBox(height: 17.h),
                   SkillsSection(
                     skillList: skillList,
                     isLoading: isLoadingSkills,
@@ -518,7 +482,7 @@ class _MyAccountState extends State<MyAccount> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 17.h),
                   ProjectsSection(
                     projects: projects,
                     isLoading: isLoadingProject,
@@ -537,8 +501,8 @@ class _MyAccountState extends State<MyAccount> {
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
                         ),
                         builder: (context) => EditProjectDetailsBottomSheet(
                           initialData: null,
@@ -563,18 +527,18 @@ class _MyAccountState extends State<MyAccount> {
                         return;
                       }
                       print("🛠 Opening Edit BottomSheet");
-                      print("📍 internshipId: ${project.internshipId}"); // Debug to confirm
+                      print("📍 internshipId: ${project.internshipId}");
                       print("📍 userId: ${project.userId}");
                       print("📍 type: ${project.type}");
                       bool isSaveComplete = false;
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
                         ),
                         builder: (context) => EditProjectDetailsBottomSheet(
-                          initialData: project, // Ensure project contains internshipId
+                          initialData: project,
                           onSave: (updatedData) async {
                             if (!isSaveComplete) {
                               print("✅ [onEdit -> onSave] Updated project: ${updatedData.projectName} | Type: ${updatedData.type}");
@@ -592,7 +556,7 @@ class _MyAccountState extends State<MyAccount> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 17.h),
                   CertificatesSection(
                     certificatesList: certificatesList,
                     isLoading: isLoadingCertificate,
@@ -606,7 +570,7 @@ class _MyAccountState extends State<MyAccount> {
                           onSave: (certif) async {
                             try {
                               final prefs =
-                                  await SharedPreferences.getInstance();
+                              await SharedPreferences.getInstance();
                               final authToken =
                                   prefs.getString('authToken') ?? '';
                               final connectSid =
@@ -625,9 +589,6 @@ class _MyAccountState extends State<MyAccount> {
                               await fetchCertificateDetails();
                               if (innerContext.mounted)
                                 Navigator.pop(innerContext);
-                              // ScaffoldMessenger.of(innerContext).showSnackBar(
-                              //   const SnackBar(content: Text('Certificate added successfully')),
-                              // );
                             } catch (e) {
                               print('❌ Failed to add certificate: $e');
                               ScaffoldMessenger.of(innerContext).showSnackBar(
@@ -652,7 +613,7 @@ class _MyAccountState extends State<MyAccount> {
                           onSave: (updatedCert) async {
                             try {
                               final prefs =
-                                  await SharedPreferences.getInstance();
+                              await SharedPreferences.getInstance();
                               final authToken =
                                   prefs.getString('authToken') ?? '';
                               final connectSid =
@@ -673,9 +634,6 @@ class _MyAccountState extends State<MyAccount> {
                               await fetchCertificateDetails();
                               if (innerContext.mounted)
                                 Navigator.pop(innerContext);
-                              // ScaffoldMessenger.of(innerContext).showSnackBar(
-                              //   const SnackBar(content: Text('Certificate updated successfully')),
-                              // );
                             } catch (e) {
                               print('❌ Failed to update certificate: $e');
                               ScaffoldMessenger.of(innerContext).showSnackBar(
@@ -701,16 +659,7 @@ class _MyAccountState extends State<MyAccount> {
                           throw Exception('Missing auth token or session ID');
                         }
 
-                        // await CertificateApi.deleteCertificateApi(
-                        //   certificateId: cert.id, // replace with actual ID field name
-                        //   authToken: authToken,
-                        //   connectSid: connectSid,
-                        // );
-
                         await fetchCertificateDetails();
-                        // ScaffoldMessenger.of(innerContext).showSnackBar(
-                        //   const SnackBar(content: Text('Certificate deleted successfully')),
-                        // );
                       } catch (e) {
                         print('❌ Failed to delete certificate: $e');
                         ScaffoldMessenger.of(innerContext).showSnackBar(
@@ -719,7 +668,7 @@ class _MyAccountState extends State<MyAccount> {
                       }
                     },
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 17.h),
                   WorkExperienceSection(
                     workExperiences: workExperiences,
                     isLoading: isLoadingWorkExperience,
@@ -774,7 +723,7 @@ class _MyAccountState extends State<MyAccount> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 17.h),
                   LanguagesSection(
                     languageList: languageList,
                     isLoading: isLoadingLanguages,
@@ -798,24 +747,8 @@ class _MyAccountState extends State<MyAccount> {
                         languageList.removeAt(index);
                       });
                     },
-                    // // If you want to enable edit too:
-                    // onEdit: (language, index) {
-                    //   showModalBottomSheet(
-                    //     context: innerContext,
-                    //     isScrollControlled: true,
-                    //     backgroundColor: Colors.white,
-                    //     builder: (_) => LanguageBottomSheet(
-                    //       initialData: language,
-                    //       onSave: (LanguagesModel data) {
-                    //         setState(() {
-                    //           languageList[index] = data;
-                    //         });
-                    //       },
-                    //     ),
-                    //   );
-                    // },
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 17.h),
                 ],
               ),
             ),
@@ -826,10 +759,6 @@ class _MyAccountState extends State<MyAccount> {
   }
 
   Widget _buildProfileHeader() {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
-
     Widget displayedImage;
 
     if (_profileImage != null) {
@@ -853,28 +782,28 @@ class _MyAccountState extends State<MyAccount> {
           alignment: Alignment.center,
           children: [
             Container(
-              width: 160 * sizeScale,
-              height: 160 * sizeScale,
+              width: 140.w,
+              height: 140.h,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: const Color(0xFF005E6A),
-                  width: 2.3 * sizeScale,
+                  width: 2.w,
                 ),
               ),
               child: ClipOval(child: displayedImage),
             ),
             Positioned(
-              bottom: 8 * sizeScale,
-              right: 8 * sizeScale,
+              bottom: 7.h,
+              right: 7.w,
               child: GestureDetector(
                 onTap: _showImagePickerOption,
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
-                  radius: 18 * sizeScale,
+                  radius: 16.r,
                   child: Icon(
                     Clarity.note_edit_line,
-                    size: 25 * sizeScale,
+                    size: 22.w,
                     color: const Color(0xFF005E6A),
                   ),
                 ),
@@ -882,16 +811,16 @@ class _MyAccountState extends State<MyAccount> {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 10.h),
         Text(
           '${_imageUpdateData?.firstName ?? ''} ${_imageUpdateData?.lastName ?? ''}'
-                  .trim()
-                  .isNotEmpty
+              .trim()
+              .isNotEmpty
               ? '${_imageUpdateData?.firstName ?? ''} ${_imageUpdateData?.lastName ?? ''}'
-                    .trim()
+              .trim()
               : '',
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 17.sp,
             fontWeight: FontWeight.w700,
             color: const Color(0xFF005E6A),
           ),

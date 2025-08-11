@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OtpField extends StatefulWidget {
   final Function(String) onSubmit;
@@ -54,27 +55,34 @@ class _OtpFieldState extends State<OtpField> {
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: List.generate(widget.length, (index) {
         return SizedBox(
-          width: 40,
+          width: 35.w,
           child: TextField(
             controller: _controllers[index],
             focusNode: _focusNodes[index],
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
             maxLength: 1,
-            style: const TextStyle(fontSize: 20),
+            style: TextStyle(fontSize: 18.sp),
             onChanged: (value) => _onChanged(value, index),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               counterText: "",
-              contentPadding: EdgeInsets.symmetric(vertical: 10),
+              contentPadding: EdgeInsets.symmetric(vertical: 8.h),
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey),
+                borderSide: BorderSide(color: Colors.grey, width: 1.w),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.teal, width: 2),
+                borderSide: BorderSide(color: Colors.teal, width: 1.7.w),
               ),
             ),
           ),

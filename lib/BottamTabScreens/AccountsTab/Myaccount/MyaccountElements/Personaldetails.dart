@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sk_loginscreen1/Model/PersonalDetail_Model.dart';
 import 'DetailRow.dart';
 import 'SectionHeader.dart';
@@ -19,10 +20,12 @@ class PersonalDetailsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double fontScale = widthScale.clamp(0.98, 1.02);
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,9 +36,12 @@ class PersonalDetailsSection extends StatelessWidget {
           onEdit: onEdit,
         ),
         isLoading
-            ? PersonalDetailsShimmer(sizeScale: sizeScale, fontScale: fontScale)
+            ? const PersonalDetailsShimmer()
             : personalDetail == null
-            ? const Text('No personal details available.')
+            ? Text(
+          'No personal details available.',
+          style: TextStyle(fontSize: 12.sp),
+        )
             : _buildCardBody(
           children: [
             DetailRow(
@@ -64,11 +70,11 @@ class PersonalDetailsSection extends StatelessWidget {
   Widget _buildCardBody({required List<Widget> children}) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(16),
-      margin: const EdgeInsets.only(top: 8),
+      padding: EdgeInsets.all(14.w),
+      margin: EdgeInsets.only(top: 7.h),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xFFBCD8DB)),
-        borderRadius: BorderRadius.circular(12 ),
+        borderRadius: BorderRadius.circular(10.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,23 +92,25 @@ class DetailRowIconplus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double fontScale = widthScale.clamp(0.98, 1.02);
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
 
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 6 * sizeScale),
+      padding: EdgeInsets.symmetric(vertical: 5.h),
       child: Row(
         children: [
-          Icon(icon, size: 17 * sizeScale, color: const Color(0xFF005E6A)),
-          const SizedBox(width: 13),
+          Icon(icon, size: 15.w, color: const Color(0xFF005E6A)),
+          SizedBox(width: 11.w),
           Expanded(
             child: Text(
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 14 * fontScale),
+              style: TextStyle(fontSize: 12.sp),
             ),
           ),
         ],

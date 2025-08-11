@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../../Utilities/MyAccount_Get_Post/AccountProgress_Api.dart';
@@ -50,6 +51,13 @@ class _ProfileCompletionBarState extends State<ProfileCompletionBar> {
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
+
     if (isLoading || percentage == null) {
       return Shimmer.fromColors(
         baseColor: Colors.grey.shade300,
@@ -57,9 +65,9 @@ class _ProfileCompletionBarState extends State<ProfileCompletionBar> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(height: 16, width: 180, color: Colors.white),
-            const SizedBox(height: 8),
-            Container(height: 10, width: double.infinity, color: Colors.white),
+            Container(height: 14.h, width: 160.w, color: Colors.white),
+            SizedBox(height: 7.h),
+            Container(height: 8.h, width: double.infinity, color: Colors.white),
           ],
         ),
       );
@@ -75,29 +83,29 @@ class _ProfileCompletionBarState extends State<ProfileCompletionBar> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               "Profile Completion Status",
               style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF005E6A),
+                fontSize: 12.sp,
+                color: const Color(0xFF005E6A),
                 fontWeight: FontWeight.w500,
               ),
             ),
             Text(
               "${clampedPercent.toInt()}%",
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.bold,
                 color: isLow ? Colors.red : const Color(0xFF027D92),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 7.h),
         LinearPercentIndicator(
           animation: true,
           animationDuration: 500,
-          lineHeight: 10.0,
+          lineHeight: 8.h,
           percent: clampedPercent / 100,
           backgroundColor: Colors.grey.shade300,
           progressColor: isLow ? Colors.red : null,
@@ -108,7 +116,7 @@ class _ProfileCompletionBarState extends State<ProfileCompletionBar> {
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
-          barRadius: const Radius.circular(10),
+          barRadius: Radius.circular(8.r),
         ),
       ],
     );

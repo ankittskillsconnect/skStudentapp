@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sk_loginscreen1/Pages/BlinkAnimatedStatus.dart';
 import '../../Model/InterviewScreen_Model.dart';
 
@@ -16,12 +17,12 @@ class InterviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(12),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.all(10.w),
+      padding: EdgeInsets.all(10.w),
       decoration: BoxDecoration(
         color: const Color(0xFFEBF6F7),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFBCD8DB), width: 1),
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: const Color(0xFFBCD8DB), width: 0.8.w),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,10 +32,10 @@ class InterviewCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   model.jobTitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Color(0xFF003840),
+                    fontSize: 16.sp,
+                    color: const Color(0xFF003840),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -42,13 +43,12 @@ class InterviewCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-
+          SizedBox(height: 10.h),
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10.r),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,14 +59,15 @@ class InterviewCard extends StatelessWidget {
                     Expanded(
                       child: Row(
                         children: [
-                          const Icon(Icons.maps_home_work_outlined, size: 18, color: Color(0xFF003840)),
-                          const SizedBox(width: 8),
+                          Icon(Icons.maps_home_work_outlined,
+                              size: 16.w, color: const Color(0xFF003840)),
+                          SizedBox(width: 7.w),
                           Expanded(
                             child: Text(
                               model.company,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Color(0xFF003840),
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: const Color(0xFF003840),
                                 fontWeight: FontWeight.w500,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -79,50 +80,52 @@ class InterviewCard extends StatelessWidget {
                     LiveSlidingText(status: model.isActive ? 'Active' : 'Inactive'),
                   ],
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 7.h),
                 Row(
                   children: [
-                    const Icon(Icons.calendar_month_outlined, size: 18, color: Color(0xFF003840)),
-                    const SizedBox(width: 8),
+                    Icon(Icons.calendar_month_outlined,
+                        size: 16.w, color: const Color(0xFF003840)),
+                    SizedBox(width: 7.w),
                     Flexible(
                       child: Text(
                         model.date,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF003840),
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: const Color(0xFF003840),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    const Icon(Icons.access_time_outlined, size: 18, color: Color(0xFF003840)),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8.w),
+                    Icon(Icons.access_time_outlined,
+                        size: 16.w, color: const Color(0xFF003840)),
+                    SizedBox(width: 7.w),
                     Expanded(
                       child: Text(
                         "${model.startTime} - ${model.endTime}",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF003840),
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: const Color(0xFF003840),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-
+                SizedBox(height: 7.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.person_outline_outlined, size: 18, color: Color(0xFF003840)),
-                        const SizedBox(width: 8),
+                        Icon(Icons.person_outline_outlined,
+                            size: 16.w, color: const Color(0xFF003840)),
+                        SizedBox(width: 7.w),
                         Text(
                           model.moderator,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF003840),
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: const Color(0xFF003840),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -132,14 +135,14 @@ class InterviewCard extends StatelessWidget {
                       children: [
                         Text(
                           model.meetingMode,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF003840),
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: const Color(0xFF003840),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(width: 5),
-                        Brand(Brands.zoom, size: 23),
+                        SizedBox(width: 4.w),
+                        Brand(Brands.zoom, size: 20.w),
                       ],
                     ),
                   ],
@@ -147,23 +150,25 @@ class InterviewCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: onJoinTap,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF005E6A),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
+          SizedBox(height: 10.h),
+          Center(
+            child: SizedBox(
+              width: 200.w,
+              child: ElevatedButton.icon(
+                onPressed: onJoinTap,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF005E6A),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 10.h),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                icon: Text(
+                  "Join Now",
+                  style: TextStyle(fontSize: 14.sp, color: Colors.white),
+                ),
+                label: Icon(Icons.arrow_forward, color: Colors.white, size: 18.w),
               ),
-              icon: const Text(
-                "Join Now",
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
-              label: const Icon(Icons.arrow_forward, color: Colors.white),
             ),
           ),
         ],

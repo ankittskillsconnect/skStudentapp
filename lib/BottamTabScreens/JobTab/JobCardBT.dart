@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class JobCardBT extends StatelessWidget {
   final String jobTitle;
@@ -24,24 +25,22 @@ class JobCardBT extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // print("Rendering JobCardBT - Title: $jobTitle, Company: $company, Location: $location, Tags: $tags, LogoUrl: $logoUrl"); // Debug log
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-      padding: const EdgeInsets.all(8),
+      margin: EdgeInsets.symmetric(horizontal: 6.w, vertical: 8.h),
+      padding: EdgeInsets.all(7.w),
       decoration: BoxDecoration(
         color: const Color(0xFFEBF6F7),
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: const Color(0xFFBCD8DB), width: 2),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: const Color(0xFFBCD8DB), width: 1.5.w),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10.r),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,109 +49,100 @@ class JobCardBT extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(3),
-                      margin: const EdgeInsets.only(bottom: 0),
+                      padding: EdgeInsets.all(3.w),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8.r),
                         border: Border.all(color: const Color(0xFF005E6A)),
                       ),
                       child: logoUrl != null && logoUrl!.isNotEmpty
                           ? Image.network(
-                              logoUrl!,
-                              width: 40,
-                              height: 40,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) {
-                                print(
-                                  "Image load error for $logoUrl: $error",
-                                );
-                                return Image.asset(
-                                  "assets/google.png",
-                                  width: 40,
-                                  height: 40,
-                                );
-                              },
-                            )
+                        logoUrl!,
+                        width: 34.w,
+                        height: 34.w,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            "assets/google.png",
+                            width: 34.w,
+                            height: 34.w,
+                          );
+                        },
+                      )
                           : Image.asset(
-                              "assets/google.png",
-                              width: 40,
-                              height: 40,
-                            ),
+                        "assets/google.png",
+                        width: 34.w,
+                        height: 34.w,
+                      ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 10.w),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             jobTitle,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 19,
-                              color: Color(0xFF003840),
+                              fontSize: 16.sp,
+                              color: const Color(0xFF003840),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                company,
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xFF827B7B),
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text(
-                                location.isNotEmpty ? location : 'NA',
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xFF827B7B),
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                          Text(
+                            company,
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              color: const Color(0xFF827B7B),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            location.isNotEmpty ? location : 'NA',
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              color: const Color(0xFF827B7B),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 6.w),
                     Text(
                       salary,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF005E6A),
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: const Color(0xFF005E6A),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 8.h),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: tags.map((tag) {
                       return Container(
-                        margin: const EdgeInsets.only(right: 10),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
+                        margin: EdgeInsets.only(right: 8.w),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 5.h,
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(18.r),
                           border: Border.all(color: const Color(0xFF827B7B)),
                         ),
                         child: Text(
                           tag,
-                          style: const TextStyle(
-                            color: Color(0xFF003840),
-                            fontSize: 14,
+                          style: TextStyle(
+                            color: const Color(0xFF003840),
+                            fontSize: 12.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -163,45 +153,45 @@ class JobCardBT extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 8.h),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 8.w),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.access_time,
-                      size: 22,
-                      color: Color(0xFF003840),
+                      size: 18.sp,
+                      color: const Color(0xFF003840),
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 3.w),
                     Text(
                       postTime,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF003840),
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        color: const Color(0xFF003840),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 6.w,
+                    vertical: 3.h,
                   ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFEDDDC),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(18.r),
                     border: Border.all(color: const Color(0xFFBCD8DB)),
                   ),
                   child: Text(
                     expiry,
-                    style: const TextStyle(
-                      color: Color(0xFFD03C2D),
-                      fontSize: 14,
+                    style: TextStyle(
+                      color: const Color(0xFFD03C2D),
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

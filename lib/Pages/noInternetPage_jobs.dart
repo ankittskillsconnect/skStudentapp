@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class NoInternetPage extends StatelessWidget {
   final VoidCallback onRetry;
@@ -9,32 +10,39 @@ class NoInternetPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              "assets/no_internet.png",
-              height: 200,
+              "assets/images/no_internet.png",
+              height: 200.h,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             Image.asset(
-              "assets/something_wrong.png",
-              height: 200,
+              "assets/images/something_wrong.png",
+              height: 60.h,
             ),
-            const SizedBox(height: 20),
+
+            SizedBox(height: 20.h),
             ElevatedButton(
               onPressed: onRetry,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: Colors.orange,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
+                  borderRadius: BorderRadius.circular(25.r),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 25.w,
+                  vertical: 12.h,
+                ),
               ),
-              child: const Text(
+              child: Text(
                 "TRY AGAIN",
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16.sp,
+                ),
               ),
             ),
           ],

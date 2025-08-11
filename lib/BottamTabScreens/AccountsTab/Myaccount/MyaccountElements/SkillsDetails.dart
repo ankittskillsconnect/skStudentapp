@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sk_loginscreen1/Model/Skiils_Model.dart';
 import 'SectionHeader.dart';
 import 'ShimmerWidgets.dart';
@@ -21,10 +22,12 @@ class SkillsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double fontScale = widthScale.clamp(0.98, 1.02);
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,20 +41,20 @@ class SkillsSection extends StatelessWidget {
         ),
         if (isLoading)
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: SkillsShimmer(sizeScale: sizeScale, fontScale: fontScale),
+            padding: EdgeInsets.all(14.w),
+            child: const SkillsShimmer(),
           )
         else if (skillList.isNotEmpty)
           Container(
-            padding: EdgeInsets.all(12 * sizeScale),
-            margin: const EdgeInsets.only(top: 8),
+            padding: EdgeInsets.all(10.w),
+            margin: EdgeInsets.only(top: 7.h),
             decoration: BoxDecoration(
               border: Border.all(color: const Color(0xFFBCD8DB)),
-              borderRadius: BorderRadius.circular(12 * sizeScale),
+              borderRadius: BorderRadius.circular(10.r),
             ),
             child: Wrap(
-              spacing: 8 * sizeScale,
-              runSpacing: 8 * sizeScale,
+              spacing: 7.w,
+              runSpacing: 7.h,
               children: skillList
                   .expand((skill) => skill.skills
                   .split(',')
@@ -60,7 +63,7 @@ class SkillsSection extends StatelessWidget {
                   .map((singleSkill) => Chip(
                 label: Text(
                   singleSkill,
-                  style: TextStyle(fontSize: 14 * fontScale),
+                  style: TextStyle(fontSize: 12.sp),
                 ),
                 onDeleted: () => onDeleteSkill(skill, singleSkill),
                 deleteIconColor: const Color(0xFF005E6A),
@@ -69,8 +72,6 @@ class SkillsSection extends StatelessWidget {
               )))
                   .toList(),
             ),
-
-
           ),
       ],
     );

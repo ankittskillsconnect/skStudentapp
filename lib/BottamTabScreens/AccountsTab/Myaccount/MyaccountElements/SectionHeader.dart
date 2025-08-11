@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -18,10 +19,12 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double fontScale = widthScale.clamp(0.98, 1.02);
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -29,7 +32,7 @@ class SectionHeader extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-            fontSize: 18 * fontScale,
+            fontSize: 16.sp,
             fontWeight: FontWeight.bold,
             color: const Color(0xFF003840),
           ),
@@ -41,33 +44,35 @@ class SectionHeader extends StatelessWidget {
                 icon: Icon(
                   Icons.edit,
                   color: const Color(0xFF005E6A),
-                  size: 20 * sizeScale,
+                  size: 18.w,
                 ),
                 onPressed: onEdit,
+                padding: EdgeInsets.zero,
+                constraints: BoxConstraints(minWidth: 40.w, minHeight: 40.h),
               ),
             if (showAdd && onAdd != null)
-              TextButton.icon(
-                onPressed: onAdd,
-                icon: const Icon(Icons.add, size: 20, color: Color(0xFF005E6A)),
-                label: Text(
-                  "Add",
-                  style: TextStyle(
-                    color: const Color(0xFF005E6A),
-                    fontSize: 16 * fontScale,
-                    fontWeight: FontWeight.bold,
+              SizedBox(
+                width: 80.w,
+                child: TextButton.icon(
+                  onPressed: onAdd,
+                  icon: Icon(Icons.add, size: 18.w, color: const Color(0xFF005E6A)),
+                  label: Text(
+                    "Add",
+                    style: TextStyle(
+                      color: const Color(0xFF005E6A),
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                style: TextButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFF005E6A), width: 1.3),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30 * sizeScale),
+                  style: TextButton.styleFrom(
+                    side: BorderSide(color: const Color(0xFF005E6A), width: 1.1.w),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.r),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                    minimumSize: Size(10.w, 0),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12 * sizeScale,
-                    vertical: 6 * sizeScale,
-                  ),
-                  minimumSize: const Size(10, 0),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
               ),
           ],

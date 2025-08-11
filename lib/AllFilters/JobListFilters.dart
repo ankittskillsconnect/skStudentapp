@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Joblistfilters extends StatefulWidget {
   final String jobType;
@@ -33,10 +34,6 @@ class _JoblistfiltersState extends State<Joblistfilters>
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
-
     jobTitleController = TextEditingController(text: widget.jobTitle);
     jobType = widget.jobType;
     workCulture = widget.workCulture;
@@ -52,12 +49,12 @@ class _JoblistfiltersState extends State<Joblistfilters>
       builder: (context, scrollController) {
         return Container(
           padding: EdgeInsets.symmetric(
-            horizontal: 20 * sizeScale,
-            vertical: 10 * sizeScale,
+            horizontal: 16.w,
+            vertical: 8.h,
           ),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
           ),
           child: SingleChildScrollView(
             controller: scrollController,
@@ -66,23 +63,24 @@ class _JoblistfiltersState extends State<Joblistfilters>
               children: [
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'Apply Filters',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF003840),
+                          color: const Color(0xFF003840),
                         ),
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Color(0xFF005E6A)),
+                      icon: Icon(Icons.close,
+                          color: const Color(0xFF005E6A), size: 22.sp),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
                 ),
-                const Divider(thickness: 1),
+                Divider(thickness: 1.h),
                 _buildLabel('Jobs Type'),
                 _buildDropdownField(
                   value: jobType,
@@ -121,40 +119,35 @@ class _JoblistfiltersState extends State<Joblistfilters>
                   items: const ['Mumbai', 'Bangalore', 'New Delhi'],
                   onChanged: (val) => setState(() => selectedCity = val ?? ''),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 16.h),
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.pop(context, {
+                        'jobType': jobType,
+                        'jobTitle': jobTitleController.text,
+                        'workCulture': workCulture,
+                        'courses': courses,
+                        'cities': selectedCity,
+                        'states': selectedState,
+                      });
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF005E6A),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(30.r),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 14,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 36.w,
+                        vertical: 12.h,
                       ),
                     ),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context, {
-                          'jobType': jobType,
-                          'jobTitle': jobTitleController.text,
-                          'workCulture': workCulture,
-                          'courses': courses,
-                          'cities': selectedCity,
-                          'states': selectedState,
-                        });
-                      },
-                      child: const Text(
-                        "Show Results",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                    child: Text(
+                      "Show Results",
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -169,36 +162,41 @@ class _JoblistfiltersState extends State<Joblistfilters>
 
   Widget _buildLabel(String text) {
     return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 4),
+      padding: EdgeInsets.only(top: 8.h, bottom: 3.h),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.w600,
-          fontSize: 16,
-          color: Color(0xFF003840),
+          fontSize: 14.sp,
+          color: const Color(0xFF003840),
         ),
       ),
     );
   }
 
   Widget _buildTextField(
-    String hint,
-    TextEditingController controller, {
-    bool readOnly = false,
-    IconData? suffixIcon,
-    VoidCallback? onTap,
-    Color? textColor,
-  }) {
+      String hint,
+      TextEditingController controller, {
+        bool readOnly = false,
+        IconData? suffixIcon,
+        VoidCallback? onTap,
+        Color? textColor,
+      }) {
     return TextField(
       controller: controller,
       readOnly: readOnly,
       onTap: onTap,
-      style: TextStyle(color: textColor ?? Colors.black),
+      style: TextStyle(color: textColor ?? Colors.black, fontSize: 13.sp),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: textColor?.withOpacity(0.6) ?? Colors.grey),
-        suffixIcon: suffixIcon != null ? Icon(suffixIcon, size: 18) : null,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+        hintStyle: TextStyle(
+            color: textColor?.withOpacity(0.6) ?? Colors.grey, fontSize: 13.sp),
+        suffixIcon:
+        suffixIcon != null ? Icon(suffixIcon, size: 18.sp) : null,
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.r), borderSide: BorderSide()),
+        contentPadding:
+        EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
       ),
     );
   }
@@ -213,7 +211,7 @@ class _JoblistfiltersState extends State<Joblistfilters>
       ...items.where((e) => e != 'Please select'),
     ];
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: EdgeInsets.symmetric(vertical: 5.h),
       child: DropdownButtonFormField<String>(
         isExpanded: true,
         value: updatedItems.contains(value) ? value : 'Please select',
@@ -223,10 +221,12 @@ class _JoblistfiltersState extends State<Joblistfilters>
             child: Text(
               e,
               style: TextStyle(
-                color: e == 'Please select' ? Color(0xff005E6A) : Colors.black,
-                fontWeight: e == 'Please select'
-                    ? FontWeight.w500
-                    : FontWeight.normal,
+                fontSize: 13.sp,
+                color: e == 'Please select'
+                    ? const Color(0xff005E6A)
+                    : Colors.black,
+                fontWeight:
+                e == 'Please select' ? FontWeight.w500 : FontWeight.normal,
               ),
             ),
           );
@@ -238,17 +238,17 @@ class _JoblistfiltersState extends State<Joblistfilters>
         },
         decoration: InputDecoration(
           hintText: 'Please select',
+          hintStyle: TextStyle(fontSize: 13.sp),
           filled: true,
           fillColor: Colors.white,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 10,
-          ),
+          border:
+          OutlineInputBorder(borderRadius: BorderRadius.circular(24.r)),
+          contentPadding:
+          EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
         ),
         dropdownColor: Colors.white,
-        menuMaxHeight: 250,
-        borderRadius: BorderRadius.circular(20),
+        menuMaxHeight: 250.h,
+        borderRadius: BorderRadius.circular(20.r),
       ),
     );
   }

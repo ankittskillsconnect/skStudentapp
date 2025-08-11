@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sk_loginscreen1/Model/Internship_Projects_Model.dart';
 import 'SectionHeader.dart';
 import 'ShimmerWidgets.dart';
@@ -21,29 +22,31 @@ class ProjectsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double fontScale = widthScale.clamp(0.98, 1.02);
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(
+        const SectionHeader(
           title: "Project/Internship Details",
           showAdd: true,
-          onAdd: onAdd,
         ),
         if (isLoading)
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: ProjectShimmer(sizeScale: sizeScale, fontScale: fontScale),
+            padding: EdgeInsets.all(14.w),
+            child: const ProjectShimmer(),
           )
         else if (projects.isEmpty)
-          const Center(
+          Center(
             child: Text(
               'No projects available',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -54,11 +57,11 @@ class ProjectsSection extends StatelessWidget {
               final proj = projects[i];
               return Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(14 * sizeScale),
-                margin: const EdgeInsets.only(top: 10),
+                padding: EdgeInsets.all(12.w),
+                margin: EdgeInsets.only(top: 8.h),
                 decoration: BoxDecoration(
                   border: Border.all(color: const Color(0xFFBCD8DB)),
-                  borderRadius: BorderRadius.circular(12 * sizeScale),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,30 +70,30 @@ class ProjectsSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Container(
-                          padding: EdgeInsets.all(6 * sizeScale),
+                          padding: EdgeInsets.all(5.w),
                           decoration: BoxDecoration(
                             color: const Color(0xFFEBF6F7),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(10.r),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.workspaces_filled,
-                            size: 24,
-                            color: Color(0xFF005E6A),
+                            size: 22.w,
+                            color: const Color(0xFF005E6A),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 8.w),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
                           decoration: BoxDecoration(
                             color: Colors.lightGreen,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(18.r),
                             border: Border.all(color: const Color(0xFFBCD8DB)),
                           ),
                           child: Text(
                             proj.type,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 14,
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -98,54 +101,54 @@ class ProjectsSection extends StatelessWidget {
                         const Spacer(),
                         IconButton(
                           icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
-                          iconSize: 18,
+                          iconSize: 16.w,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                           onPressed: () => onEdit(proj, i),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete_outline, color: Colors.red),
-                          iconSize: 18,
+                          iconSize: 16.w,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                           onPressed: () => onDelete(i),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 5.h),
                     Text(
                       'Project Name : ${proj.projectName}',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        fontSize: 14 * fontScale,
+                        fontSize: 12.sp,
                         color: const Color(0xFF005E6A),
                       ),
                     ),
                     Text(
                       'Company Name : ${proj.companyName}',
                       style: TextStyle(
-                        fontSize: 14 * fontScale,
+                        fontSize: 12.sp,
                         color: const Color(0xFF003840),
                       ),
                     ),
                     Text(
                       'Duration : ${proj.duration} - ${proj.durationPeriod}',
                       style: TextStyle(
-                        fontSize: 14 * fontScale,
+                        fontSize: 12.sp,
                         color: const Color(0xFF003840),
                       ),
                     ),
                     Text(
                       'Skills : ${proj.skills}',
                       style: TextStyle(
-                        fontSize: 14 * fontScale,
+                        fontSize: 12.sp,
                         color: const Color(0xFF003840),
                       ),
                     ),
                     Text(
                       'Details : ${proj.details}',
                       style: TextStyle(
-                        fontSize: 14 * fontScale,
+                        fontSize: 12.sp,
                         color: const Color(0xFF003840),
                         height: 1.4,
                       ),

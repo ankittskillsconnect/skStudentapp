@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,8 +48,6 @@ class _LoginpageState extends State<Loginpage> {
     super.dispose();
   }
 
-
-
   Future<bool> _hasInternetConnection() async {
     try {
       final result = await InternetAddress.lookup('google.com');
@@ -64,7 +63,7 @@ class _LoginpageState extends State<Loginpage> {
     _snackBarShown = true;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(message, style: TextStyle(fontSize: 12.sp)),
         backgroundColor: Colors.red,
         duration: Duration(seconds: cooldownSeconds),
       ),
@@ -145,10 +144,8 @@ class _LoginpageState extends State<Loginpage> {
 
       if (message.contains('email') || message.contains('e-mail') || message.contains('username')) {
         _showSnackBarOnce(context, "Email is incorrect");
-
       } else if (message.contains('password')) {
         _showSnackBarOnce(context, "Password is incorrect");
-
       } else {
         _showSnackBarOnce(
           context,
@@ -160,13 +157,15 @@ class _LoginpageState extends State<Loginpage> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    final screenWidth = mq.size.width;
-    final screenHeight = mq.size.height;
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
+
     return BlocListener<NavigationBloc, NavigationState>(
       listener: (context, state) {
         // if (state is NavigatetoForgotPassword) {
@@ -188,11 +187,11 @@ class _LoginpageState extends State<Loginpage> {
                   children: [
                     // Positioned(
                     //   top: 0,
-                    //   left: screenWidth * 0.5,
+                    //   left: 195.w,
                     //   child: SvgPicture.asset(
                     //     'assets/design.svg',
-                    //     height: screenHeight * 0.25,
-                    //     width: screenWidth * 0.5,
+                    //     height: 200.h,
+                    //     width: 195.w,
                     //     fit: BoxFit.cover,
                     //   ),
                     // ),
@@ -200,11 +199,11 @@ class _LoginpageState extends State<Loginpage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          SizedBox(height: screenHeight * 0.025),
+                          SizedBox(height: 20.h),
                           SvgPicture.asset(
                             "assets/Logo.svg",
-                            width: screenWidth * 0.8,
-                            height: screenHeight * 0.09,
+                            width: 300.w,
+                            height: 70.h,
                           ),
                         ],
                       ),
@@ -216,10 +215,10 @@ class _LoginpageState extends State<Loginpage> {
             Expanded(
               flex: 2,
               child: Container(
-                padding: EdgeInsets.all(screenWidth * 0.06),
-                decoration: const BoxDecoration(
+                padding: EdgeInsets.all(22.w),
+                decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(25.r)),
                 ),
                 child: SingleChildScrollView(
                   child: Column(
@@ -229,30 +228,31 @@ class _LoginpageState extends State<Loginpage> {
                         child: Text(
                           "Login to your account",
                           style: TextStyle(
-                            fontSize: screenWidth * 0.06,
+                            fontSize: 22.sp,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.02),
-                      Text("Enter your email address", style: TextStyle(fontSize: screenWidth * 0.038)),
-                      SizedBox(height: screenHeight * 0.01),
+                      SizedBox(height: 15.h),
+                      Text("Enter your email address", style: TextStyle(fontSize: 14.sp)),
+                      SizedBox(height: 8.h),
                       TextField(
                         controller: emailController,
                         decoration: InputDecoration(
                           hintText: "example@gmail.com",
-                          prefixIcon: const Icon(Icons.email_outlined),
+                          prefixIcon: Icon(Icons.email_outlined, size: 20.w),
                           filled: true,
                           fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(25.r),
                             borderSide: const BorderSide(color: Color(0xFF003840)),
                           ),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.02),
-                      Text("Enter password", style: TextStyle(fontSize: screenWidth * 0.038)),
-                      SizedBox(height: screenHeight * 0.01),
+                      SizedBox(height: 15.h),
+                      Text("Enter password", style: TextStyle(fontSize: 14.sp)),
+                      SizedBox(height: 8.h),
                       PasswordField(controller: passwordController),
                       Align(
                         alignment: Alignment.centerRight,
@@ -260,27 +260,26 @@ class _LoginpageState extends State<Loginpage> {
                           onPressed: () {
                             context.read<NavigationBloc>().add(GoToForgotPassword());
                             // Navigator.push(
-                            //             context,
-                            //             MaterialPageRoute(builder: (_) => const ForgotpasswordPage()),
-                            //           );
+                            //     context,
+                            //     MaterialPageRoute(builder: (_) => const ForgotpasswordPage()),
+                            // );
                           },
-                          child: const Text(
+                          child: Text(
                             "Forgot password?",
-                            style: TextStyle(color: Colors.black),
+                            style: TextStyle(color: Colors.black, fontSize: 12.sp),
                           ),
                         ),
                       ),
-                      // SizedBox(height: screenHeight * 0.01),
                       Center(
                         child: SizedBox(
-                          width: screenWidth * 0.4,
-                          height: screenHeight * 0.05,
+                          width: 140.w,
+                          height: 40.h,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _login,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF003840),
+                              backgroundColor: const Color(0xFF003840),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
+                                borderRadius: BorderRadius.circular(25.r),
                               ),
                             ),
                             child: Row(
@@ -289,37 +288,37 @@ class _LoginpageState extends State<Loginpage> {
                               children: [
                                 Text(
                                   "Login",
-                                  style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.05 ),
+                                  style: TextStyle(color: Colors.white, fontSize: 16.sp),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 7.w),
                                 _isLoading
-                                    ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
+                                    ? SizedBox(
+                                  width: 20.w,
+                                  height: 20.h,
                                   child: CircularProgressIndicator(
                                     color: Colors.white,
-                                    strokeWidth: 2,
+                                    strokeWidth: 1.7.w,
                                   ),
                                 )
-                                    :  Icon(Icons.arrow_forward, color: Colors.white , size: screenWidth * 0.05),
+                                    : Icon(Icons.arrow_forward, color: Colors.white, size: 18.w),
                               ],
                             ),
                           ),
                         ),
                       ),
-
-                      SizedBox(height: screenHeight * 0.02),
+                      SizedBox(height: 15.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Don’t have an account?"),
+                          Text("Don’t have an account?", style: TextStyle(fontSize: 12.sp)),
                           GestureDetector(
                             onTap: () {},
-                            child: const Text(
+                            child: Text(
                               "Sign Up",
                               style: TextStyle(
                                 color: Colors.teal,
                                 fontWeight: FontWeight.bold,
+                                fontSize: 12.sp,
                               ),
                             ),
                           ),

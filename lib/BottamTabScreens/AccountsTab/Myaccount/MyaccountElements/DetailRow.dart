@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DetailRow extends StatelessWidget {
   final IconData icon;
@@ -8,23 +9,25 @@ class DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double fontScale = widthScale.clamp(0.98, 1.02);
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
 
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 6 * sizeScale),
+      padding: EdgeInsets.symmetric(vertical: 5.h),
       child: Row(
         children: [
-          Icon(icon, size: 20 * sizeScale, color: const Color(0xFF005E6A)),
-          const SizedBox(width: 10),
+          Icon(icon, size: 18.w, color: const Color(0xFF005E6A)),
+          SizedBox(width: 8.w),
           Expanded(
             child: Text(
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 14 * fontScale),
+              style: TextStyle(fontSize: 12.sp),
             ),
           ),
         ],

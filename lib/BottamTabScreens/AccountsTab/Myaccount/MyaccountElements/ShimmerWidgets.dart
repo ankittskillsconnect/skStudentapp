@@ -1,49 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 
 class PersonalDetailsShimmer extends StatelessWidget {
-  final double sizeScale;
-  final double fontScale;
-
-  const PersonalDetailsShimmer({
-    super.key,
-    required this.sizeScale,
-    required this.fontScale,
-  });
+  const PersonalDetailsShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
+
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(16 * sizeScale),
-      margin: const EdgeInsets.only(top: 8),
+      padding: EdgeInsets.all(14.w),
+      margin: EdgeInsets.only(top: 7.h),
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xFFBCD8DB)),
-        borderRadius: BorderRadius.circular(12 * sizeScale),
+        borderRadius: BorderRadius.circular(10.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: List.generate(6, (index) {
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6.0),
+            padding: EdgeInsets.symmetric(vertical: 5.h),
             child: Row(
               children: [
                 Container(
-                  width: 24,
-                  height: 24,
+                  width: 22.w,
+                  height: 22.h,
                   color: Colors.grey[300],
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 10.w),
                 Expanded(
                   child: Shimmer.fromColors(
                     baseColor: Colors.grey[300]!,
                     highlightColor: Colors.grey[100]!,
                     child: Container(
-                      height: 14,
+                      height: 12.h,
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(3.r),
                       ),
                     ),
                   ),
@@ -58,26 +59,26 @@ class PersonalDetailsShimmer extends StatelessWidget {
 }
 
 class EducationShimmer extends StatelessWidget {
-  final double sizeScale;
-  final double fontScale;
-
-  const EducationShimmer({
-    super.key,
-    required this.sizeScale,
-    required this.fontScale,
-  });
+  const EducationShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
+
     return Column(
       children: List.generate(2, (index) {
         return Container(
           width: double.infinity,
-          padding: EdgeInsets.all(14 * sizeScale),
-          margin: const EdgeInsets.only(top: 8),
+          padding: EdgeInsets.all(12.w),
+          margin: EdgeInsets.only(top: 7.h),
           decoration: BoxDecoration(
             border: Border.all(color: const Color(0xFFBCD8DB)),
-            borderRadius: BorderRadius.circular(12 * sizeScale),
+            borderRadius: BorderRadius.circular(10.r),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,15 +87,15 @@ class EducationShimmer extends StatelessWidget {
                 baseColor: Colors.grey[300]!,
                 highlightColor: Colors.grey[100]!,
                 child: Container(
-                  width: 40 * sizeScale,
-                  height: 40 * sizeScale,
+                  width: 35.w,
+                  height: 35.h,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 10.w),
               Expanded(
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
@@ -103,40 +104,40 @@ class EducationShimmer extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        height: 16,
-                        width: 140,
+                        height: 14.h,
+                        width: 120.w,
                         color: Colors.white,
-                        margin: const EdgeInsets.only(bottom: 6),
+                        margin: EdgeInsets.only(bottom: 5.h),
                       ),
                       Container(
-                        height: 14,
-                        width: 200,
+                        height: 12.h,
+                        width: 180.w,
                         color: Colors.white,
-                        margin: const EdgeInsets.only(bottom: 6),
+                        margin: EdgeInsets.only(bottom: 5.h),
                       ),
                       Container(
-                        height: 14,
-                        width: 160,
+                        height: 12.h,
+                        width: 140.w,
                         color: Colors.white,
-                        margin: const EdgeInsets.only(bottom: 6),
+                        margin: EdgeInsets.only(bottom: 5.h),
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 7.w),
               Column(
                 children: [
                   Shimmer.fromColors(
                     baseColor: Colors.grey[300]!,
                     highlightColor: Colors.grey[100]!,
-                    child: const Icon(Icons.edit, color: Colors.grey),
+                    child: Icon(Icons.edit, color: Colors.grey, size: 22.w),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 3.h),
                   Shimmer.fromColors(
                     baseColor: Colors.grey[300]!,
                     highlightColor: Colors.grey[100]!,
-                    child: const Icon(Icons.delete_outline, color: Colors.grey),
+                    child: Icon(Icons.delete_outline, color: Colors.grey, size: 22.w),
                   ),
                 ],
               ),
@@ -149,26 +150,26 @@ class EducationShimmer extends StatelessWidget {
 }
 
 class ProjectShimmer extends StatelessWidget {
-  final double sizeScale;
-  final double fontScale;
-
-  const ProjectShimmer({
-    super.key,
-    required this.sizeScale,
-    required this.fontScale,
-  });
+  const ProjectShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
+
     return Column(
       children: List.generate(2, (index) {
         return Container(
           width: double.infinity,
-          padding: EdgeInsets.all(14 * sizeScale),
-          margin: const EdgeInsets.only(top: 8),
+          padding: EdgeInsets.all(12.w),
+          margin: EdgeInsets.only(top: 7.h),
           decoration: BoxDecoration(
             border: Border.all(color: const Color(0xFFBCD8DB)),
-            borderRadius: BorderRadius.circular(12 * sizeScale),
+            borderRadius: BorderRadius.circular(10.r),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,16 +178,16 @@ class ProjectShimmer extends StatelessWidget {
                 baseColor: Colors.grey[300]!,
                 highlightColor: Colors.grey[100]!,
                 child: Container(
-                  padding: EdgeInsets.all(6 * sizeScale),
+                  padding: EdgeInsets.all(5.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
-                  width: 36 * sizeScale,
-                  height: 36 * sizeScale,
+                  width: 32.w,
+                  height: 32.h,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 10.w),
               Expanded(
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
@@ -195,60 +196,60 @@ class ProjectShimmer extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        height: 20 * fontScale,
-                        width: 80,
+                        height: 18.h,
+                        width: 70.w,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(18.r),
                         ),
-                        margin: const EdgeInsets.only(bottom: 4),
+                        margin: EdgeInsets.only(bottom: 3.h),
                       ),
                       Container(
-                        height: 14 * fontScale,
-                        width: 140,
+                        height: 12.h,
+                        width: 120.w,
                         color: Colors.white,
-                        margin: const EdgeInsets.only(bottom: 4),
+                        margin: EdgeInsets.only(bottom: 3.h),
                       ),
                       Container(
-                        height: 14 * fontScale,
-                        width: 200,
+                        height: 12.h,
+                        width: 180.w,
                         color: Colors.white,
-                        margin: const EdgeInsets.only(bottom: 4),
+                        margin: EdgeInsets.only(bottom: 3.h),
                       ),
                       Container(
-                        height: 14 * fontScale,
-                        width: 160,
+                        height: 12.h,
+                        width: 140.w,
                         color: Colors.white,
-                        margin: const EdgeInsets.only(bottom: 4),
+                        margin: EdgeInsets.only(bottom: 3.h),
                       ),
                       Container(
-                        height: 13 * fontScale,
-                        width: 180,
+                        height: 11.h,
+                        width: 160.w,
                         color: Colors.white,
-                        margin: const EdgeInsets.only(bottom: 4),
+                        margin: EdgeInsets.only(bottom: 3.h),
                       ),
                       Container(
-                        height: 13 * fontScale,
-                        width: 220,
+                        height: 11.h,
+                        width: 200.w,
                         color: Colors.white,
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 7.w),
               Column(
                 children: [
                   Shimmer.fromColors(
                     baseColor: Colors.grey[300]!,
                     highlightColor: Colors.grey[100]!,
-                    child: const Icon(Icons.edit, color: Colors.grey, size: 24),
+                    child: Icon(Icons.edit, color: Colors.grey, size: 22.w),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 3.h),
                   Shimmer.fromColors(
                     baseColor: Colors.grey[300]!,
                     highlightColor: Colors.grey[100]!,
-                    child: const Icon(Icons.delete_outline, color: Colors.grey, size: 24),
+                    child: Icon(Icons.delete_outline, color: Colors.grey, size: 22.w),
                   ),
                 ],
               ),
@@ -261,26 +262,26 @@ class ProjectShimmer extends StatelessWidget {
 }
 
 class SkillsShimmer extends StatelessWidget {
-  final double sizeScale;
-  final double fontScale;
-
-  const SkillsShimmer({
-    super.key,
-    required this.sizeScale,
-    required this.fontScale,
-  });
+  const SkillsShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
+
     return Column(
       children: List.generate(2, (index) {
         return Container(
           width: double.infinity,
-          padding: EdgeInsets.all(14 * sizeScale),
-          margin: const EdgeInsets.only(top: 8),
+          padding: EdgeInsets.all(12.w),
+          margin: EdgeInsets.only(top: 7.h),
           decoration: BoxDecoration(
             border: Border.all(color: const Color(0xFFBCD8DB)),
-            borderRadius: BorderRadius.circular(12 * sizeScale),
+            borderRadius: BorderRadius.circular(10.r),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,16 +290,16 @@ class SkillsShimmer extends StatelessWidget {
                 baseColor: Colors.grey[300]!,
                 highlightColor: Colors.grey[100]!,
                 child: Container(
-                  padding: EdgeInsets.all(6 * sizeScale),
+                  padding: EdgeInsets.all(5.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
-                  width: 36 * sizeScale,
-                  height: 36 * sizeScale,
+                  width: 32.w,
+                  height: 32.h,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 10.w),
               Expanded(
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
@@ -307,60 +308,60 @@ class SkillsShimmer extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        height: 20 * fontScale,
-                        width: 80,
+                        height: 18.h,
+                        width: 70.w,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(18.r),
                         ),
-                        margin: const EdgeInsets.only(bottom: 4),
+                        margin: EdgeInsets.only(bottom: 3.h),
                       ),
                       Container(
-                        height: 14 * fontScale,
-                        width: 140,
+                        height: 12.h,
+                        width: 120.w,
                         color: Colors.white,
-                        margin: const EdgeInsets.only(bottom: 4),
+                        margin: EdgeInsets.only(bottom: 3.h),
                       ),
                       Container(
-                        height: 14 * fontScale,
-                        width: 200,
+                        height: 12.h,
+                        width: 180.w,
                         color: Colors.white,
-                        margin: const EdgeInsets.only(bottom: 4),
+                        margin: EdgeInsets.only(bottom: 3.h),
                       ),
                       Container(
-                        height: 14 * fontScale,
-                        width: 160,
+                        height: 12.h,
+                        width: 140.w,
                         color: Colors.white,
-                        margin: const EdgeInsets.only(bottom: 4),
+                        margin: EdgeInsets.only(bottom: 3.h),
                       ),
                       Container(
-                        height: 13 * fontScale,
-                        width: 180,
+                        height: 11.h,
+                        width: 160.w,
                         color: Colors.white,
-                        margin: const EdgeInsets.only(bottom: 4),
+                        margin: EdgeInsets.only(bottom: 3.h),
                       ),
                       Container(
-                        height: 13 * fontScale,
-                        width: 220,
+                        height: 11.h,
+                        width: 200.w,
                         color: Colors.white,
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 7.w),
               Column(
                 children: [
                   Shimmer.fromColors(
                     baseColor: Colors.grey[300]!,
                     highlightColor: Colors.grey[100]!,
-                    child: const Icon(Icons.edit, color: Colors.grey, size: 24),
+                    child: Icon(Icons.edit, color: Colors.grey, size: 22.w),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 3.h),
                   Shimmer.fromColors(
                     baseColor: Colors.grey[300]!,
                     highlightColor: Colors.grey[100]!,
-                    child: const Icon(Icons.delete_outline, color: Colors.grey, size: 24),
+                    child: Icon(Icons.delete_outline, color: Colors.grey, size: 22.w),
                   ),
                 ],
               ),

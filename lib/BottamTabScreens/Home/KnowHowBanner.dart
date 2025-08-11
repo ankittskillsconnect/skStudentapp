@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class KnowHowBanner extends StatefulWidget {
   final String imageAsset;
@@ -26,28 +27,10 @@ class _KnowHowBannerState extends State<KnowHowBanner> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.center,
-        //   children: [
-        //     Text(
-        //       "Know How",
-        //       style: TextStyle(
-        //         fontWeight: FontWeight.w600,
-        //         color: const Color(0xFF003840),
-        //         fontSize: 16,
-        //       ),
-        //     ),
-        //     const Icon(
-        //       Icons.keyboard_arrow_down,
-        //       size: 20,
-        //       color: Color(0xFF003840),
-        //     ),
-        //   ],
-        // ),
-        const SizedBox(height: 15),
+        SizedBox(height: 13.h),
         Container(
-          height: 160,
-          margin: const EdgeInsets.symmetric(horizontal: 16),
+          height: 140.h,
+          margin: EdgeInsets.symmetric(horizontal: 14.w),
           child: PageView.builder(
             controller: _pageController,
             itemCount: 3,
@@ -58,12 +41,12 @@ class _KnowHowBannerState extends State<KnowHowBanner> {
             },
             itemBuilder: (context, index) {
               return Padding(
-                padding: const EdgeInsets.all(2.0),
+                padding: EdgeInsets.all(1.7.w),
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: const Color(0xFFBDE4E7),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10.r),
                     image: DecorationImage(
                       image: AssetImage(widget.imageAsset),
                       fit: BoxFit.cover,
@@ -74,15 +57,15 @@ class _KnowHowBannerState extends State<KnowHowBanner> {
             },
           ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 17.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(3, (index) {
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: EdgeInsets.symmetric(horizontal: 3.w),
               child: Icon(
                 Icons.circle,
-                size: 8,
+                size: 7.w,
                 color: _currentPage == index
                     ? const Color(0xFF003840)
                     : Colors.grey,

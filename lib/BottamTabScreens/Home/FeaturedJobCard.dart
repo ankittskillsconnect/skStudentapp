@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FeaturedJobCard extends StatelessWidget {
   final String title;
@@ -26,39 +27,33 @@ class FeaturedJobCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    final cardWidth = screenWidth * 0.55;
-    final imageHeight = screenHeight * 0.14;
-    final iconSize = screenWidth * 0.05;
+    final cardWidth = 210.w; // ~0.55 * 390.w, reduced by ~10%
+    final imageHeight = 110.h; // ~0.14 * 844.h, reduced by ~12%
+    final iconSize = 18.w; // ~0.05 * 390.w, reduced by ~10%
 
     return ConstrainedBox(
       constraints: BoxConstraints(
-        minHeight: screenHeight * 0.36,
-        maxHeight: screenHeight * 0.42,
+        minHeight: 280.h, // ~0.36 * 844.h, reduced by ~12%
+        maxHeight: 330.h, // ~0.42 * 844.h, reduced by ~12%
       ),
       child: Card(
-        margin: EdgeInsets.only(
-          right: screenWidth * 0.035,
-          bottom: screenWidth * 0.01,
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        elevation: 4,
+        margin: EdgeInsets.only(right: 13.w, bottom: 4.h),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.r)),
+        elevation: 3.4,
         color: Colors.white,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(7.r),
           child: Container(
             width: cardWidth,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(7.r),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.2),
-                  blurRadius: 10,
-                  offset: const Offset(0, 6),
+                  blurRadius: 8.5.r,
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),
@@ -66,9 +61,7 @@ class FeaturedJobCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(8),
-                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(7.r)),
                   child: Image.asset(
                     imageAsset,
                     height: imageHeight,
@@ -78,10 +71,7 @@ class FeaturedJobCard extends StatelessWidget {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.03,
-                      vertical: screenWidth * 0.025,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 11.w, vertical: 9.h),
                     child: SingleChildScrollView(
                       physics: const NeverScrollableScrollPhysics(),
                       child: Column(
@@ -91,28 +81,28 @@ class FeaturedJobCard extends StatelessWidget {
                             title,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: screenWidth * 0.045,
+                              fontSize: 15.sp,
                               color: const Color(0xFF003840),
                             ),
                           ),
-                          SizedBox(height: screenWidth * 0.01),
+                          SizedBox(height: 3.h),
                           Text(
                             location,
                             style: TextStyle(
-                              fontSize: screenWidth * 0.035,
+                              fontSize: 12.sp,
                               color: const Color(0xFF003840),
                             ),
                           ),
-                          SizedBox(height: screenWidth * 0.02),
+                          SizedBox(height: 7.h),
                           Text(
                             "$salary • $applications Applications",
                             style: TextStyle(
-                              fontSize: screenWidth * 0.035,
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.w500,
                               color: const Color(0xFF003840),
                             ),
                           ),
-                          SizedBox(height: screenWidth * 0.02),
+                          SizedBox(height: 7.h),
                           Row(
                             children: [
                               Icon(
@@ -120,20 +110,20 @@ class FeaturedJobCard extends StatelessWidget {
                                 size: iconSize,
                                 color: Colors.grey[600],
                               ),
-                              SizedBox(width: screenWidth * 0.01),
+                              SizedBox(width: 3.w),
                               Flexible(
                                 child: Text(
                                   registered,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontSize: screenWidth * 0.035,
+                                    fontSize: 12.sp,
                                     color: const Color(0xFF003840),
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          SizedBox(height: screenWidth * 0.02),
+                          SizedBox(height: 7.h),
                           Row(
                             children: [
                               Icon(
@@ -141,24 +131,24 @@ class FeaturedJobCard extends StatelessWidget {
                                 size: iconSize,
                                 color: Colors.grey[600],
                               ),
-                              SizedBox(width: screenWidth * 0.01),
+                              SizedBox(width: 3.w),
                               Flexible(
                                 child: Text(
                                   timeLeft,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontSize: screenWidth * 0.035,
+                                    fontSize: 12.sp,
                                     color: const Color(0xFF003840),
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          SizedBox(height: screenWidth * 0.01),
+                          SizedBox(height: 3.h),
                           Text(
                             jobType,
                             style: TextStyle(
-                              fontSize: screenWidth * 0.03,
+                              fontSize: 10.sp,
                               color: Colors.grey[700],
                             ),
                           ),

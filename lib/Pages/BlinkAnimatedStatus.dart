@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LiveSlidingText extends StatefulWidget {
   final String status;
@@ -34,7 +35,7 @@ class _LiveSlidingTextState extends State<LiveSlidingText>
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: 1.7.w, vertical: 3.4.h),
       child: AnimatedBuilder(
         animation: _controller,
         builder: (_, __) {
@@ -54,9 +55,9 @@ class _LiveSlidingTextState extends State<LiveSlidingText>
             },
             child: Text(
               widget.status,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),

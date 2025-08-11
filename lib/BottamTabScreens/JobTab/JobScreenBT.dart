@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/JobTab/AppBarJobScreen.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/JobTab/JobdetailPage/JobdetailpageBT.dart';
@@ -7,8 +8,8 @@ import 'package:sk_loginscreen1/Pages/bottombar.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_logic.dart';
 import 'package:sk_loginscreen1/blocpage/bloc_state.dart';
 import '../../Pages/noInternetPage_jobs.dart';
-// import '../../ProfileLogic/ProfileEvent.dart';
-// import '../../ProfileLogic/ProfileLogic.dart';
+import '../../ProfileLogic/ProfileEvent.dart';
+import '../../ProfileLogic/ProfileLogic.dart';
 import '../../Utilities/JobList_Api.dart';
 import 'JobCardBT.dart';
 
@@ -65,13 +66,14 @@ class _JobScreenbtState extends State<Jobscreenbt> {
     } catch (e) {
       setState(() {
         isLoading = false;
-        errorMessage = 'no_internet';
+        errorMessage = 'Failed to load jobs: $e';
       });
     }
   }
 
   Future<void> _onRefresh() async {
-    await _fetchJobs();
+    context.read<ProfileBloc>().add(_fetchJobs() as ProfileEvent);
+    await Future.delayed(const Duration(seconds: 1));
   }
 
   void _onItemTapped(int index) {
@@ -93,50 +95,54 @@ class _JobScreenbtState extends State<Jobscreenbt> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: Appbarjobscreen(),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: isLoading
-                ? ListView.builder(
-              itemCount: 5,
-              itemBuilder: (context, index) => _buildShimmerCard(),
-            )
-                : errorMessage == 'no_internet'
-                ? NoInternetPage(
-              onRetry: _fetchJobs,
-            )
-                : jobs.isEmpty
-                ? const Center(child: Text('No jobs found'))
-                : RefreshIndicator(
-              onRefresh: _onRefresh,
-              child: ListView.builder(
-                itemCount: jobs.length,
-                itemBuilder: (context, index){
-                  final job = jobs[index];
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => JobDetailPage2(
-                              jobToken: job['jobToken']
+        appBar: const Appbarjobscreen(),
+        body: RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              child: Column(
+                children: [
+                  SizedBox(height: 8.h),
+                  Expanded(
+                    child: isLoading
+                        ? ListView.builder(
+                      itemCount: 5,
+                      itemBuilder: (context, index) => _buildShimmerCard(),
+                    )
+                        : errorMessage != null
+                        ? NoInternetPage(onRetry: _fetchJobs)
+                        : jobs.isEmpty
+                        ? const Center(child: Text('No jobs found'))
+                        : ListView.builder(
+                      itemCount: jobs.length,
+                      itemBuilder: (context, index) {
+                        final job = jobs[index];
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => JobDetailPage2(
+                                    jobToken: job['jobToken']),
+                              ),
+                            );
+                          },
+                          child: JobCardBT(
+                            jobTitle: job['title'],
+                            company: job['company'],
+                            location: job['location'],
+                            salary: job['salary'],
+                            postTime: job['postTime'],
+                            expiry: job['expiry'],
+                            tags: job['tags'],
+                            logoUrl: job['logoUrl'],
                           ),
-                        ),
-                      );
-                    },
-                    child: JobCardBT(
-                      jobTitle: job['title'],
-                      company: job['company'],
-                      location: job['location'],
-                      salary: job['salary'],
-                      postTime: job['postTime'],
-                      expiry: job['expiry'],
-                      tags: job['tags'],
-                      logoUrl: job['logoUrl'],
+                        );
+                      },
                     ),
-                  );
-                },
+                  )
+                ],
               ),
             ),
           ),
@@ -152,10 +158,10 @@ class _JobScreenbtState extends State<Jobscreenbt> {
 
 Widget _buildShimmerCard() {
   return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-    padding: const EdgeInsets.all(8),
+    margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8.h),
+    padding: EdgeInsets.all(6.w),
     decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(25),
+      borderRadius: BorderRadius.circular(20.r),
     ),
     child: Shimmer.fromColors(
       baseColor: Colors.grey.shade300,
@@ -164,10 +170,10 @@ Widget _buildShimmerCard() {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10.r),
             ),
             child: Column(
               children: [
@@ -175,51 +181,51 @@ Widget _buildShimmerCard() {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      width: 40,
-                      height: 40,
+                      width: 36.w,
+                      height: 36.w,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(6.r),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 10.w),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            height: 18,
-                            width: 120,
+                            height: 16.h,
+                            width: 100.w,
                             color: Colors.white,
                           ),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 5.h),
                           Container(
-                            height: 14,
-                            width: 180,
+                            height: 12.h,
+                            width: 160.w,
                             color: Colors.white,
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 6.w),
                     Container(
-                      height: 16,
-                      width: 50,
+                      height: 14.h,
+                      width: 44.w,
                       color: Colors.white,
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 10.h),
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 6.w,
+                  runSpacing: 6.h,
                   children: List.generate(3, (index) {
                     return Container(
-                      height: 20,
-                      width: 60,
+                      height: 18.h,
+                      width: 52.w,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(18.r),
                       ),
                     );
                   }),
@@ -227,20 +233,20 @@ Widget _buildShimmerCard() {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 8.h),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 6.w),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  height: 14,
-                  width: 80,
+                  height: 12.h,
+                  width: 70.w,
                   color: Colors.white,
                 ),
                 Container(
-                  height: 14,
-                  width: 60,
+                  height: 12.h,
+                  width: 54.w,
                   color: Colors.white,
                 ),
               ],

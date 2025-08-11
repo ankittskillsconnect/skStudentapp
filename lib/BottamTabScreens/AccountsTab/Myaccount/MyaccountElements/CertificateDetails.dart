@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sk_loginscreen1/Model/CertificateDetails_Model.dart';
 import 'SectionHeader.dart';
 
@@ -20,27 +21,28 @@ class CertificatesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double fontScale = widthScale.clamp(0.98, 1.02);
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(
+        const SectionHeader(
           title: "Certificate Details",
           showAdd: true,
-          onAdd: onAdd,
         ),
         for (var i = 0; i < certificatesList.length; i++)
           Container(
             width: double.infinity,
-            padding: EdgeInsets.all(14 * sizeScale),
-            margin: const EdgeInsets.only(top: 10),
+            padding: EdgeInsets.all(12.w),
+            margin: EdgeInsets.only(top: 8.h),
             decoration: BoxDecoration(
               border: Border.all(color: const Color(0xFFBCD8DB)),
-              borderRadius: BorderRadius.circular(12 * sizeScale),
+              borderRadius: BorderRadius.circular(10.r),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,83 +51,76 @@ class CertificatesSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                      padding: EdgeInsets.all(6 * sizeScale),
+                      padding: EdgeInsets.all(5.w),
                       decoration: BoxDecoration(
                         color: const Color(0xFFEBF6F7),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10.r),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.file_copy_outlined,
-                        size: 24,
-                        color: Color(0xFF005E6A),
+                        size: 22.w,
+                        color: const Color(0xFF005E6A),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 8.w),
                     Expanded(
                       child: Text(
                         certificatesList[i].certificateName,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          fontSize: 14 * fontScale,
+                          fontSize: 12.sp,
                           color: const Color(0xFF005E6A),
                         ),
                       ),
                     ),
-
                     IconButton(
                       icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
-                      iconSize: 18,
+                      iconSize: 16.w,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                       onPressed: () => onEdit(certificatesList[i], i),
                     ),
-
                     IconButton(
                       icon: const Icon(Icons.delete_outline, color: Colors.red),
-                      iconSize: 18,
+                      iconSize: 16.w,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                       onPressed: () => onDelete(i),
                     ),
                   ],
                 ),
-
-                const SizedBox(height: 8),
-
+                SizedBox(height: 7.h),
                 Text(
                   'Organization : ${certificatesList[i].issuedOrgName}',
                   style: TextStyle(
-                    fontSize: 13 * fontScale,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                   ),
                 ),
-                const SizedBox(height: 4),
-
+                SizedBox(height: 3.h),
                 Text(
                   'Issue Date : ${certificatesList[i].issueDate}',
                   style: TextStyle(
-                    fontSize: 13 * fontScale,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                   ),
                 ),
-                const SizedBox(height: 4),
-
+                SizedBox(height: 3.h),
                 Text(
                   'Expiry Date : ${certificatesList[i].expiryDate}',
-                   style: TextStyle(
-                    fontSize: 13 * fontScale,
+                  style: TextStyle(
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                   ),
                 ),
-                const SizedBox(height: 4),
-
+                SizedBox(height: 3.h),
                 Text(
                   'Details : ${certificatesList[i].description}',
                   style: TextStyle(
-                    fontSize: 13 * fontScale,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sk_loginscreen1/Model/Languages_Model.dart';
 import 'SectionHeader.dart';
 
@@ -18,60 +19,60 @@ class LanguagesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double fontScale = widthScale.clamp(0.98, 1.02);
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(
+        const SectionHeader(
           title: "Languages",
           showAdd: true,
-          onAdd: onAdd,
         ),
         for (var i = 0; i < languageList.length; i++)
           Container(
             width: double.infinity,
-            padding: EdgeInsets.all(14 * sizeScale),
-            margin: const EdgeInsets.only(top: 10),
+            padding: EdgeInsets.all(12.w),
+            margin: EdgeInsets.only(top: 8.h),
             decoration: BoxDecoration(
               border: Border.all(color: const Color(0xFFBCD8DB)),
-              borderRadius: BorderRadius.circular(12 * sizeScale),
+              borderRadius: BorderRadius.circular(10.r),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// Top Row: Icon + Language Name + Delete
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.all(6 * sizeScale),
+                      padding: EdgeInsets.all(5.w),
                       decoration: BoxDecoration(
                         color: const Color(0xFFEBF6F7),
-                        borderRadius: BorderRadius.circular(12 * sizeScale),
+                        borderRadius: BorderRadius.circular(10.r),
                       ),
                       child: Icon(
                         Icons.language,
-                        size: 20 * sizeScale,
+                        size: 18.w,
                         color: const Color(0xFF005E6A),
                       ),
                     ),
-                    SizedBox(width: 10 * sizeScale),
+                    SizedBox(width: 8.w),
                     Expanded(
                       child: Text(
                         languageList[i].languageName,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          fontSize: 14 * fontScale,
+                          fontSize: 12.sp,
                           color: const Color(0xFF005E6A),
                         ),
                       ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline, color: Colors.red),
-                      iconSize: 20 * sizeScale,
+                      iconSize: 18.w,
                       onPressed: () => onDelete(i),
                       visualDensity: VisualDensity.compact,
                       padding: EdgeInsets.zero,
@@ -79,13 +80,11 @@ class LanguagesSection extends StatelessWidget {
                     ),
                   ],
                 ),
-
-                SizedBox(height: 6 * sizeScale),
-
+                SizedBox(height: 5.h),
                 Text(
                   languageList[i].proficiency,
                   style: TextStyle(
-                    fontSize: 13 * fontScale,
+                    fontSize: 11.sp,
                     color: Colors.black54,
                   ),
                 ),

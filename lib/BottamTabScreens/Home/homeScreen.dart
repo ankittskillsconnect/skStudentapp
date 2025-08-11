@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/Home/CustomAppbarBT.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/JobTab/JobdetailPage/JobdetailpageBT.dart';
 import '../../Pages/bottombar.dart';
@@ -24,25 +25,30 @@ class _HomeScreen2State extends State<HomeScreen2> {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final double screenHeight = mediaQuery.size.height;
-    const double appBarHeight = 56.0;
-    const double bottomNavBarHeight = 60.0;
-    const double sectionHeaderHeight = 48.0;
-    const double sizedBoxHeight = 12.0 + 12.0 + 20.0;
-    const double knowHowBannerHeight = 100.0;
-    const double paddingHeight = 16.0 * 2;
-    const double marginHeight = 45.0 + 5.0;
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
+
+    final double appBarHeight = 48.h;
+    final double bottomNavBarHeight = 52.h;
+    final double sectionHeaderHeight = 40.h;
+    final double sizedBoxHeight = 10.h + 10.h + 17.h;
+    final double knowHowBannerHeight = 85.h;
+    final double paddingHeight = 14.h * 2;
+    final double marginHeight = 38.h + 4.h;
     final double totalFixedHeight =
         appBarHeight +
-        bottomNavBarHeight +
-        (sectionHeaderHeight * 2) +
-        sizedBoxHeight +
-        knowHowBannerHeight +
-        paddingHeight +
-        marginHeight;
+            bottomNavBarHeight +
+            (sectionHeaderHeight * 2) +
+            sizedBoxHeight +
+            knowHowBannerHeight +
+            paddingHeight +
+            marginHeight;
 
-    final double availableHeight = screenHeight - totalFixedHeight;
+    final double availableHeight = ScreenUtil().screenHeight - totalFixedHeight;
     final double popularJobListHeight = availableHeight * 0.35;
     final double featuredJobListHeight = availableHeight * 0.65;
 
@@ -51,13 +57,13 @@ class _HomeScreen2State extends State<HomeScreen2> {
       appBar: const HomeScreenAppbar(),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(bottom: 4.0),
+          padding: EdgeInsets.only(bottom: 3.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _sectionHeader("Popular Jobs", actionText: "See all"),
               SizedBox(
-                height: popularJobListHeight.clamp(220.0, 240.0),
+                height: popularJobListHeight.clamp(190.h, 210.h),
                 child: InkWell(
                   onTap: () {
                     Navigator.push(
@@ -69,65 +75,64 @@ class _HomeScreen2State extends State<HomeScreen2> {
                   },
                   child: ListView(
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    children:
-                        [
-                          PopularJobCard(
-                            title: 'Product Manager',
-                            subtitile: "Google",
-                            description:
-                                'Collaborate with cross-functional teams to define projects, requirements, and timelinesCollaborate with cross-functional teams to define projects, requirements, and timelines.',
-                            salary: '1.25L/month',
-                            time: 'Posted 7 mins ago',
-                            immageAsset: 'assets/google.png',
-                          ),
-                          PopularJobCard(
-                            title: 'UI/UX',
-                            subtitile: "Zune Studios",
-                            description:
-                                'Work on UI/UX projects with a focus on user experience and designCollaborate with cross-functional teams to define projects, requirements, and timelines.',
-                            salary: '35K/month',
-                            time: 'Posted 7 mins ago',
-                            immageAsset: 'assets/UIUXpurple.png',
-                          ),
-                          PopularJobCard(
-                            title: 'UI Designer',
-                            subtitile: "Zune Studios",
-                            description:
-                                'Design intuitive user interfaces for web and mobile applications.',
-                            salary: '25K/month',
-                            time: 'Posted 10 mins ago',
-                            immageAsset: 'assets/UIUXpurple.png',
-                          ),
-                          PopularJobCard(
-                            title: 'Interaction Designer',
-                            subtitile: "Zune Studios",
-                            description:
-                                'Create interactive prototypes and design user flows.',
-                            salary: '23K/month',
-                            time: 'Posted 20 mins ago',
-                            immageAsset: 'assets/UIUXpurple.png',
-                          ),
-                        ].map((card) {
-                          try {
-                            return card;
-                          } catch (e) {
-                            print("Error building PopularJobCard: $e");
-                            return const SizedBox.shrink();
-                          }
-                        }).toList(),
+                    padding: EdgeInsets.symmetric(horizontal: 14.w),
+                    children: [
+                      PopularJobCard(
+                        title: 'Product Manager',
+                        subtitile: "Google",
+                        description:
+                        'Collaborate with cross-functional teams to define projects, requirements, and timelines.',
+                        salary: '1.25L/month',
+                        time: 'Posted 7 mins ago',
+                        immageAsset: 'assets/google.png',
+                      ),
+                      PopularJobCard(
+                        title: 'UI/UX',
+                        subtitile: "Zune Studios",
+                        description:
+                        'Work on UI/UX projects with a focus on user experience and design.',
+                        salary: '35K/month',
+                        time: 'Posted 7 mins ago',
+                        immageAsset: 'assets/UIUXpurple.png',
+                      ),
+                      PopularJobCard(
+                        title: 'UI Designer',
+                        subtitile: "Zune Studios",
+                        description:
+                        'Design intuitive user interfaces for web and mobile applications.',
+                        salary: '25K/month',
+                        time: 'Posted 10 mins ago',
+                        immageAsset: 'assets/UIUXpurple.png',
+                      ),
+                      PopularJobCard(
+                        title: 'Interaction Designer',
+                        subtitile: "Zune Studios",
+                        description:
+                        'Create interactive prototypes and design user flows.',
+                        salary: '23K/month',
+                        time: 'Posted 20 mins ago',
+                        immageAsset: 'assets/UIUXpurple.png',
+                      ),
+                    ].map((card) {
+                      try {
+                        return card;
+                      } catch (e) {
+                        print("Error building PopularJobCard: $e");
+                        return const SizedBox.shrink();
+                      }
+                    }).toList(),
                   ),
                 ),
               ),
-              const SizedBox(height: 17),
+              SizedBox(height: 15.h),
               const KnowHowBanner(imageAsset: 'assets/KnowHow.png'),
-              const SizedBox(height: 12),
+              SizedBox(height: 10.h),
               _sectionHeader("Featured Opportunities"),
               SizedBox(
-                height: featuredJobListHeight.clamp(280.0, 316.0),
+                height: featuredJobListHeight.clamp(240.h, 270.h),
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: EdgeInsets.symmetric(horizontal: 14.w),
                   children: const [
                     FeaturedJobCard(
                       title: 'Product Manager',
@@ -182,7 +187,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 17.h),
             ],
           ),
         ),
@@ -196,23 +201,23 @@ class _HomeScreen2State extends State<HomeScreen2> {
 
   Widget _sectionHeader(String title, {String? actionText}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 15.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 18,
+            style: TextStyle(
+              fontSize: 16.sp,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF003840),
+              color: const Color(0xFF003840),
             ),
           ),
           if (actionText != null)
             Text(
               actionText,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: 12.sp,
                 color: Colors.black87,
                 fontWeight: FontWeight.w500,
               ),

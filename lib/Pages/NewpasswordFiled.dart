@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class NewPasswordField extends StatefulWidget {
   final TextEditingController? controller;
@@ -14,15 +15,23 @@ class _NewPasswordFieldState extends State<NewPasswordField> {
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
+
     return TextField(
       controller: widget.controller,
       obscureText: _obscureText,
       decoration: InputDecoration(
         hintText: "New Password",
-        prefixIcon: const Icon(Icons.lock),
+        prefixIcon: Icon(Icons.lock, size: 20.w),
         suffixIcon: IconButton(
           icon: Icon(
             _obscureText ? Icons.visibility_off : Icons.visibility,
+            size: 20.w,
           ),
           onPressed: () {
             setState(() {
@@ -33,7 +42,7 @@ class _NewPasswordFieldState extends State<NewPasswordField> {
         filled: true,
         fillColor: Colors.grey[200],
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(25.r),
           borderSide: const BorderSide(color: Color(0xFF003840)),
         ),
       ),

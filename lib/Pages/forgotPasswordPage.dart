@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sk_loginscreen1/Pages/Otpfiled.dart';
 import 'package:sk_loginscreen1/Utilities/Auth/VerifyOtp.dart';
@@ -31,7 +32,8 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
     final email = emailController.text.trim();
     if (email.isEmpty || !email.contains('@')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Enter a valid email address"),
+        SnackBar(
+          content: Text("Enter a valid email address", style: TextStyle(fontSize: 12.sp)),
           backgroundColor: Colors.red,
         ),
       );
@@ -45,18 +47,24 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
       final result = await _forgotServices.sendResetOtp(email);
       setState(() => _isLoading = false);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(result['message']), backgroundColor: Colors.red,));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message'], style: TextStyle(fontSize: 12.sp)),
+          backgroundColor: Colors.red,
+        ),
+      );
 
       if (result['success']) {
         _showOtpBottomSheet();
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red,));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: $e", style: TextStyle(fontSize: 12.sp)),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -65,18 +73,24 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
     final otp = otpController.text.trim();
 
     if (otp.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Enter the OTP"), backgroundColor: Colors.red,));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Enter the OTP", style: TextStyle(fontSize: 12.sp)),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
 
     final result = await VerifyOtp(email, otp);
 
     if (result["success"]) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(result["message"]),backgroundColor: Colors.red,));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result["message"], style: TextStyle(fontSize: 12.sp)),
+          backgroundColor: Colors.red,
+        ),
+      );
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -84,9 +98,12 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
         ),
       );
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(result["message"]),backgroundColor: Colors.red,));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result["message"], style: TextStyle(fontSize: 12.sp)),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -106,73 +123,74 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
         return Padding(
           padding: MediaQuery.of(context).viewInsets,
           child: DraggableScrollableSheet(
-            initialChildSize: 0.55,
+            initialChildSize: 0.5,
             minChildSize: 0.3,
-            maxChildSize: 0.9,
+            maxChildSize: 0.85,
             expand: false,
             builder: (context, scrollController) {
               return Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(25.r)),
                 ),
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+                padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 10.h),
                 child: SingleChildScrollView(
                   controller: scrollController,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         "Verify OTP",
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 17.h),
                       OtpField(
                         onSubmit: (otp) => otpController.text = otp,
                         onChange: (value) => otpController.text = value,
                       ),
-                      const SizedBox(height: 30),
+                      SizedBox(height: 25.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
-                            width: 130,
-                            height: 48,
+                            width: 120.w,
+                            height: 42.h,
                             child: ElevatedButton.icon(
                               onPressed: _verifyOtp,
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.check,
                                 color: Colors.white,
+                                size: 18.w,
                               ),
-                              label: const Text(
+                              label: Text(
                                 "Verify",
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: Colors.white, fontSize: 14.sp),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.teal,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(25.r),
                                 ),
                               ),
                             ),
                           ),
                           TextButton(
                             onPressed: _handleSendOtp,
-                            child: const Text(
+                            child: Text(
                               "Resend OTP",
                               style: TextStyle(
                                 color: Colors.teal,
-                                fontSize: 16,
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 8.h),
                     ],
                   ),
                 ),
@@ -194,8 +212,12 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
 
     return WillPopScope(
       onWillPop: () async {
@@ -216,11 +238,11 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          SizedBox(height: screenHeight * 0.02),
+                          SizedBox(height: 15.h),
                           SvgPicture.asset(
                             "assets/Logo.svg",
-                            width: screenWidth * 0.8,
-                            height: screenHeight * 0.09,
+                            width: 300.w,
+                            height: 70.h,
                           ),
                         ],
                       ),
@@ -232,19 +254,19 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
             Expanded(
               flex: 2,
               child: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(25.r)),
                 ),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     return SingleChildScrollView(
                       controller: _scrollController,
                       padding: EdgeInsets.only(
-                        left: 24,
-                        right: 24,
-                        top: 24,
-                        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+                        left: 20.w,
+                        right: 20.w,
+                        top: 20.h,
+                        bottom: MediaQuery.of(context).viewInsets.bottom + 20.h,
                       ),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
@@ -258,57 +280,58 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
                                 child: Text(
                                   "Reset Password?",
                                   style: TextStyle(
-                                    fontSize: screenWidth * 0.06,
+                                    fontSize: 22.sp,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ),
-                              SizedBox(height: screenHeight * 0.01),
+                              SizedBox(height: 8.h),
                               Center(
                                 child: Text(
                                   "Please provide an email to receive password reset instructions.",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontSize: screenWidth * 0.035,
+                                    fontSize: 12.sp,
                                   ),
                                 ),
                               ),
-                              SizedBox(height: screenHeight * 0.03),
+                              SizedBox(height: 25.h),
                               Text(
                                 "Enter your email address",
                                 style: TextStyle(
-                                  fontSize: screenWidth * 0.04,
+                                  fontSize: 14.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              SizedBox(height: screenHeight * 0.01),
+                              SizedBox(height: 20.h),
                               TextField(
                                 controller: emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
                                   hintText: "example@gmail.com",
-                                  prefixIcon: const Icon(Icons.mail_outline_outlined),
+                                  prefixIcon: Icon(Icons.mail_outline_outlined, size: 20.w),
                                   filled: true,
                                   fillColor: Colors.white,
+                                  contentPadding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30),
+                                    borderRadius: BorderRadius.circular(25.r),
                                     borderSide: const BorderSide(
                                       color: Color(0xFF003840),
                                     ),
                                   ),
                                 ),
                               ),
-                              SizedBox(height: screenHeight * 0.03),
+                              SizedBox(height: 25.h),
                               Center(
                                 child: SizedBox(
-                                  width: screenWidth * 0.4,
-                                  height: screenHeight * 0.05,
+                                  width: 140.w,
+                                  height: 40.h,
                                   child: ElevatedButton(
                                     onPressed: _isLoading ? null : _handleSendOtp,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.teal,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30),
+                                        borderRadius: BorderRadius.circular(25.r),
                                       ),
                                     ),
                                     child: Row(
@@ -319,30 +342,30 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
                                           "Get OTP",
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize: screenWidth * 0.045,
+                                            fontSize: 14.sp,
                                           ),
                                         ),
-                                        const SizedBox(width: 8),
+                                        SizedBox(width: 7.w),
                                         _isLoading
-                                            ? const SizedBox(
-                                          width: 20,
-                                          height: 20,
+                                            ? SizedBox(
+                                          width: 17.w,
+                                          height: 17.h,
                                           child: CircularProgressIndicator(
                                             color: Colors.white,
-                                            strokeWidth: 2,
+                                            strokeWidth: 1.5.w,
                                           ),
                                         )
                                             : Icon(
                                           Icons.arrow_forward,
                                           color: Colors.white,
-                                          size: screenWidth * 0.05,
+                                          size: 18.w,
                                         ),
                                       ],
                                     ),
                                   ),
                                 ),
                               ),
-                              SizedBox(height: screenHeight * 0.015),
+                              SizedBox(height: 12.h),
                               GestureDetector(
                                 onTap: _goBack,
                                 child: Center(
@@ -351,7 +374,7 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
                                     style: TextStyle(
                                       color: Colors.teal,
                                       fontWeight: FontWeight.bold,
-                                      fontSize: screenWidth * 0.04,
+                                      fontSize: 14.sp,
                                     ),
                                   ),
                                 ),
@@ -370,5 +393,4 @@ class _ForgotpasswordPageState extends State<ForgotpasswordPage> {
       ),
     );
   }
-
 }

@@ -17,6 +17,8 @@ import 'package:sk_loginscreen1/Pages/loginPage.dart';
 import 'ProfileLogic/ProfileEvent.dart';
 import 'ProfileLogic/ProfileLogic.dart';
 import 'blocpage/jobFilterBloc/jobFilter_logic.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,14 +30,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => NavigationBloc()),
-        BlocProvider(create: (_) => ProfileBloc()..add(LoadProfileData())),
-        BlocProvider(create: (_) => BookmarkBloc()),
-        BlocProvider(create: (_) => JobFilterBloc()),
-      ],
-      child: MaterialApp(debugShowCheckedModeBanner: false, home: MainApp()),
+    return ScreenUtilInit(
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => NavigationBloc()),
+          BlocProvider(create: (_) => ProfileBloc()..add(LoadProfileData())),
+          BlocProvider(create: (_) => BookmarkBloc()),
+          BlocProvider(create: (_) => JobFilterBloc()),
+        ],
+        child: MaterialApp(debugShowCheckedModeBanner: false, home: MainApp()),
+      ),
     );
   }
 }

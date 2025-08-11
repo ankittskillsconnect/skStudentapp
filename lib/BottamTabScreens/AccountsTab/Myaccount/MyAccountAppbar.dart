@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AccountAppBar extends StatelessWidget implements PreferredSizeWidget {
   const AccountAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(
+      context,
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+    );
+
     return SafeArea(
       child: Container(
         color: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 14.h),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -18,12 +26,12 @@ class AccountAppBar extends StatelessWidget implements PreferredSizeWidget {
                 Navigator.pop(context);
               },
             ),
-            const Text(
+            Text(
               "My Account",
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 18.sp,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF003840),
+                color: const Color(0xFF003840),
               ),
             ),
             Stack(
@@ -31,15 +39,14 @@ class AccountAppBar extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 _circleIconButton(
                   icon: Icons.notifications_none_outlined,
-                  onTap: () {
-                  },
+                  onTap: () {},
                 ),
                 Positioned(
-                  top: -2,
-                  right: -2,
+                  top: -1.h,
+                  right: -1.w,
                   child: Container(
-                    width: 10,
-                    height: 10,
+                    width: 8.w,
+                    height: 8.h,
                     decoration: const BoxDecoration(
                       color: Colors.red,
                       shape: BoxShape.circle,
@@ -58,17 +65,17 @@ class AccountAppBar extends StatelessWidget implements PreferredSizeWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 40,
-        height: 40,
+        width: 35.w,
+        height: 35.h,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(color: const Color(0xFFBCD8DB)),
         ),
-        child: Icon(icon, color: const Color(0xFF003840), size: 25),
+        child: Icon(icon, color: const Color(0xFF003840), size: 22.w),
       ),
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(90);
+  Size get preferredSize => Size.fromHeight(80.h);
 }
