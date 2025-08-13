@@ -32,7 +32,8 @@ class CertificateApi {
         final List<dynamic> certificates = data['certification'] ?? [];
         return certificates.map((e) => CertificateModel.fromJson(e)).toList();
       } else {
-        throw Exception('Failed to load certificate details: ${response.reasonPhrase}');
+        throw Exception(
+            'Failed to load certificate details: ${response.reasonPhrase}');
       }
     } catch (e) {
       return [];
@@ -53,7 +54,8 @@ class CertificateApi {
 
       var headers = {
         'Content-Type': 'application/json',
-        'Cookie': 'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
+        'Cookie':
+            'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
       };
 
       final payload = Jwt.parseJwt(authToken);
@@ -83,10 +85,44 @@ class CertificateApi {
       if (response.statusCode == 200) {
         return CertificateModel.fromJson(data['certificate'] ?? data);
       } else {
-        throw Exception('Failed to save certificate: ${data['msg'] ?? response.reasonPhrase}');
+        throw Exception(
+            'Failed to save certificate: ${data['msg'] ?? response.reasonPhrase}');
       }
     } catch (e) {
       throw Exception('Error saving certificate: $e');
+    }
+  }
+
+  static Future<bool> deleteCertificate({
+    required int certificationId,
+    required String authToken,
+    required String connectSid,
+  }) async {
+    var headers = {
+      'Content-Type': 'application/json',
+      'Cookie':
+          'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
+    };
+    var url = Uri.parse(
+        'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/delete/$certificationId?action=certificate');
+    try {
+      final request = http.Request('DELETE', url)..headers.addAll(headers);
+
+      final response = await request.send();
+
+      final responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        print('✅ Deleted Certificate ID $certificationId successfully.');
+        return true;
+      } else {
+        print(
+            '❌ Failed to delete Certificate ID $certificationId: ${response.statusCode} - $responseBody');
+        return false;
+      }
+    } catch (e) {
+      print('🚨 Exception during deleteCertificate: $e');
+      return false;
     }
   }
 }

@@ -43,11 +43,12 @@ class _JobScreenbtState extends State<Jobscreenbt> {
         jobs = fetchedJobs.map((job) {
           final location = (job['location'] as String?)?.isNotEmpty ?? false
               ? job['location']
-              : (job['job_location_detail'] as List<dynamic>?)?.isNotEmpty ?? false
-              ? (job['job_location_detail'] as List<dynamic>)
-              .map((loc) => loc['city_name'] as String? ?? 'Unknown')
-              .join(' • ')
-              : 'N/A';
+              : (job['job_location_detail'] as List<dynamic>?)?.isNotEmpty ??
+                      false
+                  ? (job['job_location_detail'] as List<dynamic>)
+                      .map((loc) => loc['city_name'] as String? ?? 'Unknown')
+                      .join(' • ')
+                  : 'N/A';
 
           return {
             'title': job['title'] ?? 'Untitled',
@@ -107,40 +108,49 @@ class _JobScreenbtState extends State<Jobscreenbt> {
                   Expanded(
                     child: isLoading
                         ? ListView.builder(
-                      itemCount: 5,
-                      itemBuilder: (context, index) => _buildShimmerCard(),
-                    )
+                            itemCount: 5,
+                            itemBuilder: (context, index) =>
+                                _buildShimmerCard(),
+                          )
                         : errorMessage != null
-                        ? NoInternetPage(onRetry: _fetchJobs)
-                        : jobs.isEmpty
-                        ? const Center(child: Text('No jobs found'))
-                        : ListView.builder(
-                      itemCount: jobs.length,
-                      itemBuilder: (context, index) {
-                        final job = jobs[index];
-                        return InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => JobDetailPage2(
-                                    jobToken: job['jobToken']),
-                              ),
-                            );
-                          },
-                          child: JobCardBT(
-                            jobTitle: job['title'],
-                            company: job['company'],
-                            location: job['location'],
-                            salary: job['salary'],
-                            postTime: job['postTime'],
-                            expiry: job['expiry'],
-                            tags: job['tags'],
-                            logoUrl: job['logoUrl'],
-                          ),
-                        );
-                      },
-                    ),
+                            ? NoInternetPage(
+                                onRetry: () async {
+                                  setState(() => isLoading = true);
+                                  await Future.delayed(
+                                      const Duration(seconds: 2));
+                                  await _fetchJobs();
+                                  setState(() => isLoading = false);
+                                },
+                              )
+                            : jobs.isEmpty
+                                ? const Center(child: Text('No jobs found'))
+                                : ListView.builder(
+                                    itemCount: jobs.length,
+                                    itemBuilder: (context, index) {
+                                      final job = jobs[index];
+                                      return InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => JobDetailPage2(
+                                                  jobToken: job['jobToken']),
+                                            ),
+                                          );
+                                        },
+                                        child: JobCardBT(
+                                          jobTitle: job['title'],
+                                          company: job['company'],
+                                          location: job['location'],
+                                          salary: job['salary'],
+                                          postTime: job['postTime'],
+                                          expiry: job['expiry'],
+                                          tags: job['tags'],
+                                          logoUrl: job['logoUrl'],
+                                        ),
+                                      );
+                                    },
+                                  ),
                   )
                 ],
               ),

@@ -45,14 +45,13 @@ class InternshipProjectApi {
     required String connectSid,
   }) async {
     try {
-      print("📦 [saveInternshipProject] Starting API call...");
-
-      print("📎 internshipId: ${model.internshipId}");
-      print("📎 userId: ${model.userId}");
-      print("📎 type: ${model.type}");
-      print("📎 projectName: ${model.projectName}");
-      print("📎 companyName: ${model.companyName}");
-      print("📎 duration: ${model.duration} ${model.durationPeriod}");
+      // print("📦 [saveInternshipProject] Starting API call...");
+      // print("📎 internshipId: ${model.internshipId}");
+      // print("📎 userId: ${model.userId}");
+      // print("📎 type: ${model.type}");
+      // print("📎 projectName: ${model.projectName}");
+      // print("📎 companyName: ${model.companyName}");
+      // print("📎 duration: ${model.duration} ${model.durationPeriod}");
 
       final headers = {
         'Content-Type': 'application/json',
@@ -61,13 +60,13 @@ class InternshipProjectApi {
       };
 
       final body = jsonEncode(model.toJson());
-       print("📤 Request Body: $body");
+       // print("📤 Request Body: $body");
 
       final url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/update-project-internship');
-      print("🌐 POST URL: $url");
+      // print("🌐 POST URL: $url");
 
       final response = await http.post(url, headers: headers, body: body);
-      print("📥 Status Code: ${response.statusCode}");
+      // print("📥 Status Code: ${response.statusCode}");
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
@@ -85,6 +84,39 @@ class InternshipProjectApi {
     } catch (e, stack) {
       print("❌ Exception during API call: $e");
       print("🧱 StackTrace: $stack");
+      return false;
+    }
+  }
+
+  static Future<bool> deleteProjectInternship({
+    required int internshipId,
+    required String authToken,
+    required String connectSid,
+  }) async {
+    var headers = {
+      'Content-Type': 'application/json',
+      'Cookie':
+      'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
+    };
+    var url = Uri.parse(
+        'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/delete/$internshipId?action=project');
+    try {
+      final request = http.Request('DELETE', url)..headers.addAll(headers);
+
+      final response = await request.send();
+
+      final responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        print('✅ Deleted Internship ID $internshipId successfully.');
+        return true;
+      } else {
+        print(
+            '❌ Failed to delete Internship ID $internshipId: ${response.statusCode} - $responseBody');
+        return false;
+      }
+    } catch (e) {
+      print('🚨 Exception during deleteInternship: $e');
       return false;
     }
   }

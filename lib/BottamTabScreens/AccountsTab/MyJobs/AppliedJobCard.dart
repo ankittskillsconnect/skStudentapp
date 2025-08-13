@@ -178,7 +178,6 @@ class AppliedJobCardBT extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),

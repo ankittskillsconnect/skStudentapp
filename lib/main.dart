@@ -18,10 +18,9 @@ import 'ProfileLogic/ProfileEvent.dart';
 import 'ProfileLogic/ProfileLogic.dart';
 import 'blocpage/jobFilterBloc/jobFilter_logic.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:file_picker/file_picker.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

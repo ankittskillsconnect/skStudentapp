@@ -28,6 +28,7 @@ import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/BottomSheets/EditSk
 import 'package:icons_plus/icons_plus.dart';
 import '../../../Model/Image_update_Model.dart';
 import '../../../Model/Percentage_bar_Model.dart';
+import '../../../Utilities/Language_Api.dart';
 import '../../../Utilities/MyAccount_Get_Post/Image_Api.dart';
 import 'MyaccountElements/CertificateDetails.dart';
 import 'MyaccountElements/EducationDetails.dart';
@@ -69,6 +70,8 @@ class _MyAccountState extends State<MyAccount> {
   File? _profileImage;
   ProfileCompletionModel? profileCompletion;
   bool isLoadingProfilePercentage = true;
+  bool _snackBarShown = false;
+
 
   @override
   void initState() {
@@ -128,7 +131,8 @@ class _MyAccountState extends State<MyAccount> {
     final authToken = prefs.getString('authToken') ?? '';
     final connectSid = prefs.getString('connectSid') ?? '';
     try {
-      final internshipProjectApi = await InternshipProjectApi.fetchInternshipProjects(
+      final internshipProjectApi = await InternshipProjectApi
+          .fetchInternshipProjects(
         authToken: authToken,
         connectSid: connectSid,
       );
@@ -288,7 +292,8 @@ class _MyAccountState extends State<MyAccount> {
               ),
               title: Text(
                 'Choose from Gallery',
-                style: TextStyle(fontSize: 14.sp, color: const Color(0xFF003840)),
+                style: TextStyle(
+                    fontSize: 14.sp, color: const Color(0xFF003840)),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -303,7 +308,8 @@ class _MyAccountState extends State<MyAccount> {
               ),
               title: Text(
                 'Take a Photo',
-                style: TextStyle(fontSize: 14.sp, color: const Color(0xFF003840)),
+                style: TextStyle(
+                    fontSize: 14.sp, color: const Color(0xFF003840)),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -312,7 +318,8 @@ class _MyAccountState extends State<MyAccount> {
             ),
             if (_profileImage != null)
               ListTile(
-                leading: Icon(Icons.delete_outline, color: Colors.red, size: 22.w),
+                leading: Icon(
+                    Icons.delete_outline, color: Colors.red, size: 22.w),
                 title: Text(
                   'Remove Image',
                   style: TextStyle(fontSize: 14.sp, color: Colors.red),
@@ -328,6 +335,24 @@ class _MyAccountState extends State<MyAccount> {
     );
   }
 
+  void _showSnackBarOnce(BuildContext context, String message,
+      {int cooldownSeconds = 3}) {
+    if (_snackBarShown) return;
+
+    _snackBarShown = true;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: TextStyle(fontSize: 12.sp)),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: cooldownSeconds),
+      ),
+    );
+
+    Future.delayed(Duration(seconds: cooldownSeconds), () {
+      _snackBarShown = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(
@@ -341,419 +366,531 @@ class _MyAccountState extends State<MyAccount> {
       appBar: const AccountAppBar(),
       backgroundColor: Colors.white,
       body: Builder(
-        builder: (innerContext) => SafeArea(
-          child: RefreshIndicator(
-            onRefresh: () async {
-              setState(() {
-                isLoadingImage = true;
-                isLoadingEducation = true;
-                isLoadingProject = true;
-                isLoadingWorkExperience = true;
-                isLoadingCertificate = true;
-                isLoadingSkills = true;
-                isLoadingLanguages = true;
-                isLoadingPersonalDetail = true;
-              });
-              await Future.wait([
-                _loadProfileImageFromApi(),
-                fetchEducationDetails(),
-                fetchInternShipProjectDetails(),
-                _fetchPersonalDetails(),
-                fetchWorkExperienceDetails(),
-                fetchCertificateDetails(),
-                fetchSkills(),
-                fetchLanguageData(),
-              ]);
-            },
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 17.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildProfileHeader(),
-                  SizedBox(height: 22.h),
-                  const ProfileCompletionBar(),
-                  SizedBox(height: 22.h),
-                  PersonalDetailsSection(
-                    personalDetail: personalDetail,
-                    isLoading: isLoadingPersonalDetail,
-                    onEdit: () {
-                      showModalBottomSheet(
-                        context: innerContext,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.white,
-                        builder: (_) => EditPersonalDetailsSheet(
-                          initialData: personalDetail,
-                          onSave: (updatedData) {
-                            setState(() {
-                              personalDetail = updatedData;
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(height: 17.h),
-                  EducationSection(
-                    educationDetails: educationDetails,
-                    isLoading: isLoadingEducation,
-                    onAdd: () {
-                      showModalBottomSheet(
-                        context: innerContext,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.white,
-                        builder: (_) => EditEducationBottomSheet(
-                          onSave: (data) {
-                            setState(() {
-                              educationDetails.add(data['educationDetail']);
-                            });
-                            Navigator.pop(innerContext);
-                          },
-                        ),
-                      );
-                    },
-                    onEdit: (edu, index) {
-                      showModalBottomSheet(
-                        context: innerContext,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.white,
-                        builder: (_) => EditEducationBottomSheet(
-                          initialData: edu,
-                          onSave: (data) {
-                            setState(() {
-                              educationDetails[index] = data['educationDetail'];
-                            });
-                            Navigator.pop(innerContext);
-                          },
-                        ),
-                      );
-                    },
-                    onDelete: (index) {
-                      setState(() {
-                        educationDetails.removeAt(index);
-                      });
-                    },
-                  ),
-                  SizedBox(height: 17.h),
-                  const ResumeSection(),
-                  SizedBox(height: 17.h),
-                  SkillsSection(
-                    skillList: skillList,
-                    isLoading: isLoadingSkills,
-                    onEdit: () {
-                      showModalBottomSheet(
-                        context: innerContext,
-                        isScrollControlled: true,
-                        builder: (_) => EditSkillsBottomSheet(
-                          initialSkills: skillList,
-                          onSave: (updatedSkills) {
-                            setState(() => skillList = updatedSkills);
-                          },
-                        ),
-                      );
-                    },
-                    onAdd: () {
-                      showModalBottomSheet(
-                        context: innerContext,
-                        isScrollControlled: true,
-                        builder: (_) => EditSkillsBottomSheet(
-                          initialSkills: skillList,
-                          onSave: (updatedSkills) {
-                            setState(() => skillList = updatedSkills);
-                          },
-                        ),
-                      );
-                    },
-                    onDeleteSkill: (skill, singleSkill) {
-                      setState(() {
-                        final parsedSkills = skill.skills
-                            .split(RegExp(r',(?![^()]*\))'))
-                            .map((s) => s.trim())
-                            .where((s) => s.isNotEmpty)
-                            .toList();
-                        final updatedSkills = parsedSkills
-                            .where((s) => s != singleSkill)
-                            .toList();
-                        if (updatedSkills.isEmpty) {
-                          skillList.remove(skill);
-                        } else {
-                          skill.skills = updatedSkills.join(', ');
-                        }
-                      });
-                    },
-                  ),
-                  SizedBox(height: 17.h),
-                  ProjectsSection(
-                    projects: projects,
-                    isLoading: isLoadingProject,
-                    onAdd: () async {
-                      final prefs = await SharedPreferences.getInstance();
-                      final authToken = prefs.getString('authToken') ?? '';
-                      final connectSid = prefs.getString('connectSid') ?? '';
-                      if (authToken.isEmpty || connectSid.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error: Please log in again.')),
-                        );
-                        return;
-                      }
-                      print("🆕 Opening Add Project BottomSheet");
-                      bool isSaveComplete = false;
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
-                        ),
-                        builder: (context) => EditProjectDetailsBottomSheet(
-                          initialData: null,
-                          onSave: (newData) async {
-                            if (!isSaveComplete) {
-                              print("✅ [onAdd -> onSave] Saved new project: ${newData.projectName} | Type: ${newData.type}");
-                              isSaveComplete = true;
-                              await fetchInternShipProjectDetails();
-                            }
-                          },
-                        ),
-                      );
-                    },
-                    onEdit: (project, index) async {
-                      final prefs = await SharedPreferences.getInstance();
-                      final authToken = prefs.getString('authToken') ?? '';
-                      final connectSid = prefs.getString('connectSid') ?? '';
-                      if (authToken.isEmpty || connectSid.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error: Please log in again.')),
-                        );
-                        return;
-                      }
-                      print("🛠 Opening Edit BottomSheet");
-                      print("📍 internshipId: ${project.internshipId}");
-                      print("📍 userId: ${project.userId}");
-                      print("📍 type: ${project.type}");
-                      bool isSaveComplete = false;
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
-                        ),
-                        builder: (context) => EditProjectDetailsBottomSheet(
-                          initialData: project,
-                          onSave: (updatedData) async {
-                            if (!isSaveComplete) {
-                              print("✅ [onEdit -> onSave] Updated project: ${updatedData.projectName} | Type: ${updatedData.type}");
-                              isSaveComplete = true;
-                              await fetchInternShipProjectDetails();
-                            }
-                          },
-                        ),
-                      );
-                    },
-                    onDelete: (index) {
-                      print("🗑 Deleting project at index: $index");
-                      setState(() {
-                        projects.removeAt(index);
-                      });
-                    },
-                  ),
-                  SizedBox(height: 17.h),
-                  CertificatesSection(
-                    certificatesList: certificatesList,
-                    isLoading: isLoadingCertificate,
-                    onAdd: () {
-                      showModalBottomSheet(
-                        context: innerContext,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.white,
-                        builder: (_) => EditCertificateBottomSheet(
-                          initialData: null,
-                          onSave: (certif) async {
-                            try {
-                              final prefs =
-                              await SharedPreferences.getInstance();
-                              final authToken =
-                                  prefs.getString('authToken') ?? '';
-                              final connectSid =
-                                  prefs.getString('connectSid') ?? '';
-
-                              if (authToken.isEmpty || connectSid.isEmpty) {
-                                throw Exception(
-                                  'Missing auth token or session ID',
-                                );
-                              }
-                              await CertificateApi.saveCertificateApi(
-                                model: certif,
-                                authToken: authToken,
-                                connectSid: connectSid,
-                              );
-                              await fetchCertificateDetails();
-                              if (innerContext.mounted)
-                                Navigator.pop(innerContext);
-                            } catch (e) {
-                              print('❌ Failed to add certificate: $e');
-                              ScaffoldMessenger.of(innerContext).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Failed to add certificate: $e',
-                                  ),
+        builder: (innerContext) =>
+            SafeArea(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {
+                    isLoadingImage = true;
+                    isLoadingEducation = true;
+                    isLoadingProject = true;
+                    isLoadingWorkExperience = true;
+                    isLoadingCertificate = true;
+                    isLoadingSkills = true;
+                    isLoadingLanguages = true;
+                    isLoadingPersonalDetail = true;
+                  });
+                  await Future.wait([
+                    _loadProfileImageFromApi(),
+                    fetchEducationDetails(),
+                    fetchInternShipProjectDetails(),
+                    _fetchPersonalDetails(),
+                    fetchWorkExperienceDetails(),
+                    fetchCertificateDetails(),
+                    fetchSkills(),
+                    fetchLanguageData(),
+                  ]);
+                },
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 14.w, vertical: 17.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _buildProfileHeader(),
+                      SizedBox(height: 22.h),
+                      const ProfileCompletionBar(),
+                      SizedBox(height: 22.h),
+                      PersonalDetailsSection(
+                        personalDetail: personalDetail,
+                        isLoading: isLoadingPersonalDetail,
+                        onEdit: () {
+                          showModalBottomSheet(
+                            context: innerContext,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.white,
+                            builder: (_) =>
+                                EditPersonalDetailsSheet(
+                                  initialData: personalDetail,
+                                  onSave: (updatedData) {
+                                    setState(() {
+                                      personalDetail = updatedData;
+                                    });
+                                  },
                                 ),
-                              );
-                            }
-                          },
-                        ),
-                      );
-                    },
-                    onEdit: (certificate, index) {
-                      showModalBottomSheet(
-                        context: innerContext,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.white,
-                        builder: (_) => EditCertificateBottomSheet(
-                          initialData: certificate,
-                          onSave: (updatedCert) async {
-                            try {
-                              final prefs =
-                              await SharedPreferences.getInstance();
-                              final authToken =
-                                  prefs.getString('authToken') ?? '';
-                              final connectSid =
-                                  prefs.getString('connectSid') ?? '';
-
-                              if (authToken.isEmpty || connectSid.isEmpty) {
-                                throw Exception(
-                                  'Missing auth token or session ID',
-                                );
-                              }
-
-                              await CertificateApi.saveCertificateApi(
-                                model: updatedCert,
-                                authToken: authToken,
-                                connectSid: connectSid,
-                              );
-
-                              await fetchCertificateDetails();
-                              if (innerContext.mounted)
-                                Navigator.pop(innerContext);
-                            } catch (e) {
-                              print('❌ Failed to update certificate: $e');
-                              ScaffoldMessenger.of(innerContext).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Failed to update certificate: $e',
-                                  ),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 17.h),
+                      EducationSection(
+                        educationDetails: educationDetails,
+                        isLoading: isLoadingEducation,
+                        onAdd: () {
+                          showModalBottomSheet(
+                            context: innerContext,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.white,
+                            builder: (_) =>
+                                EditEducationBottomSheet(
+                                  onSave: (data) {
+                                    setState(() {
+                                      educationDetails.add(
+                                          data['educationDetail']);
+                                    });
+                                    Navigator.pop(innerContext);
+                                  },
                                 ),
-                              );
+                          );
+                        },
+                        onEdit: (edu, index) {
+                          showModalBottomSheet(
+                            context: innerContext,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.white,
+                            builder: (_) =>
+                                EditEducationBottomSheet(
+                                  initialData: edu,
+                                  onSave: (data) {
+                                    setState(() {
+                                      educationDetails[index] =
+                                      data['educationDetail'];
+                                    });
+                                    Navigator.pop(innerContext);
+                                  },
+                                ),
+                          );
+                        },
+                        onDelete: (index) {
+                          setState(() {
+                            educationDetails.removeAt(index);
+                          });
+                        },
+                      ),
+                      SizedBox(height: 17.h),
+                      const ResumeSection(),
+                      SizedBox(height: 17.h),
+                      SkillsSection(
+                        skillList: skillList,
+                        isLoading: isLoadingSkills,
+                        onEdit: () {
+                          showModalBottomSheet(
+                            context: innerContext,
+                            isScrollControlled: true,
+                            builder: (_) =>
+                                EditSkillsBottomSheet(
+                                  initialSkills: skillList,
+                                  onSave: (updatedSkills) {
+                                    setState(() => skillList = updatedSkills);
+                                  },
+                                ),
+                          );
+                        },
+                        onAdd: () {
+                          showModalBottomSheet(
+                            context: innerContext,
+                            isScrollControlled: true,
+                            builder: (_) =>
+                                EditSkillsBottomSheet(
+                                  initialSkills: skillList,
+                                  onSave: (updatedSkills) {
+                                    setState(() => skillList = updatedSkills);
+                                  },
+                                ),
+                          );
+                        },
+                        onDeleteSkill: (skill, singleSkill) {
+                          setState(() {
+                            final parsedSkills = skill.skills
+                                .split(RegExp(r',(?![^()]*\))'))
+                                .map((s) => s.trim())
+                                .where((s) => s.isNotEmpty)
+                                .toList();
+                            final updatedSkills = parsedSkills
+                                .where((s) => s != singleSkill)
+                                .toList();
+                            if (updatedSkills.isEmpty) {
+                              skillList.remove(skill);
+                            } else {
+                              skill.skills = updatedSkills.join(', ');
                             }
-                          },
-                        ),
-                      );
-                    },
-                    onDelete: (index) async {
-                      try {
-                        final cert = certificatesList[index];
-                        final prefs = await SharedPreferences.getInstance();
-                        final authToken = prefs.getString('authToken') ?? '';
-                        final connectSid = prefs.getString('connectSid') ?? '';
-
-                        if (authToken.isEmpty || connectSid.isEmpty) {
-                          throw Exception('Missing auth token or session ID');
-                        }
-
-                        await fetchCertificateDetails();
-                      } catch (e) {
-                        print('❌ Failed to delete certificate: $e');
-                        ScaffoldMessenger.of(innerContext).showSnackBar(
-                          SnackBar(content: Text('Failed to delete: $e')),
-                        );
-                      }
-                    },
-                  ),
-                  SizedBox(height: 17.h),
-                  WorkExperienceSection(
-                    workExperiences: workExperiences,
-                    isLoading: isLoadingWorkExperience,
-                    onAdd: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.white,
-                        builder: (_) => EditWorkExperienceBottomSheet(
-                          initialData: null,
-                          onSave: (WorkExperienceModel newData) async {
-                            final prefs = await SharedPreferences.getInstance();
-                            final authToken = prefs.getString('authToken') ?? '';
-                            final connectSid = prefs.getString('connectSid') ?? '';
-                            final success = await WorkExperienceApi.saveWorkExperience(
-                              model: newData,
-                              authToken: authToken,
-                              connectSid: connectSid,
+                          });
+                        },
+                      ),
+                      SizedBox(height: 17.h),
+                      ProjectsSection(
+                        projects: projects,
+                        isLoading: isLoadingProject,
+                        onAdd: () async {
+                          final prefs = await SharedPreferences.getInstance();
+                          final authToken = prefs.getString('authToken') ?? '';
+                          final connectSid = prefs.getString('connectSid') ??
+                              '';
+                          if (authToken.isEmpty || connectSid.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text('Error: Please log in again.')),
                             );
-                            if (success) await fetchWorkExperienceDetails();
-                            Navigator.pop(context);
-                          },
-                        ),
-                      );
-                    },
-                    onEdit: (workExperience, index) {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.white,
-                        builder: (_) => EditWorkExperienceBottomSheet(
-                          initialData: workExperience,
-                          onSave: (WorkExperienceModel updated) async {
-                            final prefs = await SharedPreferences.getInstance();
-                            final authToken = prefs.getString('authToken') ?? '';
-                            final connectSid = prefs.getString('connectSid') ?? '';
-
-                            final success = await WorkExperienceApi.saveWorkExperience(
-                              model: updated,
-                              authToken: authToken,
-                              connectSid: connectSid,
+                            return;
+                          }
+                          print("🆕 Opening Add Project BottomSheet");
+                          bool isSaveComplete = false;
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(14.r)),
+                            ),
+                            builder: (context) =>
+                                EditProjectDetailsBottomSheet(
+                                  initialData: null,
+                                  onSave: (newData) async {
+                                    if (!isSaveComplete) {
+                                      print(
+                                          "✅ [onAdd -> onSave] Saved new project: ${newData
+                                              .projectName} | Type: ${newData
+                                              .type}");
+                                      isSaveComplete = true;
+                                      await fetchInternShipProjectDetails();
+                                    }
+                                  },
+                                ),
+                          );
+                        },
+                        onEdit: (project, index) async {
+                          final prefs = await SharedPreferences.getInstance();
+                          final authToken = prefs.getString('authToken') ?? '';
+                          final connectSid = prefs.getString('connectSid') ??
+                              '';
+                          if (authToken.isEmpty || connectSid.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text('Error: Please log in again.')),
                             );
-                            if (success) await fetchWorkExperienceDetails();
-                            Navigator.pop(context);
-                          },
-                        ),
-                      );
-                    },
-                    onDelete: (index) {
-                      setState(() {
-                        workExperiences.removeAt(index);
-                      });
-                    },
-                  ),
-                  SizedBox(height: 17.h),
-                  LanguagesSection(
-                    languageList: languageList,
-                    isLoading: isLoadingLanguages,
-                    onAdd: () {
-                      showModalBottomSheet(
-                        context: innerContext,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.white,
-                        builder: (_) => LanguageBottomSheet(
-                          initialData: null,
-                          onSave: (LanguagesModel data) {
+                            return;
+                          }
+
+                          bool isSaveComplete = false;
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(14.r)),
+                            ),
+                            builder: (context) =>
+                                EditProjectDetailsBottomSheet(
+                                  initialData: project,
+                                  onSave: (updatedData) async {
+                                    if (!isSaveComplete) {
+                                      print(
+                                          "✅ [onEdit -> onSave] Updated project: ${updatedData
+                                              .projectName} | Type: ${updatedData
+                                              .type}");
+                                      isSaveComplete = true;
+                                      await fetchInternShipProjectDetails();
+                                    }
+                                  },
+                                ),
+                          );
+                        },
+                        onDelete: (int index) async {
+                          final internshipId = int.tryParse(projects[index].internshipId ?? '');
+                          if (internshipId == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Invalid internship ID')),
+                            );
+                            return;
+                          }
+
+                          final prefs = await SharedPreferences.getInstance();
+                          final authToken = prefs.getString('authToken') ?? '';
+                          final connectSid = prefs.getString('connectSid') ?? '';
+
+                          final success = await InternshipProjectApi.deleteProjectInternship(
+                            internshipId: internshipId,
+                            authToken: authToken,
+                            connectSid: connectSid,
+                          );
+
+                          if (success) {
                             setState(() {
-                              languageList.add(data);
+                              projects.removeAt(index);
                             });
+                            _showSnackBarOnce(
+                                context, "Internship deleted successfully ");
+                          } else {
+                            _showSnackBarOnce(
+                                context, "Failed to delete Internship");
+                          }
+                        },
+                      ),
+                      SizedBox(height: 17.h),
+                      CertificatesSection(
+                        certificatesList: certificatesList,
+                        isLoading: isLoadingCertificate,
+                        onAdd: () {
+                          showModalBottomSheet(
+                            context: innerContext,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.white,
+                            builder: (_) =>
+                                EditCertificateBottomSheet(
+                                  initialData: null,
+                                  onSave: (certif) async {
+                                    try {
+                                      final prefs =
+                                      await SharedPreferences.getInstance();
+                                      final authToken =
+                                          prefs.getString('authToken') ?? '';
+                                      final connectSid =
+                                          prefs.getString('connectSid') ?? '';
+
+                                      if (authToken.isEmpty ||
+                                          connectSid.isEmpty) {
+                                        throw Exception(
+                                          'Missing auth token or session ID',
+                                        );
+                                      }
+                                      await CertificateApi.saveCertificateApi(
+                                        model: certif,
+                                        authToken: authToken,
+                                        connectSid: connectSid,
+                                      );
+                                      await fetchCertificateDetails();
+                                      if (innerContext.mounted)
+                                        Navigator.pop(innerContext);
+                                    } catch (e) {
+                                      print('❌ Failed to add certificate: $e');
+                                      ScaffoldMessenger
+                                          .of(innerContext)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Failed to add certificate: $e',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                          );
+                        },
+                        onEdit: (certificate, index) {
+                          showModalBottomSheet(
+                            context: innerContext,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.white,
+                            builder: (_) =>
+                                EditCertificateBottomSheet(
+                                  initialData: certificate,
+                                  onSave: (updatedCert) async {
+                                    try {
+                                      final prefs =
+                                      await SharedPreferences.getInstance();
+                                      final authToken =
+                                          prefs.getString('authToken') ?? '';
+                                      final connectSid =
+                                          prefs.getString('connectSid') ?? '';
+
+                                      if (authToken.isEmpty ||
+                                          connectSid.isEmpty) {
+                                        throw Exception(
+                                          'Missing auth token or session ID',
+                                        );
+                                      }
+
+                                      await CertificateApi.saveCertificateApi(
+                                        model: updatedCert,
+                                        authToken: authToken,
+                                        connectSid: connectSid,
+                                      );
+
+                                      await fetchCertificateDetails();
+                                      if (innerContext.mounted)
+                                        Navigator.pop(innerContext);
+                                    } catch (e) {
+                                      print(
+                                          '❌ Failed to update certificate: $e');
+                                      ScaffoldMessenger
+                                          .of(innerContext)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Failed to update certificate: $e',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                          );
+                        },
+                        onDelete: (int index) async {
+                          final certificationId = int.tryParse(certificatesList[index].certificationId ?? '');
+                          if (certificationId == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Invalid certificate ID')),
+                            );
+                            return;
+                          }
+
+                          final prefs = await SharedPreferences.getInstance();
+                          final authToken = prefs.getString('authToken') ?? '';
+                          final connectSid = prefs.getString('connectSid') ?? '';
+
+                          final success = await CertificateApi.deleteCertificate(
+                            certificationId: certificationId,
+                            authToken: authToken,
+                            connectSid: connectSid,
+                          );
+
+                          if (success) {
+                            setState(() {
+                              certificatesList.removeAt(index);
+                            });
+                            _showSnackBarOnce(
+                                context, "Certificate deleted successfully ");
+                          } else {
+                            _showSnackBarOnce(
+                                context, "Failed to delete certificate");
+                          }
+                        },
+                      ),
+                      SizedBox(height: 17.h),
+                      WorkExperienceSection(
+                          workExperiences: workExperiences,
+                          isLoading: isLoadingWorkExperience,
+                          onAdd: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.white,
+                              builder: (_) =>
+                                  EditWorkExperienceBottomSheet(
+                                    initialData: null,
+                                    onSave: (
+                                        WorkExperienceModel newData) async {
+                                      final prefs = await SharedPreferences
+                                          .getInstance();
+                                      final authToken = prefs.getString(
+                                          'authToken') ?? '';
+                                      final connectSid = prefs.getString(
+                                          'connectSid') ?? '';
+                                      final success = await WorkExperienceApi
+                                          .saveWorkExperience(
+                                        model: newData,
+                                        authToken: authToken,
+                                        connectSid: connectSid,
+                                      );
+                                      if (success) await fetchWorkExperienceDetails();
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                            );
                           },
-                        ),
-                      );
-                    },
-                    onDelete: (index) {
-                      setState(() {
-                        languageList.removeAt(index);
-                      });
-                    },
+                          onEdit: (workExperience, index) {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.white,
+                              builder: (_) =>
+                                  EditWorkExperienceBottomSheet(
+                                    initialData: workExperience,
+                                    onSave: (
+                                        WorkExperienceModel updated) async {
+                                      final prefs = await SharedPreferences
+                                          .getInstance();
+                                      final authToken = prefs.getString(
+                                          'authToken') ?? '';
+                                      final connectSid = prefs.getString(
+                                          'connectSid') ?? '';
+
+                                      final success = await WorkExperienceApi
+                                          .saveWorkExperience(
+                                        model: updated,
+                                        authToken: authToken,
+                                        connectSid: connectSid,
+                                      );
+                                      if (success) await fetchWorkExperienceDetails();
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                            );
+                          },
+                        onDelete: (int index) async {
+                          final workExperienceId = int.tryParse(workExperiences[index].workExperienceId ?? '');
+                          final prefs = await SharedPreferences.getInstance();
+                          final authToken = prefs.getString('authToken') ?? '';
+                          final connectSid = prefs.getString('connectSid') ?? '';
+
+                          final success = await WorkExperienceApi.deleteWorkExperience(
+                            workExperienceId: workExperienceId,
+                            authToken: authToken,
+                            connectSid: connectSid,
+                          );
+
+                          if (success) {
+                            setState(() {
+                              workExperiences.removeAt(index);
+                            });
+                            _showSnackBarOnce(
+                                context, "Work Experience deleted successfully ");
+                          } else {
+                            _showSnackBarOnce(
+                                context, "Failed to delete Work Experience");
+                          }
+                        },
+                      ),
+                      SizedBox(height: 17.h),
+                      LanguagesSection(
+                        languageList: languageList,
+                        isLoading: isLoadingLanguages,
+                        onAdd: () {
+                          showModalBottomSheet(
+                            context: innerContext,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.white,
+                            builder: (_) =>
+                                LanguageBottomSheet(
+                                  initialData: null,
+                                  onSave: (LanguagesModel data) {
+                                    setState(() {
+                                      languageList.add(data);
+                                    });
+                                  },
+                                ),
+                          );
+                        },
+                        onDelete: (int index) async {
+                          final languageId = languageList[index].id;
+                          final prefs = await SharedPreferences.getInstance();
+                          final authToken = prefs.getString('authToken') ?? '';
+                          final connectSid = prefs.getString('connectSid') ?? '';
+                          final success = await LanguageDetailApi
+                              .deleteLanguage(
+                            id: languageId,
+                            authToken: authToken,
+                            connectSid: connectSid,
+                          );
+                          if (success) {
+                            setState(() {
+                              languageList.removeAt(index);
+                            });
+                            _showSnackBarOnce(
+                                context, "Language deleted successfully ");
+                          } else {
+                            _showSnackBarOnce(context,
+                                "Failed to delete language, try again");
+                          }
+                        },
+                      ),
+                      SizedBox(height: 17.h),
+                    ],
                   ),
-                  SizedBox(height: 17.h),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
       ),
     );
   }
@@ -813,10 +950,12 @@ class _MyAccountState extends State<MyAccount> {
         ),
         SizedBox(height: 10.h),
         Text(
-          '${_imageUpdateData?.firstName ?? ''} ${_imageUpdateData?.lastName ?? ''}'
+          '${_imageUpdateData?.firstName ?? ''} ${_imageUpdateData?.lastName ??
+              ''}'
               .trim()
               .isNotEmpty
-              ? '${_imageUpdateData?.firstName ?? ''} ${_imageUpdateData?.lastName ?? ''}'
+              ? '${_imageUpdateData?.firstName ?? ''} ${_imageUpdateData
+              ?.lastName ?? ''}'
               .trim()
               : '',
           style: TextStyle(

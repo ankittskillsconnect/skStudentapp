@@ -32,9 +32,10 @@ class ProjectsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader(
+        SectionHeader(
           title: "Project/Internship Details",
           showAdd: true,
+          onAdd: onAdd,
         ),
         if (isLoading)
           Padding(

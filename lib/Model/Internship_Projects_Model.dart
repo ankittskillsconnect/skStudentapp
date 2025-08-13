@@ -23,7 +23,7 @@ class InternshipProjectModel {
 
   factory InternshipProjectModel.fromJson(Map<String, dynamic> json) {
     return InternshipProjectModel(
-      internshipId: json['internship_id']?.toString(),
+      internshipId: json['project_internship_id']?.toString(),
       userId: json['user_id']?.toString(),
       type: json['type'] ?? '',
       projectName: json['project_name'] ?? '',

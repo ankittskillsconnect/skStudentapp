@@ -31,9 +31,10 @@ class CertificatesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader(
+         SectionHeader(
           title: "Certificate Details",
           showAdd: true,
+           onAdd: onAdd,
         ),
         for (var i = 0; i < certificatesList.length; i++)
           Container(

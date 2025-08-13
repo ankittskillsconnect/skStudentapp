@@ -116,7 +116,7 @@ class _CustomFieldProjectDropdownState extends State<CustomFieldProjectDropdown>
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
                   width: size.width,
-                  height: fixedDropdownHeight, // Fixed height
+                  height: fixedDropdownHeight,
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -127,30 +127,30 @@ class _CustomFieldProjectDropdownState extends State<CustomFieldProjectDropdown>
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextField(
-                        controller: _searchController,
-                        focusNode: _focusNode,
-                        decoration: const InputDecoration(
-                          hintText: 'Search...',
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                        ),
-                        onChanged: (query) {
-                          print('OnChanged: Query: $query, Focus: ${_focusNode.hasFocus}');
-                          _debounce?.cancel();
-                          _debounce = Timer(const Duration(milliseconds: 300), () {
-                            setState(() {
-                              _filteredItems = widget.items
-                                  .where((item) => item.toLowerCase().contains(query.toLowerCase()))
-                                  .toSet()
-                                  .toList();
-                              _overlayEntry?.markNeedsBuild();
-                              print('Debounce: Filtered to ${_filteredItems.length} items, Focus: ${_focusNode.hasFocus}');
-                            });
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 4),
+                      // TextField(
+                      //   controller: _searchController,
+                      //   focusNode: _focusNode,
+                      //   decoration: const InputDecoration(
+                      //     hintText: 'Search...',
+                      //     isDense: true,
+                      //     contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                      //   ),
+                      //   onChanged: (query) {
+                      //     print('OnChanged: Query: $query, Focus: ${_focusNode.hasFocus}');
+                      //     _debounce?.cancel();
+                      //     _debounce = Timer(const Duration(milliseconds: 300), () {
+                      //       setState(() {
+                      //         _filteredItems = widget.items
+                      //             .where((item) => item.toLowerCase().contains(query.toLowerCase()))
+                      //             .toSet()
+                      //             .toList();
+                      //         _overlayEntry?.markNeedsBuild();
+                      //         print('Debounce: Filtered to ${_filteredItems.length} items, Focus: ${_focusNode.hasFocus}');
+                      //       });
+                      //     });
+                      //   },
+                      // ),
+                      // const SizedBox(height: 4),
                       Expanded(
                         child: Scrollbar(
                           child: ListView.builder(

@@ -32,9 +32,10 @@ class EducationSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader(
+         SectionHeader(
           title: "Education Details",
           showAdd: true,
+          onAdd: onAdd,
         ),
         if (isLoading)
           Padding(

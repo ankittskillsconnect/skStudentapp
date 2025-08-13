@@ -127,7 +127,7 @@ class _EditWorkExperienceBottomSheetState
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.9,
-      maxChildSize: 1.0, // Set to maximum allowed value
+      maxChildSize: 0.9,
       minChildSize: 0.9,
       builder: (context, scrollController) {
         return Container(

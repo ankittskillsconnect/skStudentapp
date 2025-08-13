@@ -15,15 +15,14 @@ class NoInternetPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              "assets/images/no_internet.png",
+              "assets/no_internet.png",
               height: 200.h,
             ),
             SizedBox(height: 20.h),
             Image.asset(
-              "assets/images/something_wrong.png",
+              "assets/something_wrong.png",
               height: 60.h,
             ),
-
             SizedBox(height: 20.h),
             ElevatedButton(
               onPressed: onRetry,

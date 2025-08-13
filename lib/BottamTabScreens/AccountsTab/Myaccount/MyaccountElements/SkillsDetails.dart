@@ -28,7 +28,6 @@ class SkillsSection extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
     );
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

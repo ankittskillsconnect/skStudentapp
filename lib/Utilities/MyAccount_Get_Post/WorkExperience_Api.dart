@@ -88,5 +88,36 @@ class WorkExperienceApi {
     }
   }
 
+  static Future<bool> deleteWorkExperience ({
+    required int? workExperienceId,
+    required String authToken,
+    required String connectSid,
+  })async {
+    var headers = {
+      'Content-Type': 'application/json',
+      'Cookie': 'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
+    };
+    var url = Uri.parse(
+        'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/delete/$workExperienceId?action=work_exp'    );
+    try {
+      final request = http.Request('DELETE', url)
+        ..headers.addAll(headers);
+
+      final response = await request.send();
+
+      final responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        print('✅ Deleted workExperience ID $workExperienceId successfully.');
+        return true;
+      } else {
+        print('❌ Failed to delete workExperience Id  $workExperienceId: ${response.statusCode} - $responseBody');
+      return false;
+    }
+  } catch (e) {
+  print('🚨 Exception during deleteworkExperience: $e');
+      return false;
+    }
+  }
 }
 

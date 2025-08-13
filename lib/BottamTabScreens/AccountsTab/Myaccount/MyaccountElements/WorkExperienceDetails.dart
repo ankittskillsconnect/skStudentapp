@@ -31,9 +31,10 @@ class WorkExperienceSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader(
+         SectionHeader(
           title: "Work Experience",
           showAdd: true,
+          onAdd: onAdd,
         ),
         for (int i = 0; i < workExperiences.length; i++)
           Container(
