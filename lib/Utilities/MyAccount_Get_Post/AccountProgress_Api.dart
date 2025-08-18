@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/Percentage_bar_Model.dart';
+import '../ApiConstants.dart';
 
 class ProfileCompletionApi {
   static Future<ProfileCompletionModel?> fetchProfileCompletion() async {
@@ -25,7 +26,7 @@ class ProfileCompletionApi {
         'Cookie': cookieHeader,
       };
 
-      var url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/personal-details');
+      var url = Uri.parse('${ApiConstants.baseUrl}profile/student/personal-details');
       var request = http.Request('GET', url);
       request.headers.addAll(headers);
       http.StreamedResponse response = await request.send();

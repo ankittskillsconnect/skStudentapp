@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../ApiConstants.dart';
+
 class ForgotPasswordService {
   static const String _url =
-      'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/authenticate/forget-password';
+      '${ApiConstants.baseUrl}authenticate/forget-password';
 
   Future<Map<String, dynamic>> sendResetOtp(String email) async {
     try {

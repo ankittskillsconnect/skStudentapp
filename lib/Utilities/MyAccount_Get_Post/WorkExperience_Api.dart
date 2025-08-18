@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:sk_loginscreen1/Model/WorkExperience_Model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../ApiConstants.dart';
+
 class WorkExperienceApi {
   static Future<List<WorkExperienceModel>> fetchWorkExperienceApi({
     required String authToken,
@@ -10,7 +12,7 @@ class WorkExperienceApi {
   }) async {
     try {
       var url = Uri.parse(
-        'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/work-experience-details',
+        '${ApiConstants.baseUrl}profile/student/work-experience-details',
       );
       var headers = {
         'Content-Type': 'application/json',
@@ -60,7 +62,7 @@ class WorkExperienceApi {
       print("📤 [saveWorkExperience] Request Body: $body");
 
       final url = Uri.parse(
-        'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/update-student-work-experience',
+        '${ApiConstants.baseUrl}profile/student/update-student-work-experience',
       );
 
       final response = await http.post(url, headers: headers, body: body);
@@ -98,7 +100,7 @@ class WorkExperienceApi {
       'Cookie': 'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
     };
     var url = Uri.parse(
-        'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/delete/$workExperienceId?action=work_exp'    );
+        '${ApiConstants.baseUrl}profile/student/delete/$workExperienceId?action=work_exp'    );
     try {
       final request = http.Request('DELETE', url)
         ..headers.addAll(headers);

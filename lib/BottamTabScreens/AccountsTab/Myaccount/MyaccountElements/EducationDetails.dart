@@ -28,7 +28,6 @@ class EducationSection extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
     );
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -78,12 +77,12 @@ class EducationSection extends StatelessWidget {
                           edu.degreeName,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: 12.sp,
+                            fontSize: 15.sp,
                             color: const Color(0xFF005E6A),
                           ),
                         ),
                       ),
-                      const Spacer(),
+                      // const Spacer(),
                       IconButton(
                         icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
                         iconSize: 16.w,
@@ -91,27 +90,27 @@ class EducationSection extends StatelessWidget {
                         constraints: const BoxConstraints(),
                         onPressed: () => onEdit(edu, index),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Colors.red),
-                        iconSize: 16.w,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () => onDelete(index),
-                      ),
+                      // IconButton(
+                      //   icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      //   iconSize: 16.w,
+                      //   padding: EdgeInsets.zero,
+                      //   constraints: const BoxConstraints(),
+                      //   onPressed: () => onDelete(index),
+                      // ),
                     ],
                   ),
                   SizedBox(height: 4.h),
                   Text(
                     'Degree : ${edu.courseName}\nSpecialization : ${edu.specializationName}\nMarks : ${edu.marks}',
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 13.sp,
                       color: const Color(0xFF003840),
                     ),
                   ),
                   Text(
                     'College : ${edu.collegeMasterName}\n${edu.passingYear}',
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 13.sp,
                       color: const Color(0xFF003840),
                       height: 1.4,
                     ),
@@ -126,7 +125,7 @@ class EducationSection extends StatelessWidget {
             child: Text(
               "No education details found.",
               style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 13.sp,
                 color: const Color(0xFF003840),
               ),
             ),

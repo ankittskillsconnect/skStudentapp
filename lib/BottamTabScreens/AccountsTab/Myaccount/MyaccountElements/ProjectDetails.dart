@@ -77,79 +77,118 @@ class ProjectsSection extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10.r),
                           ),
                           child: Icon(
-                            Icons.workspaces_filled,
+                            Icons.work_history,
                             size: 22.w,
                             color: const Color(0xFF005E6A),
                           ),
                         ),
                         SizedBox(width: 8.w),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 6.w, vertical: 2.h),
                           decoration: BoxDecoration(
-                            color: Colors.lightGreen,
-                            borderRadius: BorderRadius.circular(18.r),
-                            border: Border.all(color: const Color(0xFFBCD8DB)),
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(4.r),
                           ),
                           child: Text(
-                            proj.type,
+                            "[ ${proj.type} ]",
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF004C5C),
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
                         const Spacer(),
                         IconButton(
-                          icon: const Icon(Icons.edit, color: Color(0xFF005E6A)),
+                          icon:
+                              const Icon(Icons.edit, color: Color(0xFF005E6A)),
                           iconSize: 16.w,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                           onPressed: () => onEdit(proj, i),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete_outline, color: Colors.red),
-                          iconSize: 16.w,
+                          icon: const Icon(Icons.delete_outline,
+                              color: Colors.red),
+                          iconSize: 18.w,
+                          onPressed: () async {
+                            final shouldDelete = await showDialog<bool>(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => AlertDialog(
+                                backgroundColor: Colors.white,
+                                title: const Text('Confirm Delete'),
+                                content: Text(
+                                    'Are you sure you want to delete this ${proj.type}?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: const Text(
+                                      'Cancel',
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                    ),
+                                    child: const Text(
+                                      'Delete',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+
+                            if (shouldDelete == true) {
+                              onDelete(i); // Trigger your delete logic
+                            }
+                          },
+                          visualDensity: VisualDensity.compact,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
-                          onPressed: () => onDelete(i),
                         ),
                       ],
                     ),
-                    SizedBox(height: 5.h),
+                    SizedBox(height: 4.h),
                     Text(
                       'Project Name : ${proj.projectName}',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        fontSize: 12.sp,
+                        fontSize: 13.sp,
                         color: const Color(0xFF005E6A),
                       ),
                     ),
                     Text(
                       'Company Name : ${proj.companyName}',
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 13.sp,
                         color: const Color(0xFF003840),
                       ),
                     ),
                     Text(
                       'Duration : ${proj.duration} - ${proj.durationPeriod}',
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 13.sp,
                         color: const Color(0xFF003840),
                       ),
                     ),
                     Text(
                       'Skills : ${proj.skills}',
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 13.sp,
                         color: const Color(0xFF003840),
                       ),
                     ),
                     Text(
                       'Details : ${proj.details}',
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 13.sp,
                         color: const Color(0xFF003840),
                         height: 1.4,
                       ),

@@ -37,7 +37,9 @@ class _EditEducationBottomSheetState extends State<EditEducationBottomSheet> {
   bool isLoading = true;
   final GlobalKey _marksFieldKey = GlobalKey();
   final FocusNode _marksFocusNode = FocusNode();
-
+  int _currentPage = 1;
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
   List<String> collegeList = [];
   List<String> courseList = [];
   List<String> specializationList = [];

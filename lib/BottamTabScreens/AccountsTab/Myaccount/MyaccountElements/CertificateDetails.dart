@@ -31,10 +31,10 @@ class CertificatesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-         SectionHeader(
+        SectionHeader(
           title: "Certificate Details",
           showAdd: true,
-           onAdd: onAdd,
+          onAdd: onAdd,
         ),
         for (var i = 0; i < certificatesList.length; i++)
           Container(
@@ -69,7 +69,7 @@ class CertificatesSection extends StatelessWidget {
                         certificatesList[i].certificateName,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          fontSize: 12.sp,
+                          fontSize: 15.sp,
                           color: const Color(0xFF005E6A),
                         ),
                       ),
@@ -83,18 +83,54 @@ class CertificatesSection extends StatelessWidget {
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline, color: Colors.red),
-                      iconSize: 16.w,
+                      iconSize: 18.w,
+                      onPressed: () async {
+                        final shouldDelete = await showDialog<bool>(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Colors.white,
+                            title: const Text('Confirm Delete'),
+                            content: const Text(
+                                'Are you sure you want to delete this certificate?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                ),
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (shouldDelete == true) {
+                          onDelete(i);
+                        }
+                      },
+                      visualDensity: VisualDensity.compact,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
-                      onPressed: () => onDelete(i),
                     ),
                   ],
                 ),
-                SizedBox(height: 7.h),
+                SizedBox(height: 4.h),
                 Text(
                   'Organization : ${certificatesList[i].issuedOrgName}',
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                   ),
@@ -103,7 +139,7 @@ class CertificatesSection extends StatelessWidget {
                 Text(
                   'Issue Date : ${certificatesList[i].issueDate}',
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                   ),
@@ -112,7 +148,7 @@ class CertificatesSection extends StatelessWidget {
                 Text(
                   'Expiry Date : ${certificatesList[i].expiryDate}',
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                   ),
@@ -121,7 +157,7 @@ class CertificatesSection extends StatelessWidget {
                 Text(
                   'Details : ${certificatesList[i].description}',
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                   ),

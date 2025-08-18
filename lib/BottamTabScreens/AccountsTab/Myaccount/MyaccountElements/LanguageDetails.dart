@@ -22,7 +22,10 @@ class LanguagesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtil.init(context, designSize: const Size(390, 844), minTextAdapt: true, splitScreenMode: true);
+    ScreenUtil.init(context,
+        designSize: const Size(390, 844),
+        minTextAdapt: true,
+        splitScreenMode: true);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,7 +38,8 @@ class LanguagesSection extends StatelessWidget {
         if (isLoading)
           Center(
             child: CircularProgressIndicator(
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF005E6A)),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(Color(0xFF005E6A)),
               strokeWidth: 3.w,
             ),
           )
@@ -69,8 +73,8 @@ class LanguagesSection extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10.r),
                         ),
                         child: Icon(
-                          Icons.language,
-                          size: 18.w,
+                          Icons.language_rounded,
+                          size: 22.w,
                           color: const Color(0xFF005E6A),
                         ),
                       ),
@@ -80,7 +84,7 @@ class LanguagesSection extends StatelessWidget {
                           languageList[i].languageName,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: 12.sp,
+                            fontSize: 15.sp,
                             color: const Color(0xFF005E6A),
                           ),
                         ),
@@ -88,17 +92,43 @@ class LanguagesSection extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.delete_outline, color: Colors.red),
                         iconSize: 18.w,
-                        onPressed: () => onDelete(i),
+                        onPressed: () async {
+                          final shouldDelete = await showDialog<bool>(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => AlertDialog(
+                              backgroundColor: Colors.white,
+                              title: const Text('Confirm Delete'),
+                              content: const Text('Are you sure you want to delete this language?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                  child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.of(context).pop(true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                  ),
+                                  child: const Text('Delete', style: TextStyle(color: Colors.white)),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (shouldDelete == true) {
+                            onDelete(i);
+                          }
+                        },
                         visualDensity: VisualDensity.compact,
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                       ),
                     ],
                   ),
-                  SizedBox(height: 5.h),
+                  SizedBox(height: 4.h),
                   Text(
                     languageList[i].proficiency,
-                    style: TextStyle(fontSize: 11.sp, color: Colors.black54),
+                    style: TextStyle(fontSize: 13.sp, color: Colors.black54),
                   ),
                 ],
               ),
@@ -138,11 +168,12 @@ class _MyAccountState extends State<MyAccount> {
       setState(() {
         languageList = languages;
         isLoadingLanguages = false;
-        print('🔍 [MyAccount] Loaded languages: ${languageList.map((lang) => 'id: ${lang.id}, languageId: ${lang.languageId}, name: ${lang.languageName}').toList()}');
+        print(
+            '🔍  Loaded languages: ${languageList.map((lang) => 'id: ${lang.id}, languageId: ${lang.languageId}, name: ${lang.languageName}').toList()}');
       });
     } catch (e) {
       setState(() => isLoadingLanguages = false);
-      print('❌ [MyAccount] Failed to load languages: $e');
+      print('❌  Failed to load languages: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to load languages')),
       );
@@ -158,7 +189,6 @@ class _MyAccountState extends State<MyAccount> {
           languageList: languageList,
           isLoading: isLoadingLanguages,
           onAdd: () {
-            print('🔍 [MyAccount] Opening LanguageBottomSheet for adding language');
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
@@ -168,35 +198,34 @@ class _MyAccountState extends State<MyAccount> {
                 onSave: (LanguagesModel data) {
                   setState(() {
                     languageList.add(data);
-                    print('🔍 [MyAccount] Added language: id=${data.id}, languageId=${data.languageId}, name=${data.languageName}, proficiency=${data.proficiency}');
                   });
-                  _loadLanguages(); // Sync ID
+                  _loadLanguages();
                 },
               ),
             );
           },
           onDelete: (int index) async {
-            print('🔍 [MyAccount] Starting deletion for index: $index');
-            print('🔍 [MyAccount] languageList: ${languageList.map((lang) => 'id: ${lang.id}, languageId: ${lang.languageId}, name: ${lang.languageName}').toList()}');
-
-            if (index < 0 || index >= languageList.length) {
-              print('❌ [MyAccount] Invalid index: $index');
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Invalid language index')),
-              );
-              return;
-            }
+            // print('🔍 [MyAccount] Starting deletion for index: $index');
+            // print('🔍 [MyAccount] languageList: ${languageList.map((lang) => 'id: ${lang.id}, languageId: ${lang.languageId}, name: ${lang.languageName}').toList()}');
+            //
+            // if (index < 0 || index >= languageList.length) {
+            //   print('❌ [MyAccount] Invalid index: $index');
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //     const SnackBar(content: Text('Invalid language index')),
+            //   );
+            //   return;
+            // }
 
             final languageId = languageList[index].id;
-            print('🔍 [MyAccount] Deleting language ID: $languageId, name: ${languageList[index].languageName}');
+            // print('🔍 [MyAccount] Deleting language ID: $languageId, name: ${languageList[index].languageName}');
 
-            if (languageId == null || languageId == 0) {
-              print('❌ [MyAccount] Cannot delete language with invalid ID: $languageId');
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Cannot delete newly added language until synced')),
-              );
-              return;
-            }
+            // if (languageId == null || languageId == 0) {
+            //   print('❌ [MyAccount] Cannot delete language with invalid ID: $languageId');
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //     const SnackBar(content: Text('Cannot delete newly added language until synced')),
+            //   );
+            //   return;
+            // }
 
             final prefs = await SharedPreferences.getInstance();
             final authToken = prefs.getString('authToken') ?? '';
@@ -210,7 +239,7 @@ class _MyAccountState extends State<MyAccount> {
             if (success) {
               setState(() {
                 languageList.removeAt(index);
-                print('✅ [MyAccount] Removed language at index $index. New languageList: ${languageList.map((lang) => 'id: ${lang.id}, languageId: ${lang.languageId}, name: ${lang.languageName}').toList()}');
+                // print('✅ [MyAccount] Removed language at index $index. New languageList: ${languageList.map((lang) => 'id: ${lang.id}, languageId: ${lang.languageId}, name: ${lang.languageName}').toList()}');
               });
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Language deleted successfully')),
@@ -219,7 +248,8 @@ class _MyAccountState extends State<MyAccount> {
             } else {
               print('❌ [MyAccount] Failed to delete language ID: $languageId');
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Failed to delete language, try again')),
+                const SnackBar(
+                    content: Text('Failed to delete language, try again')),
               );
             }
           },

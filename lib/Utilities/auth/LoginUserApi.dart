@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../ApiConstants.dart';
+
 class loginUser {
   static const String _loginUrl =
-      'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/authenticate/login';
+      '${ApiConstants.baseUrl}authenticate/login';
   static const String _tokenKey = 'auth_token';
 
   Future<Map<String, dynamic>> login(String username, String password) async {

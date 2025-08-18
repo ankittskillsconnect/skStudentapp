@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Model/PersonalDetailPost_Model.dart';
+import '../ApiConstants.dart';
 
 class PersonalDetailPostApi {
   static Future<void> updatePersonalDetails({
@@ -47,7 +48,7 @@ class PersonalDetailPostApi {
 
 
       var response = await http.post(
-        Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/update-personal-details'),
+        Uri.parse('${ApiConstants.baseUrl}profile/student/update-personal-details'),
         headers: headers,
         body: body,
       );
@@ -83,7 +84,7 @@ class PersonalDetailPostApi {
     final connectSid = prefs.getString('connectSid') ?? '';
 
     final response = await http.post(
-      Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/state/list'),
+      Uri.parse('${ApiConstants.baseUrl}master/state/list'),
       headers: {
         'Content-Type': 'application/json',
         'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
@@ -107,7 +108,7 @@ class PersonalDetailPostApi {
     final connectSid = prefs.getString('connectSid') ?? '';
 
     final response = await http.post(
-      Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/city/list'),
+      Uri.parse('${ApiConstants.baseUrl}master/city/list'),
       headers: {
         'Content-Type': 'application/json',
         'Cookie': 'authToken=$authToken; connect.sid=$connectSid',

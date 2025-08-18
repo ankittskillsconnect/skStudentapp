@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Model/Applied_Jobs_Model.dart';
+import 'ApiConstants.dart';
 
 class AppliedJobsApi {
   static Future<List<AppliedJobModel>> fetchAppliedJobs() async {
@@ -12,7 +13,7 @@ class AppliedJobsApi {
     print("🔐 authToken: $authToken");
     print("🍪 connectSid: $connectSid");
 
-    const String url = 'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/jobs';
+    const String url = '${ApiConstants.baseUrl}jobs';
 
     try {
       final response = await http.post(

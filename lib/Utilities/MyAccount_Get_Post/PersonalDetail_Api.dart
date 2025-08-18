@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:sk_loginscreen1/Model/PersonalDetail_Model.dart';
 
+import '../ApiConstants.dart';
+
 class PersonalDetailApi {
   static Future<List<PersonalDetailModel>> fetchPersonalDetails({
   required String authToken,
@@ -9,7 +11,7 @@ class PersonalDetailApi {
 }) async {
     try{
       var url = Uri.parse(
-          'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/personal-details'
+          '${ApiConstants.baseUrl}profile/student/personal-details'
       );
       var headers = {
         'Content-Type': 'application/json',

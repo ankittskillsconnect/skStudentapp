@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:math';
 
+import 'ApiConstants.dart';
+
 class CityListApi {
   static Future<List<String>> fetchCities({
     required String cityName,
@@ -18,7 +20,7 @@ class CityListApi {
 
     try {
       while (hasMore) {
-        var url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/city/list');
+        var url = Uri.parse('${ApiConstants.baseUrl}master/city/list');
         var headers = {
           'Content-Type': 'application/json',
           'Cookie': 'authToken=$authToken; connect.sid=$connectSid',

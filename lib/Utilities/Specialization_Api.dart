@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import 'ApiConstants.dart';
+
 class SpecializationListApi {
   static Future<List<String>> fetchSpecializations({
     required String specializationName,
@@ -9,7 +11,7 @@ class SpecializationListApi {
     required String connectSid,
   }) async {
     try {
-      var url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/courses-specilization/list');
+      var url = Uri.parse('${ApiConstants.baseUrl}master/courses-specilization/list');
       var headers = {
         'Content-Type': 'application/json',
         'Cookie': 'authToken=$authToken; connect.sid=$connectSid',

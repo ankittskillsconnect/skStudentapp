@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../ApiConstants.dart';
+
 class PasswordServices {
   static const String _baseurl =
-      "https://api.skillsconnect.in/dcxqyqzqpdydfk/api/authenticate/change-password";
+      "${ApiConstants.baseUrl}authenticate/change-password";
 
   static Future<Map<String, dynamic>> resetPassword({
     required String email,

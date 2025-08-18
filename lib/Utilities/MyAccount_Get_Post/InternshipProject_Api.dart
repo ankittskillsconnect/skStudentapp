@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:sk_loginscreen1/Model/Internship_Projects_Model.dart';
 
+import '../ApiConstants.dart';
+
 class InternshipProjectApi {
   static Future<List<InternshipProjectModel>> fetchInternshipProjects({
     required String authToken,
@@ -9,7 +11,7 @@ class InternshipProjectApi {
   }) async {
     try {
       var url = Uri.parse(
-        'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/project-internship-details',
+        '${ApiConstants.baseUrl}profile/student/project-internship-details',
       );
 
       var headers = {
@@ -62,7 +64,7 @@ class InternshipProjectApi {
       final body = jsonEncode(model.toJson());
        // print("📤 Request Body: $body");
 
-      final url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/update-project-internship');
+      final url = Uri.parse('${ApiConstants.baseUrl}profile/student/update-project-internship');
       // print("🌐 POST URL: $url");
 
       final response = await http.post(url, headers: headers, body: body);
@@ -99,7 +101,7 @@ class InternshipProjectApi {
       'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
     };
     var url = Uri.parse(
-        'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/delete/$internshipId?action=project');
+        '${ApiConstants.baseUrl}profile/student/delete/$internshipId?action=project');
     try {
       final request = http.Request('DELETE', url)..headers.addAll(headers);
 

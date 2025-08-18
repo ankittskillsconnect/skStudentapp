@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/AccountScreen_Image_Name_Model.dart';
+import '../ApiConstants.dart';
 
 class AccountImageApi {
   static Future<AcountScreenImageModel?> fetchAccountScreenData() async {
@@ -11,7 +12,7 @@ class AccountImageApi {
       final connectSid = prefs.getString('connectSid') ?? '';
 
       final response = await http.get(
-        Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/personal-details'),
+        Uri.parse('${ApiConstants.baseUrl}profile/student/personal-details'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $authToken',

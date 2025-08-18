@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../ApiConstants.dart';
+
 Future<Map<String, dynamic>> VerifyOtp(String email, String Otp) async {
   final url = Uri.parse(
-    "https://api.skillsconnect.in/dcxqyqzqpdydfk/api/authenticate/verify-otp",
+    "${ApiConstants.baseUrl}authenticate/verify-otp",
   );
   final headers = {'Content-Type': 'application/json'};
   final body = jsonEncode({"email": email.trim(), "otp": int.tryParse(Otp)});

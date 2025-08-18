@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../Model/Skiils_Model.dart';
+import '../ApiConstants.dart';
 
 class SkillsApi {
   static Future<List<SkillsModel>> fetchSkills({
@@ -9,7 +10,7 @@ class SkillsApi {
   }) async {
     try {
       final uri = Uri.parse(
-        'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/skills-details',
+        '${ApiConstants.baseUrl}profile/student/skills-details',
       );
 
       final headers = {

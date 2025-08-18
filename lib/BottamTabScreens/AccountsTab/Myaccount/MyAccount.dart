@@ -919,8 +919,8 @@ class _MyAccountState extends State<MyAccount> {
           alignment: Alignment.center,
           children: [
             Container(
-              width: 140.w,
-              height: 140.h,
+              width: 145.w,
+              height: 145.h,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
@@ -931,8 +931,8 @@ class _MyAccountState extends State<MyAccount> {
               child: ClipOval(child: displayedImage),
             ),
             Positioned(
-              bottom: 7.h,
-              right: 7.w,
+              bottom: 8.h,
+              right: 8.w,
               child: GestureDetector(
                 onTap: _showImagePickerOption,
                 child: CircleAvatar(

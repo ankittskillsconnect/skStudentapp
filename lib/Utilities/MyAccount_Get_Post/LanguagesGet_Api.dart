@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../Model/Languages_Model.dart';
+import '../ApiConstants.dart';
 
 class LanguageDetailApi {
   static Future<List<LanguagesModel>> fetchLanguages({
@@ -9,7 +10,7 @@ class LanguageDetailApi {
   }) async {
     try {
       final url = Uri.parse(
-        'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/language-details',
+        '${ApiConstants.baseUrl}profile/student/language-details',
       );
       final headers = {
         'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
@@ -47,7 +48,7 @@ class LanguageDetailApi {
     required LanguagesModel language,
   }) async {
     final url = Uri.parse(
-      'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/update-languages',
+      '${ApiConstants.baseUrl}profile/student/update-languages',
     );
     final headers = {
       'Content-Type': 'application/json',
@@ -128,7 +129,7 @@ class LanguageDetailApi {
     }
 
     print('🔍 [deleteLanguage] Starting deletion for ID: $id');
-    final url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/delete/$id?action=language');
+    final url = Uri.parse('${ApiConstants.baseUrl}profile/student/delete/$id?action=language');
     final headers = {
       'Content-Type': 'application/json',
       'Cookie': 'authToken=$authToken; connect.sid=$connectSid',

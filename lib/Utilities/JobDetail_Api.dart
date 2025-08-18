@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'ApiConstants.dart';
+
 class JobDetailApi {
   static Future<Map<String, dynamic>> fetchJobDetail({
     required String token,
@@ -21,7 +23,7 @@ class JobDetailApi {
     final response = await http
           .post(
           Uri.parse(
-            'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/jobs/details',
+            '${ApiConstants.baseUrl}jobs/details',
           ),
           headers: headers,
           body: body,

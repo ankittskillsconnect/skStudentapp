@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:sk_loginscreen1/Model/Image_update_Model.dart';
 
+import '../ApiConstants.dart';
+
 class LoadImageApi {
   static Future<ImageUpdateModel?> fetchUserImage({
     required String authToken,
@@ -9,7 +11,7 @@ class LoadImageApi {
   }) async {
     try {
       final url = Uri.parse(
-        'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/personal-details',
+        '${ApiConstants.baseUrl}profile/student/personal-details',
       );
 
       final headers = {

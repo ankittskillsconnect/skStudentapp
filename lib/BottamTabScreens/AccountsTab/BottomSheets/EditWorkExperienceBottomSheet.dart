@@ -423,14 +423,13 @@ class _EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused> {
           final position = scrollable.position;
           final offset = object.localToGlobal(Offset.zero, ancestor: scrollable.context.findRenderObject());
           final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-          final targetOffset = offset.dy - keyboardHeight - 20; // Adjust for keyboard and padding
+          final targetOffset = offset.dy - keyboardHeight - 20;
           position.ensureVisible(
             object,
             alignment: 0.0,
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
           );
-          // Ensure the scroll position doesn’t exceed the content height
           final maxScrollExtent = position.maxScrollExtent;
           if (targetOffset > maxScrollExtent) {
             position.jumpTo(maxScrollExtent);

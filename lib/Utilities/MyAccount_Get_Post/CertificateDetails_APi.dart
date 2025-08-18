@@ -4,6 +4,8 @@ import 'package:sk_loginscreen1/Model/CertificateDetails_Model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 
+import '../ApiConstants.dart';
+
 class CertificateApi {
   static Future<List<CertificateModel>> fetchCertificateApi({
     required String authToken,
@@ -11,7 +13,8 @@ class CertificateApi {
   }) async {
     try {
       var url = Uri.parse(
-          'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/certification-details');
+          '${ApiConstants.baseUrl}profile/student/certification-details'
+      );
       var headers = {
         'Content-Type': 'application/json',
         'Cookie': 'authToken=$authToken; connect.sid=$connectSid',
@@ -50,7 +53,8 @@ class CertificateApi {
       final body = model.toJson(isNew: isNew);
 
       var url = Uri.parse(
-          'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/update-certification');
+          '${ApiConstants.baseUrl}profile/student/update-certification'
+      );
 
       var headers = {
         'Content-Type': 'application/json',
@@ -104,7 +108,7 @@ class CertificateApi {
           'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
     };
     var url = Uri.parse(
-        'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/delete/$certificationId?action=certificate');
+        '${ApiConstants.baseUrl}profile/student/delete/$certificationId?action=certificate');
     try {
       final request = http.Request('DELETE', url)..headers.addAll(headers);
 

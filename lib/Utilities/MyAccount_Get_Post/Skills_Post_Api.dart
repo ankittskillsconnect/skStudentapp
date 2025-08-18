@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../ApiConstants.dart';
+
 class SkillsPostApi {
   static Future<bool> updateSkills({
     required String authToken,
@@ -9,7 +11,7 @@ class SkillsPostApi {
   }) async {
     try {
       final uri = Uri.parse(
-        'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/update-skills',
+        '${ApiConstants.baseUrl}profile/student/update-skills',
       );
 
       final headers = {

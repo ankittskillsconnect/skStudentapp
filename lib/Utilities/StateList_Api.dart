@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:math';
 
+import 'ApiConstants.dart';
+
 class StateListApi {
   static Future<List<String>> fetchStates({
     required String countryId,
@@ -17,7 +19,7 @@ class StateListApi {
 
     try {
       while (hasMore) {
-        var url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/master/state/list');
+        var url = Uri.parse('${ApiConstants.baseUrl}master/state/list');
         var headers = {
           'Content-Type': 'application/json',
           'Cookie': 'authToken=$authToken; connect.sid=$connectSid',

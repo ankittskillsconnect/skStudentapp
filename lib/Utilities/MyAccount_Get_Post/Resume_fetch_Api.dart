@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/Resume_fetch_Model.dart';
+import '../ApiConstants.dart';
 
 class ResumeFetchApi {
   static Future<ResumeModel?> fetchResume() async {
@@ -20,7 +21,7 @@ class ResumeFetchApi {
         'Accept': 'application/json',
       };
 
-      final url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/resume');
+      final url = Uri.parse('${ApiConstants.baseUrl}profile/student/resume');
 
       final response = await http.get(url, headers: headers);
 
@@ -87,7 +88,7 @@ class ResumeFetchApi {
     final request = http.Request(
       'POST',
       Uri.parse(
-          'https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/update-resume'),
+          '${ApiConstants.baseUrl}profile/student/update-resume'),
     );
 
     request.headers.addAll(headers);

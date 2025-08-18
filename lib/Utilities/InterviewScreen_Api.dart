@@ -3,13 +3,15 @@ import 'package:http/http.dart' as http;
 import '../Model/InterviewScreen_Model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'ApiConstants.dart';
+
 class InterviewApi {
   static Future<List<InterviewModel>> fetchInterviews() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final authToken = prefs.getString('authToken') ?? '';
       final connectSid = prefs.getString('connectSid') ?? '';
-      var url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/interview-room/list');
+      var url = Uri.parse('${ApiConstants.baseUrl}/interview-room/list');
       var headers = {
         'Content-Type': 'application/json',
         'Cookie': 'authToken=$authToken; connect.sid=$connectSid',

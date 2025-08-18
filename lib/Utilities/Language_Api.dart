@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Model/LanguageMaster_Model.dart';
+import 'ApiConstants.dart';
 
 class LanguageListApi {
   static const String _cacheKey = 'cached_languages';
@@ -28,7 +29,6 @@ class LanguageListApi {
           return lang;
         }).toList();
 
-        // Validate cached data
         bool isValidCache = allLanguages.every((lang) => lang.languageId != 0);
         if (!isValidCache) {
           print("❌ Invalid cache: Found languages with ID 0. Clearing cache.");
@@ -44,7 +44,6 @@ class LanguageListApi {
       }
     }
 
-    // Fetch from language-details API
     final effectiveConnectSid = connectSid.isEmpty
         ? 's%3A90I8VK0ssLCW9DjFq4xSLrkDEI7xUgCG.JFNw9cZG8Txw07rqZ6gs7K8bGpm4pMApT7Yu9FqqjbY'
         : connectSid;
@@ -54,7 +53,7 @@ class LanguageListApi {
       'Cookie': 'authToken=$authToken; connect.sid=$effectiveConnectSid',
     };
 
-    final url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/profile/student/language-details');
+    final url = Uri.parse('${ApiConstants.baseUrl}profile/student/language-details');
 
     try {
       final request = http.Request('GET', url)..headers.addAll(headers);

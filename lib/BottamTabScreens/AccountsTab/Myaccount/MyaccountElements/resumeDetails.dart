@@ -227,7 +227,7 @@ class _ResumeSectionState extends State<ResumeSection> {
           children: [
             Text(
               "Resume",
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
             ),
             SizedBox(
               width: 100.w,
@@ -275,7 +275,7 @@ class _ResumeSectionState extends State<ResumeSection> {
                 },
                 child: Text(
                   _resumeUrl == null ? "Upload" : "Update",
-                  style: TextStyle(color: Colors.white, fontSize: 12.sp),
+                  style: TextStyle(color: Colors.white, fontSize: 14.sp),
                 ),
               ),
             ),

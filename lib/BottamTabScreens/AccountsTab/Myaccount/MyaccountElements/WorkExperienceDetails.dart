@@ -31,7 +31,7 @@ class WorkExperienceSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-         SectionHeader(
+        SectionHeader(
           title: "Work Experience",
           showAdd: true,
           onAdd: onAdd,
@@ -57,8 +57,8 @@ class WorkExperienceSection extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10.r),
                       ),
                       child: Icon(
-                        Icons.work_history_outlined,
-                        size: 18.w,
+                        Icons.home_work,
+                        size: 22.w,
                         color: const Color(0xFF005E6A),
                       ),
                     ),
@@ -67,7 +67,7 @@ class WorkExperienceSection extends StatelessWidget {
                       child: Text(
                         workExperiences[i].organization,
                         style: TextStyle(
-                          fontSize: 12.sp,
+                          fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
                           color: const Color(0xFF005E6A),
                         ),
@@ -84,19 +84,55 @@ class WorkExperienceSection extends StatelessWidget {
                     SizedBox(width: 3.w),
                     IconButton(
                       icon: const Icon(Icons.delete_outline, color: Colors.red),
-                      iconSize: 16.w,
-                      onPressed: () => onDelete(i),
+                      iconSize: 18.w,
+                      onPressed: () async {
+                        final shouldDelete = await showDialog<bool>(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Colors.white,
+                            title: const Text('Confirm Delete'),
+                            content: const Text(
+                                'Are you sure you want to delete this work experience?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                ),
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (shouldDelete == true) {
+                          onDelete(i);
+                        }
+                      },
                       visualDensity: VisualDensity.compact,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),
                   ],
                 ),
-                SizedBox(height: 7.h),
+                SizedBox(height: 4.h),
                 Text(
                   'Project Name : ${workExperiences[i].jobTitle}',
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                   ),
@@ -105,7 +141,7 @@ class WorkExperienceSection extends StatelessWidget {
                 Text(
                   'Duration : ${workExperiences[i].workFromDate} - ${workExperiences[i].workToDate}',
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                   ),
@@ -114,7 +150,7 @@ class WorkExperienceSection extends StatelessWidget {
                 Text(
                   'Skills : ${workExperiences[i].skills}',
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                   ),
@@ -123,7 +159,7 @@ class WorkExperienceSection extends StatelessWidget {
                 Text(
                   'Exp : ${workExperiences[i].totalExperienceYears} yrs ${workExperiences[i].totalExperienceMonths} months',
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                   ),
@@ -132,7 +168,7 @@ class WorkExperienceSection extends StatelessWidget {
                 Text(
                   'Salary : ${workExperiences[i].salaryInLakhs}.${workExperiences[i].salaryInThousands} LPA',
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                   ),
@@ -141,7 +177,7 @@ class WorkExperienceSection extends StatelessWidget {
                 Text(
                   'Details : ${workExperiences[i].jobDescription}',
                   style: TextStyle(
-                    fontSize: 11.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF003840),
                     height: 1.4,

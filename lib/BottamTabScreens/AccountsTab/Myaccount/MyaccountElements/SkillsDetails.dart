@@ -64,8 +64,8 @@ class SkillsSection extends StatelessWidget {
                   singleSkill,
                   style: TextStyle(fontSize: 12.sp),
                 ),
-                onDeleted: () => onDeleteSkill(skill, singleSkill),
-                deleteIconColor: const Color(0xFF005E6A),
+                // onDeleted: () => onDeleteSkill(skill, singleSkill),
+                // deleteIconColor: const Color(0xFF005E6A),
                 backgroundColor: const Color(0xFFEBF6F7),
                 labelStyle: const TextStyle(color: Color(0xFF003840)),
               )))

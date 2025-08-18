@@ -27,7 +27,7 @@ class DetailRow extends StatelessWidget {
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 12.sp),
+              style: TextStyle(fontSize: 13.sp),
             ),
           ),
         ],

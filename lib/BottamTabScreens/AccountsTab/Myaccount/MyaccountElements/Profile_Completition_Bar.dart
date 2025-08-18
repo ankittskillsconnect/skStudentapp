@@ -86,7 +86,7 @@ class _ProfileCompletionBarState extends State<ProfileCompletionBar> {
             Text(
               "Profile Completion Status",
               style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 13.sp,
                 color: const Color(0xFF005E6A),
                 fontWeight: FontWeight.w500,
               ),
@@ -94,7 +94,7 @@ class _ProfileCompletionBarState extends State<ProfileCompletionBar> {
             Text(
               "${clampedPercent.toInt()}%",
               style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 13.sp,
                 fontWeight: FontWeight.bold,
                 color: isLow ? Colors.red : const Color(0xFF027D92),
               ),

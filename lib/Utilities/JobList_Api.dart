@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'ApiConstants.dart';
+
 class JobApi {
   static Future<List<Map<String, dynamic>>> fetchJobs() async {
     final prefs = await SharedPreferences.getInstance();
@@ -12,7 +14,7 @@ class JobApi {
 
     final response = await http
         .post(
-      Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/jobs'),
+      Uri.parse('${ApiConstants.baseUrl}jobs'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': bearerToken,
