@@ -105,28 +105,31 @@ class CertificateApi {
     var headers = {
       'Content-Type': 'application/json',
       'Cookie':
-          'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
+      'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
     };
+
     var url = Uri.parse(
         '${ApiConstants.baseUrl}profile/student/delete/$certificationId?action=certificate');
+
     try {
+      print('🟡 Deleting certificate with ID: $certificationId');
+
       final request = http.Request('DELETE', url)..headers.addAll(headers);
-
       final response = await request.send();
-
       final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
-        print('✅ Deleted Certificate ID $certificationId successfully.');
+        print('✅ Certificate $certificationId deleted successfully');
         return true;
       } else {
         print(
-            '❌ Failed to delete Certificate ID $certificationId: ${response.statusCode} - $responseBody');
+            '❌ Delete failed [${response.statusCode}] → $responseBody');
         return false;
       }
     } catch (e) {
-      print('🚨 Exception during deleteCertificate: $e');
+      print('🚨 Exception while deleting certificate $certificationId → $e');
       return false;
     }
   }
+
 }

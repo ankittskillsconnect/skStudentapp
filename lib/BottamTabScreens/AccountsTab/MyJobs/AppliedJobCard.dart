@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppliedJobCardBT extends StatelessWidget {
   final String jobTitle;
@@ -24,23 +25,26 @@ class AppliedJobCardBT extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(context, designSize: const Size(390, 844), minTextAdapt: true, splitScreenMode: true);
+    print('🔍 [AppliedJobCardBT] Rendering card for job: $jobTitle, company: $company');
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-      padding: const EdgeInsets.all(8),
+      margin: EdgeInsets.symmetric(horizontal: 5.3.w, vertical: 8.8.h),
+      padding: EdgeInsets.all(7.w),
       decoration: BoxDecoration(
         color: const Color(0xFFEBF6F7),
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: const Color(0xFFBCD8DB), width: 2),
+        borderRadius: BorderRadius.circular(22.r),
+        border: Border.all(color: const Color(0xFFBCD8DB), width: 1.8.w),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(10.6.w),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10.6.r),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,80 +53,75 @@ class AppliedJobCardBT extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(3),
-                      margin: const EdgeInsets.only(bottom: 0),
+                      padding: EdgeInsets.all(2.6.w),
+                      margin: EdgeInsets.only(bottom: 0.h),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFF005E6A)),
+                        borderRadius: BorderRadius.circular(7.r),
+                        border: Border.all(color: const Color(0xFF005E6A), width: 0.9.w),
                       ),
                       child: logoUrl != null && logoUrl!.isNotEmpty
                           ? Image.network(
                         logoUrl!,
-                        width: 40,
-                        height: 40,
+                        width: 35.2.w,
+                        height: 35.2.h,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
+                          print('⚠️ [AppliedJobCardBT] Failed to load logo for $jobTitle: $error');
                           return Image.asset(
                             "assets/google.png",
-                            width: 40,
-                            height: 40,
+                            width: 35.2.w,
+                            height: 35.2.h,
                           );
                         },
                       )
                           : Image.asset(
                         "assets/google.png",
-                        width: 40,
-                        height: 40,
+                        width: 35.2.w,
+                        height: 35.2.h,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 10.6.w),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             jobTitle,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 19,
-                              color: Color(0xFF003840),
+                              fontSize: 16.7.sp,
+                              color: const Color(0xFF003840),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 2),
+                          SizedBox(height: 1.8.h),
                           Text(
                             company,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Color(0xFF827B7B),
-                            ),
+                            style: TextStyle(fontSize: 13.2.sp, color: const Color(0xFF827B7B)),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 2),
+                          SizedBox(height: 1.8.h),
                           Text(
                             location.isNotEmpty ? location : 'NA',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Color(0xFF827B7B),
-                            ),
+                            style: TextStyle(fontSize: 13.2.sp, color: const Color(0xFF827B7B)),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 7.w),
                     ConstrainedBox(
-                      constraints: const BoxConstraints(minWidth: 50, maxWidth: 100),
+                      constraints: BoxConstraints(minWidth: 44.w, maxWidth: 88.w),
                       child: Text(
                         '$salary LPA',
                         textAlign: TextAlign.end,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Color(0xFF005E6A),
+                        style: TextStyle(
+                          fontSize: 15.8.sp,
+                          color: const Color(0xFF005E6A),
                           fontWeight: FontWeight.w700,
                         ),
                         maxLines: 1,
@@ -131,41 +130,40 @@ class AppliedJobCardBT extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 10.6.h),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: tags.map((tag) {
-                      if (tags == null || tags.isEmpty || tags.every((tag) => tag.trim().isEmpty)) {
-                        return const Text(
+                      print('🔍 [AppliedJobCardBT] Processing tags: $tags');
+                      if (tags.isEmpty || tags.every((tag) => tag.trim().isEmpty)) {
+                        print('⚠️ [AppliedJobCardBT] No valid tags for $jobTitle');
+                        return Text(
                           "No Skills listed",
                           style: TextStyle(
-                            color: Color(0xFF003840),
-                            fontSize: 14,
+                            color: const Color(0xFF003840),
+                            fontSize: 12.3.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         );
                       }
                       return Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: 7.w,
+                        runSpacing: 7.h,
                         children: tags.where((tag) => tag.trim().isNotEmpty).map((tag) {
                           return Container(
-                            margin: const EdgeInsets.only(right: 10),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
+                            margin: EdgeInsets.only(right: 8.8.w),
+                            padding: EdgeInsets.symmetric(horizontal: 8.8.w, vertical: 5.3.h),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Color(0xFF827B7B)),
+                              borderRadius: BorderRadius.circular(17.6.r),
+                              border: Border.all(color: const Color(0xFF827B7B)),
                             ),
                             child: Text(
                               tag,
-                              style: const TextStyle(
-                                color: Color(0xFF003840),
-                                fontSize: 14,
+                              style: TextStyle(
+                                color: const Color(0xFF003840),
+                                fontSize: 12.3.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -178,46 +176,46 @@ class AppliedJobCardBT extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 8.8.h),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 7.w),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.access_time,
-                      size: 22,
-                      color: Color(0xFF003840),
+                      size: 19.4.w,
+                      color: const Color(0xFF003840),
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 3.5.w),
                     Text(
                       postTime,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF003840),
+                      style: TextStyle(
+                        fontSize: 14.1.sp,
+                        color: const Color(0xFF003840),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
                 // Container(
-                //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                //   padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.5.h),
                 //   decoration: BoxDecoration(
                 //     color: const Color(0xFFFEDDDC),
-                //     borderRadius: BorderRadius.circular(20),
+                //     borderRadius: BorderRadius.circular(17.6.r),
                 //     border: Border.all(color: const Color(0xFFBCD8DB)),
                 //   ),
                 //   child: Text(
                 //     expiry,
-                //     style: const TextStyle(
-                //       color: Color(0xFFD03C2D),
-                //       fontSize: 14,
+                //     style: TextStyle(
+                //       color: const Color(0xFFD03C2D),
+                //       fontSize: 12.3.sp,
                 //       fontWeight: FontWeight.w600,
                 //     ),
                 //   ),
-                // ), (expiry != null &&  expiry.isNotEmpty) ? uncomment : del ;
+                // ),
               ],
             ),
           ),

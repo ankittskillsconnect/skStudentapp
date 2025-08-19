@@ -14,7 +14,7 @@ class WatchListPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Wishlist",
+          "Watchlist",
           style: TextStyle(
             color: Color(0xFF003840),
             fontWeight: FontWeight.bold,

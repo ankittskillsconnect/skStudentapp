@@ -59,9 +59,9 @@ class CustomBottomNavBar extends StatelessWidget {
                 _buildNavItem(context, currentIndex, 2, Icons.airplay_outlined, 'Interview', () {
                   context.read<NavigationBloc>().add(GoToInterviewScreen2());
                 }, iconSize, textSize),
-                _buildNavItem(context, currentIndex, 3, Icons.contacts_outlined, 'Contacts', () {
-                  context.read<NavigationBloc>().add(GoToContactsScreen2());
-                }, iconSize, textSize),
+                // _buildNavItem(context, currentIndex, 3, Icons.contacts_outlined, 'Contacts', () {
+                //   context.read<NavigationBloc>().add(GoToContactsScreen2());
+                // }, iconSize, textSize),
                 _buildNavItem(context, currentIndex, 4, Icons.account_circle_outlined, 'Account', () {
                   context.read<NavigationBloc>().add(GoToAccountScreen2());
                 }, iconSize, textSize, isLast: true),

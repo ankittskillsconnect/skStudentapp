@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../Model/CertificateDetails_Model.dart';
 import 'CustomDropDowns/CustomDropDownCertificate.dart';
 
@@ -13,10 +14,12 @@ class EditCertificateBottomSheet extends StatefulWidget {
   });
 
   @override
-  State<EditCertificateBottomSheet> createState() => _EditCertificateBottomSheetState();
+  State<EditCertificateBottomSheet> createState() =>
+      _EditCertificateBottomSheetState();
 }
 
-class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet> {
+class _EditCertificateBottomSheetState
+    extends State<EditCertificateBottomSheet> {
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController _certificateNameController;
@@ -34,12 +37,16 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
   @override
   void initState() {
     super.initState();
+    print('🔍 [EditCertificateBottomSheet] Initializing');
     final data = widget.initialData;
-    _certificateNameController = TextEditingController(text: data?.certificateName ?? '');
-    _issuedOrgController = TextEditingController(text: data?.issuedOrgName ?? '');
+    _certificateNameController =
+        TextEditingController(text: data?.certificateName ?? '');
+    _issuedOrgController =
+        TextEditingController(text: data?.issuedOrgName ?? '');
     _credIdController = TextEditingController(text: data?.credId ?? '');
     _urlController = TextEditingController(text: data?.url ?? '');
-    _descriptionController = TextEditingController(text: data?.description ?? '');
+    _descriptionController =
+        TextEditingController(text: data?.description ?? '');
 
     if (data != null) {
       final issueParts = data.issueDate.split('-');
@@ -52,11 +59,14 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
         _expiryYear = expiryParts[0];
         _expiryMonth = CertificateModel.numberToMonth(expiryParts[1]);
       }
+      print(
+          '🔍 [EditCertificateBottomSheet] Loaded initial data: ${data.certificateName ?? 'N/A'}');
     }
   }
 
   @override
   void dispose() {
+    print('🔍 [EditCertificateBottomSheet] Disposing controllers');
     _certificateNameController.dispose();
     _issuedOrgController.dispose();
     _credIdController.dispose();
@@ -66,8 +76,12 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
   }
 
   void _handleSave() {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      print('⚠️ [EditCertificateBottomSheet] Form validation failed');
+      return;
+    }
 
+    print('🔍 [EditCertificateBottomSheet] Saving certificate');
     setState(() => isSaving = true);
 
     final certificate = CertificateModel(
@@ -76,16 +90,25 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
       issuedOrgName: _issuedOrgController.text.trim(),
       credId: _credIdController.text.trim(),
       issueDate: '$_issueYear-${CertificateModel.monthToNumber(_issueMonth)}',
-      expiryDate: '$_expiryYear-${CertificateModel.monthToNumber(_expiryMonth)}',
+      expiryDate:
+          '$_expiryYear-${CertificateModel.monthToNumber(_expiryMonth)}',
       description: _descriptionController.text.trim(),
       url: _urlController.text.trim(),
       userId: widget.initialData?.userId,
     );
     widget.onSave(certificate);
+    print(
+        '✅ [EditCertificateBottomSheet] Certificate saved: ${certificate.certificateName}');
   }
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(context,
+        designSize: const Size(390, 844),
+        minTextAdapt: true,
+        splitScreenMode: true);
+    print('🔍 [EditCertificateBottomSheet] Rendering');
+
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.9,
@@ -96,14 +119,14 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
           onTap: () => FocusScope.of(context).unfocus(),
           child: Container(
             padding: EdgeInsets.only(
-              left: 16.0,
-              right: 16.0,
-              top: 10,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 10, // Adaptive padding for keyboard
+              left: 14.4.w,
+              right: 14.4.w,
+              top: 9.h,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 9.h,
             ),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(18.1.r)),
             ),
             child: Form(
               key: _formKey,
@@ -113,16 +136,20 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Edit Certificate Details',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16.2.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.close, size: 17.7.w),
+                        onPressed: () {
+                          print(
+                              '🔍 [EditCertificateBottomSheet] Closing bottom sheet');
+                          Navigator.of(context).pop();
+                        },
                       ),
                     ],
                   ),
@@ -141,36 +168,49 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
                         _buildLabel('Description'),
                         _buildTextField(_descriptionController),
                         _buildLabel('Issued Date'),
-                        _buildDateRow(_issueMonth, _issueYear,
-                                (m) => setState(() => _issueMonth = m),
-                                (y) => setState(() => _issueYear = y)),
+                        _buildDateRow(_issueMonth, _issueYear, (m) {
+                          setState(() => _issueMonth = m);
+                          print(
+                              '🔍 [EditCertificateBottomSheet] Issue month changed to: $m');
+                        }, (y) {
+                          setState(() => _issueYear = y);
+                          print(
+                              '🔍 [EditCertificateBottomSheet] Issue year changed to: $y');
+                        }),
                         _buildLabel('Expiry Date'),
-                        _buildDateRow(_expiryMonth, _expiryYear,
-                                (m) => setState(() => _expiryMonth = m),
-                                (y) => setState(() => _expiryYear = y)),
-                        const SizedBox(height: 30),
+                        _buildDateRow(_expiryMonth, _expiryYear, (m) {
+                          setState(() => _expiryMonth = m);
+                          print(
+                              '🔍 [EditCertificateBottomSheet] Expiry month changed to: $m');
+                        }, (y) {
+                          setState(() => _expiryYear = y);
+                          print(
+                              '🔍 [EditCertificateBottomSheet] Expiry year changed to: $y');
+                        }),
+                        SizedBox(height: 27.1.h),
                         ElevatedButton(
                           onPressed: isSaving ? null : _handleSave,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF005E6A),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                              borderRadius: BorderRadius.circular(27.1.r),
                             ),
-                            minimumSize: const Size.fromHeight(50),
+                            minimumSize: Size.fromHeight(45.1.h),
                           ),
                           child: isSaving
-                              ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                              : const Text(
-                            'Save',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                              ? SizedBox(
+                                  height: 18.1.h,
+                                  width: 18.1.w,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 1.8.w,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(
+                                  'Save',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 13.7.sp),
+                                ),
                         ),
                       ],
                     ),
@@ -185,43 +225,68 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
   }
 
   Widget _buildLabel(String text) => Padding(
-    padding: const EdgeInsets.only(top: 12, bottom: 6),
-    child: Text(text, style: const TextStyle(fontWeight: FontWeight.w700)),
-  );
+        padding: EdgeInsets.only(top: 10.8.h, bottom: 5.4.h),
+        child: Text(text,
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.4.sp)),
+      );
 
-  Widget _buildTextField(TextEditingController controller, {bool required = true}) {
+  Widget _buildTextField(TextEditingController controller,
+      {bool required = true}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: 10.8.h),
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          border:
+              OutlineInputBorder(borderRadius: BorderRadius.circular(10.8.r)),
+          contentPadding:
+              EdgeInsets.symmetric(horizontal: 10.8.w, vertical: 7.2.h),
         ),
-        validator: (value) => (required && (value == null || value.trim().isEmpty)) ? 'Required' : null,
+        style: TextStyle(fontSize: 12.4.sp),
+        validator: (value) =>
+            (required && (value == null || value.trim().isEmpty))
+                ? 'Required'
+                : null,
       ),
     );
   }
 
-  Widget _buildDateRow(String month, String year, Function(String) onMonthChanged, Function(String) onYearChanged) {
+  Widget _buildDateRow(String month, String year,
+      Function(String) onMonthChanged, Function(String) onYearChanged) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: 10.8.h),
       child: Row(
         children: [
           Expanded(
             child: CustomFieldCertificateDropdown(
-              const ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+              const [
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec'
+              ],
               month,
-                  (val) => onMonthChanged(val ?? 'Jan'),
+              (val) => onMonthChanged(val ?? 'Jan'),
               label: 'Month',
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 10.8.w),
           Expanded(
             child: CustomFieldCertificateDropdown(
-              _yearItems().map((item) => item.value!).whereType<String>().toList(), // Filter out nulls
+              _yearItems()
+                  .map((item) => item.value!)
+                  .whereType<String>()
+                  .toList(),
               year,
-                  (val) => onYearChanged(val ?? '2025'),
+              (val) => onYearChanged(val ?? '2025'),
               label: 'Year',
             ),
           ),
@@ -229,12 +294,9 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
       ),
     );
   }
-  // List<DropdownMenuItem<String>> _monthItems() {
-  //   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  //   return months.map((m) => DropdownMenuItem(value: m, child: Text(m))).toList();
-  // }
+
   List<DropdownMenuItem<String>> _yearItems() {
-    final currentYear = DateTime.now().year; // 2025
+    final currentYear = DateTime.now().year;
     final selectedYears = {
       int.tryParse(_issueYear) ?? currentYear,
       int.tryParse(_expiryYear) ?? currentYear,
@@ -249,7 +311,9 @@ class _EditCertificateBottomSheetState extends State<EditCertificateBottomSheet>
 
     return allYears.map((year) {
       final yearStr = year.toString();
-      return DropdownMenuItem(value: yearStr, child: Text(yearStr));
+      return DropdownMenuItem(
+          value: yearStr,
+          child: Text(yearStr, style: TextStyle(fontSize: 12.4.sp)));
     }).toList();
   }
 }

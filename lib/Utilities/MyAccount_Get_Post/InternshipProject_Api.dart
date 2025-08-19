@@ -29,9 +29,7 @@ class InternshipProjectApi {
         final Map<String, dynamic> data = jsonDecode(jsonString);
 
         final List<dynamic> rawList = data['projectInternship'] ?? [];
-        return rawList
-            .map((e) => InternshipProjectModel.fromJson(e))
-            .toList();
+        return rawList.map((e) => InternshipProjectModel.fromJson(e)).toList();
       } else {
         throw Exception(' Failed to load internship/project details');
       }
@@ -47,29 +45,15 @@ class InternshipProjectApi {
     required String connectSid,
   }) async {
     try {
-      // print("📦 [saveInternshipProject] Starting API call...");
-      // print("📎 internshipId: ${model.internshipId}");
-      // print("📎 userId: ${model.userId}");
-      // print("📎 type: ${model.type}");
-      // print("📎 projectName: ${model.projectName}");
-      // print("📎 companyName: ${model.companyName}");
-      // print("📎 duration: ${model.duration} ${model.durationPeriod}");
-
       final headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $authToken',
         'Cookie': 'connect.sid=$connectSid',
       };
-
       final body = jsonEncode(model.toJson());
-       // print("📤 Request Body: $body");
-
-      final url = Uri.parse('${ApiConstants.baseUrl}profile/student/update-project-internship');
-      // print("🌐 POST URL: $url");
-
+      final url = Uri.parse(
+          '${ApiConstants.baseUrl}profile/student/update-project-internship');
       final response = await http.post(url, headers: headers, body: body);
-      // print("📥 Status Code: ${response.statusCode}");
-
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         print("✅ API Success: ${decoded['msg'] ?? 'No message'}");
@@ -98,17 +82,14 @@ class InternshipProjectApi {
     var headers = {
       'Content-Type': 'application/json',
       'Cookie':
-      'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
+          'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
     };
     var url = Uri.parse(
         '${ApiConstants.baseUrl}profile/student/delete/$internshipId?action=project');
     try {
       final request = http.Request('DELETE', url)..headers.addAll(headers);
-
       final response = await request.send();
-
       final responseBody = await response.stream.bytesToString();
-
       if (response.statusCode == 200) {
         print('✅ Deleted Internship ID $internshipId successfully.');
         return true;
@@ -122,6 +103,4 @@ class InternshipProjectApi {
       return false;
     }
   }
-
 }
-

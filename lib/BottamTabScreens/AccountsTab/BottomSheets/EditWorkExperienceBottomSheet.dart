@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../Model/WorkExperience_Model.dart';
 import 'CustomDropDowns/CustomDropdownEducation.dart';
 
@@ -41,6 +42,7 @@ class _EditWorkExperienceBottomSheetState
   @override
   void initState() {
     super.initState();
+    print('🔍 [EditWorkExperienceBottomSheet] Initializing');
 
     const validMonths = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -83,10 +85,13 @@ class _EditWorkExperienceBottomSheetState
     experienceInMonths = widget.initialData?.totalExperienceMonths ?? '0';
     salaryInLakhs = widget.initialData?.salaryInLakhs ?? '0';
     salaryInThousands = widget.initialData?.salaryInThousands ?? '0';
+
+    print('🔍 [EditWorkExperienceBottomSheet] Loaded initial data: ${widget.initialData?.jobTitle ?? 'N/A'}');
   }
 
   @override
   void dispose() {
+    print('🔍 [EditWorkExperienceBottomSheet] Disposing controllers');
     _jobTitleController.dispose();
     _organizationController.dispose();
     _skillsController.dispose();
@@ -95,7 +100,11 @@ class _EditWorkExperienceBottomSheetState
   }
 
   void _handleSave() {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      print('⚠️ [EditWorkExperienceBottomSheet] Form validation failed');
+      return;
+    }
+    print('🔍 [EditWorkExperienceBottomSheet] Saving work experience');
     setState(() => saving = true);
     final workExperience = WorkExperienceModel(
       workExperienceId: widget.initialData?.workExperienceId,
@@ -115,14 +124,13 @@ class _EditWorkExperienceBottomSheetState
       exEndYear: _toYear,
     );
     widget.onSave(workExperience);
+    print('✅ [EditWorkExperienceBottomSheet] Work experience saved: ${workExperience.jobTitle}');
   }
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double widthScale = size.width / 360;
-    final double sizeScale = widthScale.clamp(0.98, 1.02);
-    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    ScreenUtil.init(context, designSize: const Size(390, 844), minTextAdapt: true, splitScreenMode: true);
+    print('🔍 [EditWorkExperienceBottomSheet] Rendering');
 
     return DraggableScrollableSheet(
       expand: false,
@@ -132,12 +140,12 @@ class _EditWorkExperienceBottomSheetState
       builder: (context, scrollController) {
         return Container(
           padding: EdgeInsets.symmetric(
-            horizontal: 20 * sizeScale,
-            vertical: 10 * sizeScale,
+            horizontal: 18.1.w,
+            vertical: 9.h,
           ),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(18.1.r)),
           ),
           child: Form(
             key: _formKey,
@@ -146,17 +154,20 @@ class _EditWorkExperienceBottomSheetState
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Work Experience',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 16.2.sp,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF003840),
+                        color: const Color(0xFF003840),
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Color(0xFF005E6A)),
-                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.close, color: const Color(0xFF005E6A), size: 17.7.w),
+                      onPressed: () {
+                        print('🔍 [EditWorkExperienceBottomSheet] Closing bottom sheet');
+                        Navigator.pop(context);
+                      },
                     ),
                   ],
                 ),
@@ -165,8 +176,8 @@ class _EditWorkExperienceBottomSheetState
                     controller: scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.only(
-                      bottom: keyboardHeight + 20,
-                      top: 10,
+                      bottom: MediaQuery.of(context).viewInsets.bottom + 18.1.h,
+                      top: 9.h,
                     ),
                     children: [
                       _buildLabel("Job Title"),
@@ -179,15 +190,27 @@ class _EditWorkExperienceBottomSheetState
                       _buildDateRow(
                         _fromMonth,
                         _fromYear,
-                            (val) => setState(() => _fromMonth = val),
-                            (val) => setState(() => _fromYear = val),
+                            (val) {
+                          setState(() => _fromMonth = val);
+                          print('🔍 [EditWorkExperienceBottomSheet] From month changed to: $val');
+                        },
+                            (val) {
+                          setState(() => _fromYear = val);
+                          print('🔍 [EditWorkExperienceBottomSheet] From year changed to: $val');
+                        },
                       ),
                       _buildLabel("To Date"),
                       _buildDateRow(
                         _toMonth,
                         _toYear,
-                            (val) => setState(() => _toMonth = val),
-                            (val) => setState(() => _toYear = val),
+                            (val) {
+                          setState(() => _toMonth = val);
+                          print('🔍 [EditWorkExperienceBottomSheet] To month changed to: $val');
+                        },
+                            (val) {
+                          setState(() => _toYear = val);
+                          print('🔍 [EditWorkExperienceBottomSheet] To year changed to: $val');
+                        },
                       ),
                       _buildLabel("Experience"),
                       Row(
@@ -200,12 +223,15 @@ class _EditWorkExperienceBottomSheetState
                                 _dropdownField(
                                   value: experienceInYear,
                                   items: List.generate(31, (i) => "$i"),
-                                  onChanged: (val) => setState(() => experienceInYear = val!),
+                                  onChanged: (val) {
+                                    setState(() => experienceInYear = val!);
+                                    print('🔍 [EditWorkExperienceBottomSheet] Experience years changed to: $val');
+                                  },
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          SizedBox(width: 14.4.w),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,7 +240,10 @@ class _EditWorkExperienceBottomSheetState
                                 _dropdownField(
                                   value: experienceInMonths,
                                   items: List.generate(12, (i) => "${i + 1}"),
-                                  onChanged: (val) => setState(() => experienceInMonths = val!),
+                                  onChanged: (val) {
+                                    setState(() => experienceInMonths = val!);
+                                    print('🔍 [EditWorkExperienceBottomSheet] Experience months changed to: $val');
+                                  },
                                 ),
                               ],
                             ),
@@ -232,12 +261,15 @@ class _EditWorkExperienceBottomSheetState
                                 _dropdownField(
                                   value: salaryInLakhs,
                                   items: List.generate(31, (i) => "$i"),
-                                  onChanged: (val) => setState(() => salaryInLakhs = val!),
+                                  onChanged: (val) {
+                                    setState(() => salaryInLakhs = val!);
+                                    print('🔍 [EditWorkExperienceBottomSheet] Salary lakhs changed to: $val');
+                                  },
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          SizedBox(width: 14.4.w),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +278,10 @@ class _EditWorkExperienceBottomSheetState
                                 _dropdownField(
                                   value: salaryInThousands,
                                   items: ["0", "5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95"],
-                                  onChanged: (val) => setState(() => salaryInThousands = val!),
+                                  onChanged: (val) {
+                                    setState(() => salaryInThousands = val!);
+                                    print('🔍 [EditWorkExperienceBottomSheet] Salary thousands changed to: $val');
+                                  },
                                 ),
                               ],
                             ),
@@ -255,31 +290,31 @@ class _EditWorkExperienceBottomSheetState
                       ),
                       _buildLabel("Add Details"),
                       _buildTextField("Job details ", _jobDescriptionController),
-                      const SizedBox(height: 30),
+                      SizedBox(height: 27.1.h),
                       ElevatedButton(
                         onPressed: saving ? null : _handleSave,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF005E6A),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(27.1.r),
                           ),
-                          minimumSize: const Size.fromHeight(50),
+                          minimumSize: Size.fromHeight(45.1.h),
                         ),
                         child: saving
-                            ? const SizedBox(
-                          height: 20,
-                          width: 20,
+                            ? SizedBox(
+                          height: 18.1.h,
+                          width: 18.1.w,
                           child: CircularProgressIndicator(
-                            strokeWidth: 2,
+                            strokeWidth: 1.8.w,
                             color: Colors.white,
                           ),
                         )
-                            : const Text(
+                            : Text(
                           'Save',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.white, fontSize: 13.7.sp),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 9.h),
                     ],
                   ),
                 ),
@@ -293,13 +328,13 @@ class _EditWorkExperienceBottomSheetState
 
   Widget _buildLabel(String text) {
     return Padding(
-      padding: const EdgeInsets.only(top: 16, bottom: 6),
+      padding: EdgeInsets.only(top: 14.4.h, bottom: 5.4.h),
       child: Text(
         text,
-        style: const TextStyle(
-          fontSize: 16,
+        style: TextStyle(
+          fontSize: 14.4.sp,
           fontWeight: FontWeight.w700,
-          color: Color(0xff003840),
+          color: const Color(0xff003840),
         ),
       ),
     );
@@ -312,7 +347,7 @@ class _EditWorkExperienceBottomSheetState
   }) {
     final focusNode = FocusNode();
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: EdgeInsets.symmetric(vertical: 5.4.h),
       child: EnsureVisibleWhenFocused(
         focusNode: focusNode,
         child: SearchableDropdownField(
@@ -334,7 +369,7 @@ class _EditWorkExperienceBottomSheetState
       }) {
     final focusNode = FocusNode();
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: EdgeInsets.symmetric(vertical: 5.4.h),
       child: EnsureVisibleWhenFocused(
         focusNode: focusNode,
         child: TextField(
@@ -344,11 +379,13 @@ class _EditWorkExperienceBottomSheetState
           onTap: onTap,
           decoration: InputDecoration(
             hintText: hintText,
+            hintStyle: TextStyle(fontSize: 12.4.sp),
             suffixIcon: suffixIcon != null
-                ? IconButton(icon: Icon(suffixIcon), onPressed: onTap)
+                ? IconButton(icon: Icon(suffixIcon, size: 17.7.w), onPressed: onTap)
                 : null,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.8.r)),
           ),
+          style: TextStyle(fontSize: 12.4.sp),
         ),
       ),
     );
@@ -374,7 +411,7 @@ class _EditWorkExperienceBottomSheetState
             onChanged: (val) => onMonthChanged(val!),
           ),
         ),
-        const SizedBox(width: 16),
+        SizedBox(width: 14.4.w),
         Expanded(
           child: _dropdownField(
             value: year,
@@ -423,7 +460,7 @@ class _EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused> {
           final position = scrollable.position;
           final offset = object.localToGlobal(Offset.zero, ancestor: scrollable.context.findRenderObject());
           final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-          final targetOffset = offset.dy - keyboardHeight - 20;
+          final targetOffset = offset.dy - keyboardHeight - 18.1.h;
           position.ensureVisible(
             object,
             alignment: 0.0,

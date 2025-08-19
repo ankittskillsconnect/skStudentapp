@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/MyJobs/AppliedJobs.dart';
 import 'package:sk_loginscreen1/BottamTabScreens/AccountsTab/Myaccount/MyAccount.dart';
@@ -33,6 +34,7 @@ class _AccountScreenState extends State<AccountScreen> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      print('🔍 [AccountScreen] Bottom nav index changed to: $index');
     });
   }
 
@@ -61,7 +63,7 @@ class _AccountScreenState extends State<AccountScreen> {
     _snackBarShown = true;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(message, style: TextStyle(fontSize: 12.4.sp)),
         backgroundColor: Colors.red,
         duration: Duration(seconds: cooldownSeconds),
       ),
@@ -72,23 +74,22 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Future<void> _logout() async {
+    print('🔍 [AccountScreen] Initiating logout');
     final shouldLogout = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white,
-        title: const Text('Confirm Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        title: Text('Confirm Logout', style: TextStyle(fontSize: 18.1.sp)),
+        content: Text('Are you sure you want to logout?', style: TextStyle(fontSize: 14.4.sp)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            style: ButtonStyle(
-            ),
-            child: const Text('Cancel', style: TextStyle(color: Colors.black),),
+            child: Text('Cancel', style: TextStyle(color: Colors.black, fontSize: 14.4.sp)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Logout', style: TextStyle(color: Colors.black),),
+            child: Text('Logout', style: TextStyle(color: Colors.black, fontSize: 14.4.sp)),
           ),
         ],
       ),
@@ -96,7 +97,8 @@ class _AccountScreenState extends State<AccountScreen> {
 
     if (shouldLogout == true) {
       if (!await _hasInternetConnection()) {
-        _showSnackBarOnce(context, "No internet ");
+        print('❌ [AccountScreen] No internet connection');
+        _showSnackBarOnce(context, "No internet connection");
         return;
       }
       setState(() => _isLoggingOut = true);
@@ -104,30 +106,40 @@ class _AccountScreenState extends State<AccountScreen> {
       await loginService.clearToken();
       await Future.delayed(const Duration(milliseconds: 500));
       if (context.mounted) {
+        print('✅ [AccountScreen] Logout successful, navigating to login page');
         context.read<NavigationBloc>().add(GobackToLoginPage());
       }
       setState(() => _isLoggingOut = false);
+    } else {
+      print('🔍 [AccountScreen] Logout cancelled');
     }
   }
 
   @override
   void initState() {
     super.initState();
+    print('🔍 [AccountScreen] Initializing');
     _loadProfileData();
   }
 
   Future<void> _loadProfileData() async {
+    print('🔍 [AccountScreen] Loading profile data');
     final data = await AccountImageApi.fetchAccountScreenData();
     if (mounted) {
       setState(() {
         _profileData = data;
+        print('✅ [AccountScreen] Profile data loaded: ${_profileData?.firstName ?? 'N/A'}');
       });
+    } else {
+      print('⚠️ [AccountScreen] Widget not mounted, skipping profile data update');
     }
   }
 
   Future<void> _onRefresh() async {
+    print('🔍 [AccountScreen] Refreshing profile data');
     context.read<ProfileBloc>().add(LoadProfileData());
     await Future.delayed(const Duration(seconds: 1));
+    print('✅ [AccountScreen] Refresh completed');
   }
 
   String _calculateAge(String? dob) {
@@ -136,8 +148,7 @@ class _AccountScreenState extends State<AccountScreen> {
       final date = DateFormat('yyyy-MM-dd').parse(dob);
       final today = DateTime.now();
       int age = today.year - date.year;
-      if (today.month < date.month ||
-          (today.month == date.month && today.day < date.day)) {
+      if (today.month < date.month || (today.month == date.month && today.day < date.day)) {
         age--;
       }
       if (age < 0 || age > 120) return 'N/A';
@@ -149,87 +160,83 @@ class _AccountScreenState extends State<AccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final media = MediaQuery.of(context).size;
-    final double iconSize = media.width * 0.065;
-    final double profileSize = media.width * 0.37;
-    final double spacing = media.height * 0.015;
+    ScreenUtil.init(context, designSize: const Size(390, 844), minTextAdapt: true, splitScreenMode: true);
+
     return BlocListener<NavigationBloc, NavigationState>(
       listener: (_, __) {},
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: media.width * 0.06),
+            padding: EdgeInsets.symmetric(horizontal: 21.1.w),
             child: Column(
               children: [
-                SizedBox(height: spacing),
+                SizedBox(height: 11.4.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "Account",
                       style: TextStyle(
-                        fontSize: media.width * 0.07,
+                        fontSize: 24.6.sp,
                         fontWeight: FontWeight.w700,
                         color: const Color(0xFF003840),
                       ),
                     ),
                     _iconCircle(
                       icon: Icons.notifications_none,
-                      iconSize: iconSize,
+                      iconSize: 22.9.w,
                     ),
                   ],
                 ),
-                SizedBox(height: media.height * 0.03),
+                SizedBox(height: 25.3.h),
                 _profileData == null
-                    ? ProfileHeaderShimmer(profileSize: profileSize)
+                    ? ProfileHeaderShimmer(profileSize: 130.2.w)
                     : Column(
-                        children: [
-                          Container(
-                            width: profileSize,
-                            height: profileSize,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: const Color(0xFF005E6A),
-                                width: 2,
-                              ),
-                            ),
-                            child: ClipOval(
-                              child: _profileData!.userImage != null
-                                  ? Image.network(
-                                      _profileData!.userImage!,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : const Image(
-                                      image: AssetImage(
-                                        'assets/placeholder.jpg',
-                                      ),
-                                      fit: BoxFit.cover,
-                                    ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            '${_profileData!.firstName ?? ''} ${_profileData!.lastName ?? ''}',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF005E6A),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          if (_profileData!.age != null)
-                            Text(
-                              _calculateAge(_profileData!.age!),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Color(0xFF6A8E92),
-                              ),
-                            ),
-                        ],
+                  children: [
+                    Container(
+                      width: 130.2.w,
+                      height: 130.2.h,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFF005E6A),
+                          width: 1.8.w,
+                        ),
                       ),
-                SizedBox(height: spacing * 1.0),
+                      child: ClipOval(
+                        child: _profileData!.userImage != null
+                            ? Image.network(
+                          _profileData!.userImage!,
+                          fit: BoxFit.cover,
+                        )
+                            : const Image(
+                          image: AssetImage('assets/placeholder.jpg'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 11.4.h),
+                    Text(
+                      '${_profileData!.firstName ?? ''} ${_profileData!.lastName ?? ''}',
+                      style: TextStyle(
+                        fontSize: 18.1.sp,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF005E6A),
+                      ),
+                    ),
+                    SizedBox(height: 1.9.h),
+                    if (_profileData!.age != null)
+                      Text(
+                        _calculateAge(_profileData!.age!),
+                        style: TextStyle(
+                          fontSize: 14.4.sp,
+                          color: const Color(0xFF6A8E92),
+                        ),
+                      ),
+                  ],
+                ),
+                SizedBox(height: 11.4.h),
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: _onRefresh,
@@ -247,16 +254,18 @@ class _AccountScreenState extends State<AccountScreen> {
                             setState(() => selectedOptionIndex = index);
                             Future.delayed(
                               const Duration(milliseconds: 100),
-                              () {
+                                  () {
                                 if (!mounted) return;
                                 setState(() => selectedOptionIndex = -1);
                               },
                             );
+                            print('🔍 [AccountScreen] Tapped option: ${option['label']}');
                             switch (option['label']) {
                               case 'Logout':
                                 _logout();
                                 break;
                               case 'My Account':
+                                print('🔍 [AccountScreen] Navigating to MyAccount');
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -264,13 +273,13 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ),
                                 ).then((_) {
                                   if (mounted) {
-                                    context.read<ProfileBloc>().add(
-                                      LoadProfileData(),
-                                    );
+                                    print('🔍 [AccountScreen] Returned from MyAccount, reloading profile');
+                                    context.read<ProfileBloc>().add(LoadProfileData());
                                   }
                                 });
                                 break;
                               case 'My Intro videos':
+                                print('🔍 [AccountScreen] Navigating to MyInterviewVideos');
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -279,6 +288,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                 );
                                 break;
                               case 'Watchlist':
+                                print('🔍 [AccountScreen] Navigating to WatchListPage');
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -287,6 +297,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                 );
                                 break;
                               case 'My Jobs':
+                                print('🔍 [AccountScreen] Navigating to AppliedJobsPage');
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -295,6 +306,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                 );
                                 break;
                               default:
+                                print('⚠️ [AccountScreen] Unhandled option: ${option['label']}');
                                 break;
                             }
                           },
@@ -317,11 +329,11 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Widget _iconCircle({required IconData icon, required double iconSize}) {
     return Container(
-      width: iconSize * 1.4,
-      height: iconSize * 1.4,
+      width: 32.w,
+      height: 32.h,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.grey, width: 1),
+        border: Border.all(color: Colors.grey, width: 0.9.w),
       ),
       child: Icon(icon, size: iconSize, color: const Color(0xFF003840)),
     );
@@ -343,22 +355,21 @@ class _AccountOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(7.2.r),
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: size.height * 0.02),
+        padding: EdgeInsets.symmetric(vertical: 15.2.h),
         child: Row(
           children: [
-            Icon(icon, size: size.width * 0.06),
-            SizedBox(width: size.width * 0.04),
+            Icon(icon, size: 21.1.w),
+            SizedBox(width: 14.1.w),
             Text(
               label,
               style: TextStyle(
-                fontSize: size.width * 0.045,
+                fontSize: 15.9.sp,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -376,6 +387,7 @@ class ProfileHeaderShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('🔍 [AccountScreen] Rendering ProfileHeaderShimmer');
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade300,
       highlightColor: Colors.grey.shade100,
@@ -389,26 +401,22 @@ class ProfileHeaderShimmer extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-
-          const SizedBox(height: 12),
-
+          SizedBox(height: 11.4.h),
           Container(
-            width: 160,
-            height: 24,
+            width: 144.4.w,
+            height: 21.7.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(5.4.r),
             ),
           ),
-
-          const SizedBox(height: 2),
-
+          SizedBox(height: 1.9.h),
           Container(
-            width: 100,
-            height: 18,
+            width: 90.3.w,
+            height: 16.2.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(5.4.r),
             ),
           ),
         ],

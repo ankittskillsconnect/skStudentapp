@@ -33,7 +33,8 @@ class VideoIntroApi {
           debugPrint("⚠️ No 'videoIntro' data found.");
         }
       } else {
-        debugPrint("❌ Failed to fetch: ${response.statusCode} ${response.reasonPhrase}");
+        debugPrint(
+            "❌ Failed to fetch: ${response.statusCode} ${response.reasonPhrase}");
       }
     } catch (e) {
       debugPrint('❌ Exception during fetch: $e');
@@ -41,5 +42,3 @@ class VideoIntroApi {
     return null;
   }
 }
-
-

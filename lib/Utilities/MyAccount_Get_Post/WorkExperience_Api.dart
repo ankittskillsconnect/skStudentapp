@@ -31,7 +31,7 @@ class WorkExperienceApi {
         return workExperienceList
             .map((e) => WorkExperienceModel.fromJson(e))
             .toList();
-      }else {
+      } else {
         throw Exception('Failed to load education details');
       }
     } catch (e) {
@@ -50,7 +50,6 @@ class WorkExperienceApi {
       final savedAuthToken = prefs.getString('authToken') ?? '';
       final savedConnectSid = prefs.getString('connectSid') ?? '';
 
-      print("📦 [saveWorkExperience] Starting API call...");
 
       final headers = {
         'Content-Type': 'application/json',
@@ -67,21 +66,15 @@ class WorkExperienceApi {
 
       final response = await http.post(url, headers: headers, body: body);
 
-      print("📥 [saveWorkExperience] Status Code: ${response.statusCode}");
-      print("📥 [saveWorkExperience] Response Body: ${response.body}");
-      print("📤 Final POST body: ${body}");
-
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
-        print("✅ [saveWorkExperience] Work Experience Saved: ${decoded['msg']}");
+        print(
+            "✅ [saveWorkExperience] Work Experience Saved: ${decoded['msg']}");
         return true;
       } else {
         print("❌ [saveWorkExperience] Failed to save. Details:");
-        print("Headers: $headers");
-        print("Body Sent: $body");
-        print("Response Code: ${response.statusCode}");
-        print("Response Body: ${response.body}");
+
         return false;
       }
     } catch (e) {
@@ -90,36 +83,43 @@ class WorkExperienceApi {
     }
   }
 
-  static Future<bool> deleteWorkExperience ({
+  static Future<bool> deleteWorkExperience({
     required int? workExperienceId,
     required String authToken,
     required String connectSid,
-  })async {
+  }) async {
     var headers = {
       'Content-Type': 'application/json',
-      'Cookie': 'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
+      'Cookie':
+      'authToken=$authToken${connectSid.isNotEmpty ? '; connect.sid=$connectSid' : ''}',
     };
+
     var url = Uri.parse(
-        '${ApiConstants.baseUrl}profile/student/delete/$workExperienceId?action=work_exp'    );
+        '${ApiConstants.baseUrl}profile/student/delete/$workExperienceId?action=work_exp');
+
     try {
-      final request = http.Request('DELETE', url)
-        ..headers.addAll(headers);
+      print('🟡 Attempting to delete Work Experience ID: $workExperienceId');
+      print('🌐 Request URL: $url');
 
+      final request = http.Request('DELETE', url)..headers.addAll(headers);
       final response = await request.send();
-
       final responseBody = await response.stream.bytesToString();
 
+      print('📩 Response status: ${response.statusCode}');
+      print('📩 Response body: $responseBody');
+
       if (response.statusCode == 200) {
-        print('✅ Deleted workExperience ID $workExperienceId successfully.');
+        print('✅ Work Experience $workExperienceId deleted successfully');
         return true;
       } else {
-        print('❌ Failed to delete workExperience Id  $workExperienceId: ${response.statusCode} - $responseBody');
-      return false;
-    }
-  } catch (e) {
-  print('🚨 Exception during deleteworkExperience: $e');
+        print(
+            '❌ Failed to delete Work Experience $workExperienceId → [${response.statusCode}]');
+        return false;
+      }
+    } catch (e) {
+      print('🚨 Exception while deleting Work Experience $workExperienceId → $e');
       return false;
     }
   }
-}
 
+}
