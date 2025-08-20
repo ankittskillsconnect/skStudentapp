@@ -293,7 +293,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
     final company = job?['company'] ?? 'Company';
     final isLocationLong = location.length > 40 || location.contains('\n');
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
       child: Column(
         children: [
           IntrinsicHeight(
@@ -301,7 +301,7 @@ class _JobDetailPage2State extends State<JobDetailPage2> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: EdgeInsets.all(2.w),
+                  padding: EdgeInsets.all(4.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(6.r),

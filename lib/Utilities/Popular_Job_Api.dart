@@ -12,9 +12,10 @@ import '../../Model/Popular_Job_Model.dart';
 import '../../Pages/bottombar.dart';
 import '../../Utilities/Popular_Job_Api.dart';
 import '../../Model/featured_Job_Model.dart';
-import 'KnowHowBanner.dart';
-import 'PopularJobCard.dart';
-import 'FeaturedJobCard.dart';
+import '../BottamTabScreens/Home/FeaturedJobCard.dart';
+import '../BottamTabScreens/Home/KnowHowBanner.dart';
+import '../BottamTabScreens/Home/PopularJobCard.dart';
+import 'ApiConstants.dart';
 import 'package:http/http.dart' as http;
 
 class HomeScreen2 extends StatefulWidget {
@@ -50,10 +51,12 @@ class _HomeScreen2State extends State<HomeScreen2> {
   Future<void> _fetchHomeData() async {
     print('🔍 [HomeScreen2] Fetching home data');
     try {
-      var url = Uri.parse('https://api.skillsconnect.in/dcxqyqzqpdydfk/api/jobs/home');
+      final prefs = await SharedPreferences.getInstance();
+      final authToken = prefs.getString('authToken') ?? '';
+      var url = Uri.parse('${ApiConstants.baseUrl}jobs/home');
       var headers = {
         'Content-Type': 'application/json',
-        'Cookie': 'authToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTA1NDc2LCJlbWFpbCI6ImJoYXZlc2guc2tpbGxzY29ubmVjdCtzdHVkZW50ZHVtbXkxMjNAZ21haWwuY29tIiwidXNlcl90eXBlIjo0LCJzb3VyY2UiOiJteXNxbCIsImNvbGxlZ2VfaWQiOjk5OTk5LCJjb2xsZWdlX25hbWUiOiJPdGhlciIsIm1vdSI6bnVsbCwibW91X3NpZ25lZCI6bnVsbCwiaWF0IjoxNzU1NjcyMjYwLCJleHAiOjE3NTU4NDUwNjB9.Ks-nav76eHI8ME9Nso2ufCQ59TBH3m9_QRA0Tv8Jlm8'
+        'Cookie': 'authToken=$authToken',
       };
 
       var request = http.Request('POST', url);
@@ -105,7 +108,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
           });
         }
       } else {
-        print('⚠️ [HomeScreen2] Failed to fetch home data: ${response.statusCode} - ${response.reasonPhrase}');
+        print('⚠️ [HomeScreen2] Failed to fetch home data: ${response.statusCode}');
         if (!mounted) return;
         setState(() {
           _isLoadingBanners = false;
@@ -197,7 +200,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
               ),
               SizedBox(height: 13.6.h),
               _isLoadingBanners
-                  ? const Center(child: KnowHowBannerShimmer())
+                  ? const Center(child: CircularProgressIndicator())
                   : _banners.isEmpty
                   ? Center(child: Text("No banners available", style: TextStyle(fontSize: 12.4.sp)))
                   : KnowHowBanner(banners: _banners),
